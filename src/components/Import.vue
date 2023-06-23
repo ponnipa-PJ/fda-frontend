@@ -1,0 +1,250 @@
+<template>
+  <div class="container" style="height: 600px">
+      <div class="form-group mt-5">
+    <label for="exampleFormControlTextarea1">URL</label>
+    <textarea v-model="url" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+  </div>
+  <button @click="search()" type="submit" class="mb-3 btn btn-success">
+      ค้นหา
+    </button>
+      <!-- <div class="form-group mt-5"> -->
+        <!-- <label for="exampleFormControlFile1">นำเข้าไฟล์&nbsp;</label>
+        <input type="file" @change="onChangeA1" class="form-control-file" id="exampleFormControlFile1" />
+      </div> -->
+      <table class="table" v-if="list.length > 0">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">ข้อมูล</th>
+            <th scope="col">FDA</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(l, i) in list" :key="i">
+            <td :style="l.bg">{{ i + 1 }}</td>
+            <td :style="l.bg">{{ l.detail }}</td>
+            <td :style="l.bg">{{ l.fda }}</td>
+            <td :style="l.bg" v-if="l.status == 1">
+              <p class="card-text">สถานะ : {{ l.list.cncnm  }}</p>
+              <p class="card-text">ประเภทผลิตภัณฑ์ : {{ l.list.typepro }}</p>
+              <p class="card-text">ใบสำคัญ/เลขที่อนุญาต : {{ l.list.lcnno }}</p>
+              <p class="card-text">ชื่อผลิตภัณฑ์ (TH) : {{ l.list.productha }}</p>
+              <p class="card-text">ชื่อผลิตภัณฑ์ (EN) : {{ l.list.produceng }}</p>
+              <p class="card-text">ชื่อผู้รับอนุญาต : {{ l.list.licen }}</p>
+              <p class="card-text">สถานที่ผลิต : {{ l.list.Addr }}</p>
+              <p class="card-text">Newcode : {{ l.list.Newcode }}</p>
+            </td>
+            <td :style="l.bg" v-else> ไม่พบข้อมูล</td>
+            <td :style="l.bg">
+              <i class="fa fa-circle" :style="l.icon" aria-hidden="true"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  </div>
+</template>
+
+<script>
+import readXlsxFile from "read-excel-file";
+// import moment from 'moment'
+// import axios from "axios";
+import MenuService from '../services/MenuService.js'
+export default {
+  name: "App",
+  components: {},
+  data() {
+    return {
+      type: 0,
+      list: [],
+      url:''
+    };
+  },
+  methods: {
+    search(){
+      this.list = []
+      MenuService.getproduct(this.url).then().then((res)=>{
+        console.log(res.data);
+
+        var fdalist = []
+        var detail = res.data
+        // var detail = 'ข้อมูลจำเพาะของสินค้าหมวดหมู่Shopeeกลุ่มผลิตภัณฑ์เพื่อสุขภาพอาหารเสริมเพื่อความงามผิวยี่ห้อGlobal White(โกลบอลไวท์)หน้าที่ของอาหารเสริมสำหรับความงามคอลลาเจน, ผม ผิว และเล็บหมายเลขใบอนุญาต/อย.70-1-27160-5-0268จำนวนสินค้า258ส่งจากจังหวัดปทุมธานีรายละเอียดสินค้าหมายเลขใบอนุญาต/อย.🌼70-1-27160-5-0268อายุการเก็บรักษา 24 เดือน'
+            var fda = this.findfda(detail)
+
+            fdalist.push({
+              detail: detail,
+              fda: fda
+            })
+            for (let f = 0; f < fdalist.length; f++) {
+
+const url = "https://tawaiforhealth.org/api/oryor/check-product";
+const data = { "number_src": fdalist[f].fda };
+
+const options = {
+  method: "POST",
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json;charset=UTF-8",
+  },
+  body: JSON.stringify(data),
+};
+
+fetch(url, options)
+  .then((response) => response.json())
+  .then((data) => {
+    // console.log(data);
+    if (data.message) {
+      fdalist[f].status = 0
+      fdalist[f].list = []
+      fdalist[f].bg = 'background-color:#f9bdbb'
+    } else {
+      fdalist[f].list = data
+      fdalist[f].status = 1
+      fdalist[f].bg = 'background-color:#a3e9a4'
+      // console.log(data.STATUS_ID.includes(7))
+      if (data.cncnm == "คงอยู่") {
+      fdalist[f].icon = 'color: green'
+        
+      }else{
+      fdalist[f].icon = 'color: red'
+      fdalist[f].bg = 'background-color:#f9bdbb'
+      }
+    }
+    
+    // console.log(f+1, fdalist.length);
+    if (f+1 == fdalist.length) {
+ console.log(fdalist); 
+ this.list = fdalist
+ 
+}
+  });
+
+  
+}
+      })
+    },
+    onChangeA1(event) {
+      this.list = []
+      this.file = event.target.files ? event.target.files[0] : null;
+      // var c = '☕️[พร้อมส่ง] Cal s Coffee by Primaya กาแฟแคลเอส โกโก้แคลเอส ชาไทยแคลเอส 1 กล่อง 10 ซองน้ำหนักรักษาสัดส่วนหมายเลขอย./ใบอนุญาต1310176020080ลักษณะผงจำนวนสินค้า392ส่งจากเขตดอนเมือง, จังหวัดกรุงเทพมหานคร'
+      // console.log(this.findfda(c))
+      var fdalist = []
+      if (this.file) {
+        readXlsxFile(event.target.files[0]).then((excel) => {
+          // console.log(excel);
+          for (let i = 1; i < excel.length; i++) {
+            // console.log(data[i][0]);
+            var detail = excel[i][0]
+            var fda = this.findfda(detail)
+
+            fdalist.push({
+              detail: detail,
+              fda: fda
+            })
+            if (i + 1 == excel.length) {
+              // console.log(fdalist);
+              for (let f = 0; f < fdalist.length; f++) {
+
+                const url = "https://tawaiforhealth.org/api/oryor/check-product";
+                const data = { "number_src": fdalist[f].fda };
+
+                const options = {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json;charset=UTF-8",
+                  },
+                  body: JSON.stringify(data),
+                };
+
+                fetch(url, options)
+                  .then((response) => response.json())
+                  .then((data) => {
+                    // console.log(data);
+                    if (data.message) {
+                      fdalist[f].status = 0
+                      fdalist[f].list = []
+                      fdalist[f].bg = 'background-color:#f9bdbb'
+                    } else {
+                      fdalist[f].list = data
+                      fdalist[f].status = 1
+                      fdalist[f].bg = 'background-color:#a3e9a4'
+                      // console.log(data.STATUS_ID.includes(7))
+                      if (data.cncnm == "คงอยู่") {
+                      fdalist[f].icon = 'color: green'
+                        
+                      }else{
+                      fdalist[f].icon = 'color: red'
+                      fdalist[f].bg = 'background-color:#f9bdbb'
+                      }
+                    }
+                    
+                    // console.log(f+1, fdalist.length);
+                    if (f+1 == fdalist.length) {
+                 console.log(fdalist); 
+                 this.list = fdalist
+                 
+                }
+                  });
+
+                  
+              }
+            }
+          }
+        });
+      }
+      this.file = ''
+    },
+    findfda(data) {
+      var text = ['ใบอนุญาติ', 'ใบอนุญาต']
+      var findfda = data
+      for (let t = 0; t < text.length; t++) {
+        findfda = findfda.substring(findfda.indexOf(text[t]));
+
+      }
+      // console.log(findfda);
+      findfda = findfda.replaceAll("-", "");
+      var regex = /\d+/g;
+      var matches = findfda.match(regex);  // creates array from matches
+      // console.log(matches[0]);
+      return matches[0]
+    },
+    loaddata(fda) {
+      const url = "https://tawaiforhealth.org/api/oryor/check-product";
+      const data = { "number_src": fda };
+
+      const options = {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+        body: JSON.stringify(data),
+      };
+
+      fetch(url, options)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          return data
+        });
+    },
+    async checkfda(fda) {
+      window.open(
+        "/detail/" + fda,
+        "_blank" // <- This is what makes it open in a new window.
+      );
+    }
+  },
+  mounted() {
+  },
+};
+</script>
+
+<style>
+html,
+body {
+  height: 100%;
+  margin: 0px;
+}</style>
