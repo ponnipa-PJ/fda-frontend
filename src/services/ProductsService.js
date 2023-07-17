@@ -7,6 +7,12 @@ class ProductsService {
   scraping(data) {
     return http.post('/products/findscraping',data);
   }
+  scrapingheader(data) {
+    return http.post('/products/findscrapingheader',data);
+  }
+  saveimageproduct(data) {
+    return http.post('/products/saveimageproduct',data);
+  }
   getproduct(id) {
     return http.get('/products/'+id);
   }

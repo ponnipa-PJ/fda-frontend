@@ -16,6 +16,7 @@
       <thead>
         <tr>
           <th scope="col">#</th>
+          <th scope="col">สินค้า</th>
           <th scope="col">ข้อมูล</th>
           <!-- <th scope="col">รูปภาพ</th> -->
           <th scope="col">FDA</th>
@@ -27,6 +28,7 @@
       <tbody>
         <tr v-for="(l, i) in list" :key="i">
           <td :style="l.bg">{{ i + 1 }}</td>
+          <td :style="l.bg"><img :src="imagelists" style="width:100%">{{ l.name }}</td>
           <td :style="l.bg">{{ l.detail }}</td>
 
           <!-- <td :style="l.bg">
@@ -37,7 +39,7 @@
         </div>
             </td> -->
           <td :style="l.bg">{{ l.fda }}</td>
-          <td :style="l.bg">{{ cut(tokenize) }}</td>
+          <td :style="l.bg"><div v-html="cut(tokenize)"></div></td>
           <td :style="l.bg" v-if="l.status == 1">
             <p class="card-text">สถานะ : {{ l.list.cncnm }}</p>
             <p class="card-text">ประเภทผลิตภัณฑ์ : {{ l.list.typepro }}</p>
@@ -78,44 +80,41 @@ export default {
       file: '',
       status: false,
       urlPath: '',
-      imagelists: [],
+      imagelists: '',
       tokenize: ''
     };
   },
   methods: {
     cut(word) {
       var wo = word.toString()
-      // console.log(wo);
-      wo = wo.replaceAll('"', '')
-      wo = wo.replaceAll(',', ' | ')
+      // wo = wo.replaceAll(' ', ' | ')
       return wo
     },
     async gettokenize(words) {
-      var token = "10512F2049B72659DB9C46A7DCF60ED1"
-      var url = `https://nlp.insightera.co.th/api/nlp/v2/tokenize?token=${token}`
-      const resp = await axios.post(url, {
-        engine: 'uppercut',
-        text: words
-      })
-      // console.log(resp.data.results.tokens);
-      this.tokenize = resp.data.results.tokens
-
+      axios.get('http://127.0.0.1:5000/worktoken?text=' + words).then((res) => {
+        this.tokenize = res.data
+      });
     },
-    getimagefile(folder) {
-      this.imagelists = []
-      axios.get('http://localhost:8081/getimage?path=' + folder).then((res) => {
-        // console.log(res.data);
-        for (let im = 0; im < res.data.length; im++) {
-          axios.get('http://localhost:8081/img?name=' + res.data[im]).then((res) => {
-            // console.log(res.data.base64);
-            this.imagelists.push(res.data.base64)
+    getimagefile(id) {
+      this.imagelists = ''
+      axios.get('http://127.0.0.1:5000/base64?id=' + id).then((res) => {
+        console.log(res.data);
+        this.imagelists = 'data:image/jpeg;base64,'+res.data
+      });
+      
+      // axios.get('http://localhost:8081/getimage?path=' + folder).then((res) => {
+      //   // console.log(res.data);
+      //   for (let im = 0; im < res.data.length; im++) {
+      //     axios.get('http://localhost:8081/img?name=' + res.data[im]).then((res) => {
+      //       // console.log(res.data.base64);
+      //       this.imagelists.push(res.data.base64)
 
-          });
+      //     });
 
-        }
+      //   }
         // console.log(this.imagelists);
         return this.imagelists
-      })
+      // })
     },
     downloadHtml() {
       let url = this.urlInput;
@@ -209,7 +208,7 @@ export default {
           // console.log(res.data[0].content);
           this.gettokenize(res.data[0].content)
           // console.log(this.tokenize);
-          this.getimagefile(res.data[0].image_path)
+          this.getimagefile(res.data[0].id)
           var detail = res.data[0].content
           // var detail = 'ข้อมูลจำเพาะของสินค้าหมวดหมู่Shopeeกลุ่มผลิตภัณฑ์เพื่อสุขภาพอาหารเสริมเพื่อความงามผิวยี่ห้อGlobal White(โกลบอลไวท์)หน้าที่ของอาหารเสริมสำหรับความงามคอลลาเจน, ผม ผิว และเล็บหมายเลขใบอนุญาต/อย.70-1-27160-5-0268จำนวนสินค้า258ส่งจากจังหวัดปทุมธานีรายละเอียดสินค้าหมายเลขใบอนุญาต/อย.🌼70-1-27160-5-0268อายุการเก็บรักษา 24 เดือน'
           var fda = this.findfda(detail)
@@ -217,8 +216,8 @@ export default {
           // console.log(res.data[0].image_path);
 
           fdalist.push({
+            name: res.data[0].name,
             detail: detail,
-            tokenizer: res.data[0].tokenizer,
             fda: fda,
           })
           for (let f = 0; f < fdalist.length; f++) {
