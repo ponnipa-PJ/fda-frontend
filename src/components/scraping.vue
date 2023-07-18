@@ -1,18 +1,39 @@
 <template>
-  <div class=" mt-5">
-      <table class="table" v-if="list.length > 0">
+  <div class="mt-5">
+    <div style="text-align:right"> <button @click="getid(0)"
+          data-bs-toggle="modal"
+          data-bs-target="#AddProduct"
+           type="submit" class="mb-3 btn btn-success">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    </button></div>
+      <table class="table" v-if="list.length > 0" width="100%">
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col">url</th>
+            <th scope="col">หมวด</th>
+            <th scope="col">ชื่อไฟล์</th>
+            <th scope="col" style="width: 50px">url</th>
+            <th scope="col"></th>
             <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(l, i) in list" :key="i">
             <td :style="l.bg">{{ i + 1 }}</td>
-            <td :style="l.bg" style="width:10%">{{ l.url }}</td>
-           
+            <td :style="l.bg">{{ l.cat_name }}</td>
+            <td :style="l.bg">{{ l.file }}</td>
+            <td :style="l.bg" style="width: 50px"><span style="width: 50px">{{ l.url }}</span></td>
+            <td>
+            <a @click="getid(l.id)">
+              <button
+                type="button"
+                class="btn btn-warning"
+                data-bs-toggle="modal"
+                data-bs-target="#AddProduct"
+              >
+                <i class="fa fa-edit"></i></button
+            ></a>
+          </td>
             <td :style="l.bg">
               <button @click="scrape(l)" type="submit" class="mb-3 btn btn-success">
       scraping
@@ -24,6 +45,67 @@
       <div v-if="list.length == 0" class="mt-5">
 <h3 style="text-align:center">ไม่พบข้อมูล</h3>
       </div>
+  <!-- Modal -->
+  <div
+      class="modal fade"
+      id="AddProduct"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{ title }}</h5>
+            
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="card-body mt-3">
+
+<div class="form-group mt-3">
+                  <label for="password">หมวด</label>
+                  <select class="form-control" v-model="data.cat_id">
+  <option v-for="(i,r) in category" :key="r" :value="i.id">{{i.name}}</option>
+</select>
+                </div>
+                <div class="form-group mt-3">
+                  <label>Name File</label>
+                  <input
+                    v-model="data.file"
+                    type="text"
+                    min="1"
+                    class="form-control form-control-sm"
+                  />
+                </div>
+                <div class="form-group mt-3">
+                  <label>URL</label>
+                  <textarea
+                  rows="15"
+                    v-model="data.url"
+                    type="text"
+                    class="form-control form-control-sm"
+                  ></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer mt-3">
+            <button type="button" class="btn btn-success" @click="save()">
+              บันทึก
+            </button>
+            <button
+            id="closedproduct"
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              ปิด
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -32,6 +114,7 @@
 // import axios from "axios";
 import ProductsService from '../services/ProductsService.js'
 import axios from "axios";
+import CategoryService from '../services/CategoryService'
 
 export default {
   name: "App",
@@ -43,10 +126,75 @@ export default {
       url:'',
       file:'',
       status:false,
-      urlPath:''
+      urlPath:'',
+      title:'',
+      data:{},
+      pro_id:0,
+      category:[]
     };
   },
   methods: {
+    save() {
+      console.log(this.data);
+      if (this.data.cat_id == null || this.data.cat_id == "") {
+        alert("กรุณาเลือกหมวด");
+      } else if (this.data.file == null || this.data.file == "") {
+        alert("กรุณากรอกชื่อไฟล์");
+      }else if (this.data.url == null ||  this.data.url == "") {
+        alert("กรุณากรอก url");
+      } else {
+        var prodata = {
+          cat_id: this.data.cat_id,
+          file: this.data.file,
+          path:'uploads/'+this.data.file+'.html',
+          image_path:'uploads/'+this.data.file+'_files',
+          status:0,
+          url: this.data.url,
+        };
+        console.log(prodata);
+        if (this.pro_id == 0) {
+          ProductsService.createproduct(prodata).then(() => {
+            document.getElementById("closedproduct").click();
+            this.getproduct();
+            alert('บันทึกสำเร็จ')
+            //       setTimeout(function () {
+            //   location.reload();
+            // }, 500);
+            // window.scrollTo(0, 0);
+          });
+        } else {
+          ProductsService.updateproduct(this.pro_id, prodata).then(() => {
+            // console.log(res.data);
+            document.getElementById("closedproduct").click();
+            this.getproduct();
+            alert('บันทึกสำเร็จ')
+            //       setTimeout(function () {
+            //   location.reload();
+            // }, 500);
+            // window.scrollTo(0, 0);
+          });
+        }
+      }
+    },
+    getcategory(){
+      CategoryService.getcategorys(1).then((res)=>{
+        this.category = res.data
+      })
+    },
+    getid(id) {
+      this.pro_id = id;
+      if (this.pro_id != 0) {
+        this.title = "แก้ไขข้อมูลสินค้า";
+        // console.log(this.user_id);
+        ProductsService.getproduct(this.pro_id).then((res) => {
+          // console.log(res.data);
+          this.data = res.data;
+        });
+      } else {
+        this.title = "เพิ่มข้อมูลสินค้า";
+        this.data = [];
+      }
+    },
    getproduct(){
     ProductsService.getproducts('').then((res)=>{
       this.list = res.data
@@ -97,6 +245,7 @@ export default {
   },
   mounted() {
     this.getproduct()
+    this.getcategory()
     // var url = 'file:///Users/ponnipa/Documents/GitHub/shophtml/%F0%9F%8D%92%20(%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%81%E0%B8%97%E0%B9%89100%25)%20Jelly%20Fiber%20%E0%B9%80%E0%B8%88%E0%B8%A5%E0%B8%A5%E0%B8%B5%E0%B9%88%E0%B9%84%E0%B8%9F%E0%B9%80%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%20%E0%B8%A5%E0%B8%94%E0%B8%9E%E0%B8%B8%E0%B8%87%20%E0%B8%A5%E0%B8%94%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81%201%E0%B8%81%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%87_5%20%E0%B8%8B%E0%B8%AD%E0%B8%87%20_%20Shopee%20Thailand.html'
     // ProductsService.scraping(url).then((res)=>{
     //   console.log(res.data);
