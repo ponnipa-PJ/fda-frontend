@@ -1,5 +1,10 @@
 <template>
+  <div>
+    <div class="topnav">
+  <a v-for="m in menu" :key="m.id" :class="m.class" :href="m.path">{{m.name}}</a>
+</div>
 <router-view />
+  </div>
 </template>
 
 <script>
@@ -10,6 +15,7 @@ export default {
   data() {
     return {
       show: true,
+      menu:[]
     };
   },
   computed: {},
@@ -17,33 +23,65 @@ export default {
     
   },
   mounted() {
-    // console.log(this.$route.name);
+    // console.log(this.$route.path);
     if (this.$route.params.name == "map" || this.$route.name == "login" || this.$route.name == "register") {
       this.show = false;
+    }
+    this.menu.push({
+      name:'ค้นหาสินค้า',
+      path:'/',
+      class:''
+    },
+    {
+      name:'รายการสินค้า',
+      path:'/scraping',
+      class:''
+    },
+    {
+      name:'หมวด',
+      path:'/category',
+      class:''
+    },
+    {
+      name:'scopus',
+      path:'/scopus',
+      class:''
+    })
+    for (let m = 0; m < this.menu.length; m++) {
+      if (this.menu[m].path == this.$route.path) {
+        this.menu[m].class = 'active'
+      }
     }
   },
 };
 </script>
 
 <style>
-.navbar {
-  background-color: #09cc68;
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
 }
-.header {
-  padding: 5px;
-  background-color: #09cc68;
-  color: white;
-}
-.text {
-  font-size: 15px;
-  /* min-height: 1em; */
-  margin: 5px;
-  vertical-align: middle;
-}
-footer {
-  /* display: grid; */
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #f2f2f2;
   text-align: center;
-  padding: 30px;
-  background: #3e4041;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #808000;
+  color: white;
 }
 </style>

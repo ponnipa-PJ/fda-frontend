@@ -2,6 +2,8 @@ import Vue from "vue";
 import Router from "vue-router";
 import Import from './components/Import.vue';
 import scraping from './components/scraping.vue';
+import category from './components/category.vue';
+import scopus from './components/scopus.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -18,6 +20,18 @@ const router = new Router({
       alias: "/scraping",
       name: "scraping",
       component: scraping
+    },
+    {
+      path: "/category",
+      alias: "/category",
+      name: "category",
+      component: category
+    },
+    {
+      path: "/scopus",
+      alias: "/scopus",
+      name: "scopus",
+      component: scopus
     },
     
   ]

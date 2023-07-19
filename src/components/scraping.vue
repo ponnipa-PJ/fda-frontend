@@ -1,30 +1,43 @@
 <template>
-  <div class="mt-5">
-    <div style="text-align:right"> <button @click="getid(0)"
+  <div class="container mt-5">
+    <div class="col-md-4">
+      <label>สถานะ</label>
+      <select class="form-select" v-model="status" @change="getproduct">
+  <option value="1">ดึงข้อมูลแล้ว</option>
+  <option value="0">ยังไม่ได้ดึงข้อมูล</option>
+</select>
+    </div>
+   
+    <div style="text-align:right" v-if="status == 0"> <button @click="getid(0)"
           data-bs-toggle="modal"
           data-bs-target="#AddProduct"
            type="submit" class="mb-3 btn btn-success">
       <i class="fa fa-plus" aria-hidden="true"></i>
     </button></div>
-      <table class="table" v-if="list.length > 0" width="100%">
+      <table class="table mt-3" v-if="list.length > 0">
         <thead>
           <tr>
             <th scope="col">#</th>
             <th scope="col">หมวด</th>
+            <th scope="col" v-if="status ==1">ชื่อสินค้า</th>
+            <th scope="col" v-if="status ==1">ข้อมูลสินค้า</th>
             <th scope="col">ชื่อไฟล์</th>
             <th scope="col" style="width: 50px">url</th>
             <th scope="col"></th>
-            <th scope="col"></th>
+            <th scope="col" v-if="status == 0"></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(l, i) in list" :key="i">
             <td :style="l.bg">{{ i + 1 }}</td>
             <td :style="l.bg">{{ l.cat_name }}</td>
+            <!-- <img :src="imagelists[i].path" style="width:100%">{ -->
+            <td :style="l.bg" v-if="status ==1"><img :src="imagelists[i]" style="width:100%">{{ l.name }}</td>
+            <td :style="l.bg" v-if="status ==1">{{ l.content }}</td>
             <td :style="l.bg">{{ l.file }}</td>
-            <td :style="l.bg" style="width: 50px"><span style="width: 50px">{{ l.url }}</span></td>
+            <td :style="l.bg" style="width: 442px;word-break:break-word;">{{ l.url }}</td>
             <td>
-            <a @click="getid(l.id)">
+            <a @click="getid(l.id)" v-if="status == 0">
               <button
                 type="button"
                 class="btn btn-warning"
@@ -32,11 +45,20 @@
                 data-bs-target="#AddProduct"
               >
                 <i class="fa fa-edit"></i></button
+            ></a>&nbsp;
+            <a @click="getid(l.id)">
+              <button
+                type="button"
+                class="btn btn-danger" 
+                data-bs-toggle="modal"
+                data-bs-target="#DeleteProduct"
+              >
+                <i class="fa fa-trash"></i></button
             ></a>
           </td>
-            <td :style="l.bg">
+            <td :style="l.bg" v-if="status == 0">
               <button @click="scrape(l)" type="submit" class="mb-3 btn btn-success">
-      scraping
+                ดึงข้อมูล
     </button>
             </td>
           </tr>
@@ -106,6 +128,37 @@
         </div>
       </div>
     </div>
+    <!-- Modal -->
+  <div
+      class="modal fade"
+      id="DeleteProduct"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">ยืนยันการลบหมวด</h5>
+            
+          </div>
+         
+          <div class="modal-footer mt-3">
+            <button type="button" class="btn btn-success" @click="deleteproduct()">
+              ยืนยัน
+            </button>
+            <button
+            id="closedDeleteProduct"
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              ยกเลิก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -125,15 +178,36 @@ export default {
       list: [],
       url:'',
       file:'',
-      status:false,
       urlPath:'',
       title:'',
       data:{},
       pro_id:0,
-      category:[]
+      category:[],
+      status:1,
+      imagelists:[]
     };
   },
   methods: {
+    async getimagefile(id) {
+     await axios.get('http://127.0.0.1:5000/base64?id=' + id).then((res) => {
+        // console.log(res.data);
+        // console.log('data:image/jpeg;base64,'+res.data);
+        // this.imagelists.push({id:id,
+        // path:'data:image/jpeg;base64,'+res.data})
+        this.imagelists.push('data:image/jpeg;base64,'+res.data)
+        return 'data:image/jpeg;base64,'+res.data
+      });
+        
+      // })
+    },
+    deleteproduct(){
+      ProductsService.deleteproduct(this.pro_id).then(()=>{
+        // console.log(res.data);
+        document.getElementById("closedDeleteProduct").click();
+        this.getproduct();
+        alert('บันทึกสำเร็จ')
+      })
+    },
     save() {
       console.log(this.data);
       if (this.data.cat_id == null || this.data.cat_id == "") {
@@ -148,8 +222,9 @@ export default {
           file: this.data.file,
           path:'uploads/'+this.data.file+'.html',
           image_path:'uploads/'+this.data.file+'_files',
-          status:0,
+          status:1,
           url: this.data.url,
+          statusdelete:1
         };
         console.log(prodata);
         if (this.pro_id == 0) {
@@ -196,29 +271,46 @@ export default {
       }
     },
    getproduct(){
-    ProductsService.getproducts('').then((res)=>{
-      this.list = res.data
-      console.log(res.data);
+    ProductsService.getproducts(this.status).then(async (res)=>{
+      this.imagelists = []
+      for (let l = 0; l < res.data.length; l++) {
+        this.getimagefile(res.data[l].id)
+        
+      }
+     this.list = res.data
+  //    this.imagelists = this.imagelists.sort((a, b) => {
+  // if (a.id < b.id) {
+  //   return -1;
+  // }
+// });
+// console.log(this.imagelists);
+      // var list = res.data
+      // for (let l = 0; l < list.length; l++) {
+      //   list[l].imagelists = await this.getimagefile(list[l].id)
+      // }
+      // this.list = list
+      // console.log(list);
     })
    },
    scrape(data){
+    // console.log(data);
     axios.get('http://127.0.0.1:5000/scraping?id=' + data.id+'&&path='+data.path).then(() => {
         // this.tokenize = res.data
       });
     // http://127.0.0.1:5000/scraping?id=1&&path=%27uploads/1.html%27
     // var url = 'file:///Users/ponnipa/Documents/GitHub/shophtml/%F0%9F%8D%92%20(%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%81%E0%B8%97%E0%B9%89100%25)%20Jelly%20Fiber%20%E0%B9%80%E0%B8%88%E0%B8%A5%E0%B8%A5%E0%B8%B5%E0%B9%88%E0%B9%84%E0%B8%9F%E0%B9%80%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%20%E0%B8%A5%E0%B8%94%E0%B8%9E%E0%B8%B8%E0%B8%87%20%E0%B8%A5%E0%B8%94%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81%201%E0%B8%81%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%87_5%20%E0%B8%8B%E0%B8%AD%E0%B8%87%20_%20Shopee%20Thailand.html'
-    var path = {
+    var paths = {
       id:data.id,
       path:data.path
     }
     // console.log(path);
     // ProductsService.saveimageproduct(path).then(()=>{
-    ProductsService.scraping(path).then((res)=>{
+    ProductsService.scraping(paths).then((res)=>{
       var con = res.data
       // con = con.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
       con = con.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
       // console.log(con);
-      ProductsService.scrapingheader(path).then((res)=>{
+      ProductsService.scrapingheader(paths).then((res)=>{
         var name = res.data
         name = name.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
 
@@ -231,7 +323,7 @@ export default {
           status:1
         }
         // console.log(pro);
-        ProductsService.updateproduct(data.id,pro).then(()=>{
+        ProductsService.updatescraping(data.id,pro).then(()=>{
           // console.log(res.data);
           alert('บันทึกเรียบร้อย')
           this.getproduct()
@@ -246,6 +338,19 @@ export default {
   mounted() {
     this.getproduct()
     this.getcategory()
+    this.getimagefile(1)
+    var data = [
+  { id: 2, name: "FIAT", active: true, parentId: "1" },
+  { id: 11, name: "BMW", active: true, parentId: "1" },
+  { id: 3, name: "RENAULT", active: false, parentId: "1" },
+  { id: 0, name: "AUDI", active: true, parentId: "1" },
+];
+data = data.sort((a, b) => {
+  if (a.id < b.id) {
+    return -1;
+  }
+});
+console.log(data);
     // var url = 'file:///Users/ponnipa/Documents/GitHub/shophtml/%F0%9F%8D%92%20(%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%81%E0%B8%97%E0%B9%89100%25)%20Jelly%20Fiber%20%E0%B9%80%E0%B8%88%E0%B8%A5%E0%B8%A5%E0%B8%B5%E0%B9%88%E0%B9%84%E0%B8%9F%E0%B9%80%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%20%E0%B8%A5%E0%B8%94%E0%B8%9E%E0%B8%B8%E0%B8%87%20%E0%B8%A5%E0%B8%94%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81%201%E0%B8%81%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%87_5%20%E0%B8%8B%E0%B8%AD%E0%B8%87%20_%20Shopee%20Thailand.html'
     // ProductsService.scraping(url).then((res)=>{
     //   console.log(res.data);

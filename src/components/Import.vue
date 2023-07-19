@@ -98,7 +98,7 @@ export default {
     getimagefile(id) {
       this.imagelists = ''
       axios.get('http://127.0.0.1:5000/base64?id=' + id).then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         this.imagelists = 'data:image/jpeg;base64,'+res.data
       });
       
