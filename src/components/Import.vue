@@ -18,7 +18,7 @@
           <th scope="col">#</th>
           <th scope="col">สินค้า</th>
           <th scope="col">ข้อมูล</th>
-          <!-- <th scope="col">รูปภาพ</th> -->
+          <th scope="col">หมวด</th>
           <th scope="col">FDA</th>
           <th scope="col">ตัดคำ</th>
           <th scope="col"></th>
@@ -30,7 +30,7 @@
           <td :style="l.bg">{{ i + 1 }}</td>
           <td :style="l.bg"><img :src="imagelists" style="width:100%">{{ l.name }}</td>
           <td :style="l.bg">{{ l.detail }}</td>
-
+          <td :style="l.bg">{{ l.cat_name }}</td>
           <!-- <td :style="l.bg">
               <div class="row">
           <div class="col-md-2" v-for="(im ,i) in imagelists" :key="i">
@@ -38,7 +38,10 @@
           </div>
         </div>
             </td> -->
-          <td :style="l.bg">{{ l.fda }}</td>
+          <td :style="l.bg" style="width:300px"><div v-if="l.status == 1">เลขที่อนุญาต : <span style="color:red">{{ l.fda }}</span><br/>
+            ชื่อผลิตภัณฑ์: <span v-html="matchname"></span><br/>
+            หมวดหมู่: <span v-html="matchcategory"></span></div><div v-else> เลขที่อนุญาต : {{ l.fda }}<br/>
+              </div></td>
           <td :style="l.bg"><div v-html="cut(tokenize)"></div></td>
           <td :style="l.bg" v-if="l.status == 1">
             <p class="card-text">สถานะ : {{ l.list.cncnm }}</p>
@@ -81,10 +84,27 @@ export default {
       status: false,
       urlPath: '',
       imagelists: '',
-      tokenize: ''
+      tokenize: '',
+      matchname:'',
+      matchcategory:''
     };
   },
   methods: {
+    checkfdamatch(name,name_real) {
+       this.matchname = ''
+      axios.get('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
+        // console.log(res.data);
+        this.matchname = res.data
+      });
+    },
+    checkcategorymatch(category,category_real) {
+       this.matchcategory = ''
+      //  console.log('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real);
+      axios.get('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
+        // console.log(res.data);
+        this.matchcategory = res.data
+      });
+    },
     cut(word) {
       var wo = word.toString()
       // wo = wo.replaceAll(' ', ' | ')
@@ -211,20 +231,24 @@ export default {
           this.getimagefile(res.data[0].id)
           var detail = res.data[0].content
           // var detail = 'ข้อมูลจำเพาะของสินค้าหมวดหมู่Shopeeกลุ่มผลิตภัณฑ์เพื่อสุขภาพอาหารเสริมเพื่อความงามผิวยี่ห้อGlobal White(โกลบอลไวท์)หน้าที่ของอาหารเสริมสำหรับความงามคอลลาเจน, ผม ผิว และเล็บหมายเลขใบอนุญาต/อย.70-1-27160-5-0268จำนวนสินค้า258ส่งจากจังหวัดปทุมธานีรายละเอียดสินค้าหมายเลขใบอนุญาต/อย.🌼70-1-27160-5-0268อายุการเก็บรักษา 24 เดือน'
-          var fda = this.findfda(detail)
+          var fda = res.data[0].fda
+          // console.log(fda);
           var fdalist = []
-          // console.log(res.data[0].image_path);
-
+          // console.log(res.data[0]);
+// if (fda.length != 12) {
+//   alert('หมายเลขใบอนุญาตไม่ถูกต้อง')
+// }else{
           fdalist.push({
             name: res.data[0].name,
             detail: detail,
             fda: fda,
+            cat_name:res.data[0].cat_name
           })
           for (let f = 0; f < fdalist.length; f++) {
 
             const url = "https://tawaiforhealth.org/api/oryor/check-product";
             const data = { "number_src": fdalist[f].fda };
-
+// console.log(data);
             const options = {
               method: "POST",
               headers: {
@@ -237,7 +261,16 @@ export default {
             fetch(url, options)
               .then((response) => response.json())
               .then((data) => {
-                // console.log(data);
+                // console.log(name);
+                // productha
+                // console.log(fdalist[f].name,data.productha);
+                this.checkfdamatch(fdalist[f].name,data.productha+data.produceng)
+                // console.log(fdalist[f].detail,data.typepro);
+                var cat = this.findcategory(fdalist[f].detail)
+                var fdatype = this.fdatype(data.typepro)
+                fdatype = fdatype.replaceAll(' ','')
+                // console.log(fdatype);             
+                this.checkcategorymatch(cat,fdatype+fdatype+'เสริม')
                 if (data.message) {
                   fdalist[f].status = 0
                   fdalist[f].list = []
@@ -251,6 +284,7 @@ export default {
                     fdalist[f].icon = 'color: green'
 
                   } else {
+                    fdalist[f].status = 0
                     fdalist[f].icon = 'color: red'
                     fdalist[f].bg = 'background-color:#f9bdbb'
                   }
@@ -268,6 +302,7 @@ export default {
 
           }
         }
+      // }
       })
     },
     onChangeA1(event) {
@@ -343,19 +378,49 @@ export default {
       }
       this.file = ''
     },
-    findfda(data) {
-      var text = ['ใบอนุญาติ', 'ใบอนุญาต', 'อย.']
+    findcategory(data){
+      var text = ['หมวดหมู่']
+      var end = ['ยี่ห้อ']
       var findfda = data
       for (let t = 0; t < text.length; t++) {
-        findfda = findfda.substring(findfda.indexOf(text[t]));
+        findfda = findfda.substring(findfda.indexOf(text[t]),findfda.indexOf(end[0]));
+
+      }
+      return findfda
+    },
+    fdatype(data){
+      // console.log(data);
+      if (data) {
+        var text = ['(']
+      var findfda = data
+      for (let t = 0; t < text.length; t++) {
+        findfda = findfda.substring(findfda.indexOf(0),findfda.indexOf(text[0]));
+
+      }
+      }else{
+        findfda = ''
+      }
+      
+      return findfda
+    },
+    findfda(data) {
+      var text = ['หมายเลขใบอนุญาต/อย.']
+      var end = ['จำนวน']
+      var findfda = data
+      for (let t = 0; t < text.length; t++) {
+        findfda = findfda.substring(findfda.indexOf(text[t]),findfda.indexOf(end[0]));
 
       }
       // console.log(findfda);
+
+      findfda = findfda.replaceAll("หมายเลขใบอนุญาต/อย.", "");
       findfda = findfda.replaceAll("-", "");
-      var regex = /\d+/g;
-      var matches = findfda.match(regex);  // creates array from matches
+      findfda = findfda.replaceAll("–", "");
+      // console.log(findfda);
+      // var regex = /\d+/g;
+      // var matches = findfda.match(regex);  // creates array from matches
       // console.log(matches[0]);
-      return matches[0]
+      return findfda
     },
     loaddata(fda) {
       const url = "https://tawaiforhealth.org/api/oryor/check-product";
@@ -385,7 +450,7 @@ export default {
     }
   },
   mounted() {
-
+    // console.log(this.findcategory('ข้อมูลจำเพาะของสินค้าหมวดหมู่Shopeeอาหารและเครื่องดื่มเครื่องดื่มกาแฟยี่ห้อBe Easy(บีอีซี่)เครื่องดื่ม3-in-1 และกาแฟสำเร็จรูปอายุการเก็บรักษา24 เดือนน้ำหนัก150gวันหมดอายุ08-12-2023หมายเลขใบอนุญาต/อย.13-2-03657-2-0054จำนวนสินค้า95ส่งจากจังหวัดปทุมธานีรายละเอียดสินค้าBe Easy ที่สุดของกาแฟควบคุมน้ำหนัก เพียง 70 Kcal - กระชับสัดส่วน ไขมันส่วนเกิน - ดีท๊อกซ์ของเสียออกจากร่ายกาย - ผิวพรรณเปล่งปลั่ง กระจ่างใส - บำรุงร่างกาย บำรุงวมอง มีของพร้อมส่งตลอด สั่งได้เลยจ้า อย. เลขที่ 13-2-03657-2-0054 กาแฟบีอีซี่ กลิ่นหอม รสชาติ กลมกล่อม “คาปูชิโน่”นุ่มๆละมุนลิ้น 1 ห่อ มี 10 ซอง ให้ตายเถอะ! กาแฟบ้าอะไรยิ่งดื่มยิ่งหุ่นดี! น้ำหนักลด เอวนี่หดลงทุกวันๆ! โครตหอม โครตอร่อย โครตกลมกล่อม ลองสิแล้วคุณจะติดใจ! #กาแฟบีอีซี่ #กาแฟนางบี #Beeasycappuccino'))
     // var url = 'file:///Users/ponnipa/Documents/GitHub/shophtml/%F0%9F%8D%92%20(%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%81%E0%B8%97%E0%B9%89100%25)%20Jelly%20Fiber%20%E0%B9%80%E0%B8%88%E0%B8%A5%E0%B8%A5%E0%B8%B5%E0%B9%88%E0%B9%84%E0%B8%9F%E0%B9%80%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%20%E0%B8%A5%E0%B8%94%E0%B8%9E%E0%B8%B8%E0%B8%87%20%E0%B8%A5%E0%B8%94%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81%201%E0%B8%81%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%87_5%20%E0%B8%8B%E0%B8%AD%E0%B8%87%20_%20Shopee%20Thailand.html'
     // ProductsService.scraping(url).then((res)=>{
     //   console.log(res.data);
