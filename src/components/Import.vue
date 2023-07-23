@@ -12,22 +12,55 @@
         <label for="exampleFormControlFile1">นำเข้าไฟล์&nbsp;</label>
         <input type="file" @change="onChangeA1" class="form-control-file" id="exampleFormControlFile1" />
       </div> -->
-    <table class="table" v-if="list.length > 0">
+      <table class="table table-bordered" v-if="list.length > 0">
       <thead>
         <tr>
-          <th scope="col">#</th>
+          <th scope="col" style="text-align:center">เงื่อนไขการตรวจสอบข้อที่ 1</th>
+          <th scope="col" style="text-align:center">ข้อมูลจากฐานข้อมูลอย.</th>
+          <th scope="col" style="text-align:center">ข้อมูลจากเว็บไซต์</th>
+          <th scope="col" style="text-align:center">ผลการตรวจสอบ</th>
+          <th scope="col" style="text-align:center">ข้อสรุป</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td :style="colorfda">เลขที่อนุญาต</td>
+          <td :style="colorfda">{{ list[0].fda }}</td>
+          <td :style="colorfda">{{ list[0].fda }}</td>
+          <td :style="colorfda">{{ list[0].list.cncnm }}</td>
+          <td v-if="statusfda && statuscat && statusname" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
+          <span>ผ่าน</span></td>
+          <td v-else rowspan="3" style="text-align: center;vertical-align: middle;background-color:#f9bdbb">
+          <span>ไม่ผ่าน</span></td>
+        </tr>
+        <tr>
+          <td :style="colorcat">ประเภทผลิตภัณฑ์</td>
+          <td :style="colorcat">{{ type}}</td>
+          <td :style="colorcat"><span v-html="matchcategory"></span></td>
+          <td :style="colorcat"><span v-if="statuscat">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
+        </tr>
+        <tr>
+          <td :style="colorname">ชื่อผลิตภัณฑ์</td>
+          <td :style="colorname">{{ list[0].list.productha }}<br/>{{ list[0].list.produceng }}</td>
+          <td :style="colorname"><span v-html="matchname"></span></td>
+          <td :style="colorname"><span v-if="statusname">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
+        </tr>
+      </tbody>
+      </table>
+    <table class="table mt-3" v-if="list.length > 0">
+      <thead>
+        <tr>
           <th scope="col">สินค้า</th>
           <th scope="col">ข้อมูล</th>
           <th scope="col">หมวด</th>
           <th scope="col">FDA</th>
           <th scope="col">ตัดคำ</th>
-          <th scope="col"></th>
-          <th scope="col"></th>
+          <th scope="col">ข้อมูลจากฐานข้อมูลอย.</th>
+          <!-- <th scope="col"></th> -->
         </tr>
       </thead>
       <tbody>
         <tr v-for="(l, i) in list" :key="i">
-          <td :style="l.bg">{{ i + 1 }}</td>
           <td :style="l.bg"><img :src="imagelists" style="width:100%">{{ l.name }}</td>
           <td :style="l.bg">{{ l.detail }}</td>
           <td :style="l.bg">{{ l.cat_name }}</td>
@@ -38,25 +71,24 @@
           </div>
         </div>
             </td> -->
-          <td :style="l.bg" style="width:300px"><div v-if="l.status == 1">เลขที่อนุญาต : <span style="color:red">{{ l.fda }}</span><br/>
-            ชื่อผลิตภัณฑ์: <span v-html="matchname"></span><br/>
-            หมวดหมู่: <span v-html="matchcategory"></span></div><div v-else> เลขที่อนุญาต : {{ l.fda }}<br/>
-              </div></td>
+          <td :style="l.bg" style="width:300px"><div >เลขที่อนุญาต : <span style="color:red">{{ l.fda }}</span><br/>
+            ชื่อผลิตภัณฑ์: <span v-html="matchname"></span>
+           </div></td>
           <td :style="l.bg"><div v-html="cut(tokenize)"></div></td>
-          <td :style="l.bg" v-if="l.status == 1">
+          <td style="background-color:#BDEDFF" v-if="l.status == 1">
             <p class="card-text">สถานะ : {{ l.list.cncnm }}</p>
-            <p class="card-text">ประเภทผลิตภัณฑ์ : {{ l.list.typepro }}</p>
-            <p class="card-text">ใบสำคัญ/เลขที่อนุญาต : {{ l.list.lcnno }}</p>
-            <p class="card-text">ชื่อผลิตภัณฑ์ (TH) : {{ l.list.productha }}</p>
-            <p class="card-text">ชื่อผลิตภัณฑ์ (EN) : {{ l.list.produceng }}</p>
+            <p class="card-text">ประเภทผลิตภัณฑ์ :<span style="color:red"> {{ l.list.typepro }}</span></p>
+            <p class="card-text">ใบสำคัญ/เลขที่อนุญาต : <span style="color:red"> {{ l.list.lcnno }}</span></p>
+            <p class="card-text">ชื่อผลิตภัณฑ์ (TH) : <span style="color:red"> {{ l.list.productha }}</span></p>
+            <p class="card-text">ชื่อผลิตภัณฑ์ (EN) : <span style="color:red"> {{ l.list.produceng }}</span></p>
             <p class="card-text">ชื่อผู้รับอนุญาต : {{ l.list.licen }}</p>
             <p class="card-text">สถานที่ผลิต : {{ l.list.Addr }}</p>
             <p class="card-text">Newcode : {{ l.list.Newcode }}</p>
           </td>
           <td :style="l.bg" v-else> ไม่พบข้อมูล</td>
-          <td :style="l.bg">
+          <!-- <td :style="l.bg">
             <i class="fa fa-circle" :style="l.icon" aria-hidden="true"></i>
-          </td>
+          </td> -->
         </tr>
       </tbody>
     </table>
@@ -77,7 +109,6 @@ export default {
   components: {},
   data() {
     return {
-      type: 0,
       list: [],
       url: '',
       file: '',
@@ -86,7 +117,15 @@ export default {
       imagelists: '',
       tokenize: '',
       matchname:'',
-      matchcategory:''
+      matchcategory:'',
+      type:'',
+      matchnamesum:'',
+      statusname:0,
+      statuscat:0,
+      statusfda:0,
+      colorname:'background-color:#f9bdbb',
+      colorfda:'background-color:#f9bdbb',
+      colorcat:'background-color:#f9bdbb',
     };
   },
   methods: {
@@ -95,6 +134,13 @@ export default {
       axios.get('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
         // console.log(res.data);
         this.matchname = res.data
+        this.matchnamesum = this.matchname.replaceAll('red','black')
+        if(this.matchname.includes('red')){
+          this.statusname = 1
+          this.colorname = "background-color:#a3e9a4"
+        }
+
+
       });
     },
     checkcategorymatch(category,category_real) {
@@ -103,6 +149,10 @@ export default {
       axios.get('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
         // console.log(res.data);
         this.matchcategory = res.data
+        if(this.matchcategory.includes('red')){
+          this.statuscat = 1
+          this.colorcat = "background-color:#a3e9a4"
+        }
       });
     },
     cut(word) {
@@ -110,8 +160,9 @@ export default {
       // wo = wo.replaceAll(' ', ' | ')
       return wo
     },
-    async gettokenize(words) {
-      axios.get('http://127.0.0.1:5000/worktoken?text=' + words).then((res) => {
+    async gettokenize(words,namereal_result) {
+      axios.get('http://127.0.0.1:5000/worktoken?text=' + words+'&&namereal_result='+namereal_result).then((res) => {
+        console.log(res.data);
         this.tokenize = res.data
       });
     },
@@ -226,7 +277,6 @@ export default {
           alert('ไม่พบข้อมูลในระบบ')
         } else {
           // console.log(res.data[0].content);
-          this.gettokenize(res.data[0].content)
           // console.log(this.tokenize);
           this.getimagefile(res.data[0].id)
           var detail = res.data[0].content
@@ -261,17 +311,29 @@ export default {
             fetch(url, options)
               .then((response) => response.json())
               .then((data) => {
-                // console.log(name);
+                console.log(data);
                 // productha
-                // console.log(fdalist[f].name,data.productha);
-                this.checkfdamatch(fdalist[f].name,data.productha+data.produceng)
+                console.log(data.message);
+                if (data.message) {
+                  data.produceng = ''
+                  data.productha = ''
+                  data.typepro = ''
+                }
+                if (data.length > 1) {
+                  alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
+                }
+                  this.checkfdamatch(fdalist[f].name,data.productha+data.produceng)
+
                 // console.log(fdalist[f].detail,data.typepro);
                 var cat = this.findcategory(fdalist[f].detail)
                 var fdatype = this.fdatype(data.typepro)
                 fdatype = fdatype.replaceAll(' ','')
-                // console.log(fdatype);             
+                console.log(fdatype);             
                 this.checkcategorymatch(cat,fdatype+fdatype+'เสริม')
-                if (data.message) {
+                var name = data.productha.replaceAll('ผลิตภัณฑ์','')
+                this.type = fdatype
+                this.gettokenize(res.data[0].content,fdatype+name+data.produceng)
+                if (!data.lcnno) {
                   fdalist[f].status = 0
                   fdalist[f].list = []
                   fdalist[f].bg = 'background-color:#f9bdbb'
@@ -281,10 +343,11 @@ export default {
                   fdalist[f].bg = 'background-color:#a3e9a4'
                   // console.log(data.STATUS_ID.includes(7))
                   if (data.cncnm == "คงอยู่") {
+                    this.statusfda = 1
+                    this.colorfda = "background-color:#a3e9a4"
                     fdalist[f].icon = 'color: green'
 
                   } else {
-                    fdalist[f].status = 0
                     fdalist[f].icon = 'color: red'
                     fdalist[f].bg = 'background-color:#f9bdbb'
                   }
@@ -295,7 +358,9 @@ export default {
                   // console.log(fdalist);
                   this.list = fdalist
 
+                
                 }
+                
                 // console.log(this.list);
               });
 
