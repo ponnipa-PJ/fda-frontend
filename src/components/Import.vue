@@ -52,7 +52,6 @@
         <tr>
           <th scope="col">สินค้า</th>
           <th scope="col">ข้อมูล</th>
-          <th scope="col">หมวด</th>
           <th scope="col">FDA</th>
           <th scope="col">ตัดคำ</th>
           <th scope="col">ข้อมูลจากฐานข้อมูลอย.</th>
@@ -63,7 +62,6 @@
         <tr v-for="(l, i) in list" :key="i">
           <td :style="l.bg"><img :src="imagelists" style="width:100%">{{ l.name }}</td>
           <td :style="l.bg">{{ l.detail }}</td>
-          <td :style="l.bg">{{ l.cat_name }}</td>
           <!-- <td :style="l.bg">
               <div class="row">
           <div class="col-md-2" v-for="(im ,i) in imagelists" :key="i">
