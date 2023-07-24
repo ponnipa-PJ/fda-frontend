@@ -145,7 +145,7 @@ export default {
        this.matchcategory = ''
       //  console.log('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real);
       axios.get('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
-        // console.log(res.data);
+        console.log(res.data);
         this.matchcategory = res.data
         if(this.matchcategory.includes('red')){
           this.statuscat = 1
