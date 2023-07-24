@@ -101,6 +101,7 @@ import readXlsxFile from "read-excel-file";
 // import moment from 'moment'
 import axios from "axios";
 import ProductsService from '../services/ProductsService.js'
+import FDATypesService from '../services/FDATypesService'
 
 export default {
   name: "App",
@@ -128,6 +129,9 @@ export default {
   },
   methods: {
     checkfdamatch(name,name_real) {
+      this.matchname = ''
+      this.statusname = 0
+          this.colorname = "background-color:#f9bdbb"
        this.matchname = ''
       axios.get('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
         // console.log(res.data);
@@ -142,16 +146,25 @@ export default {
       });
     },
     checkcategorymatch(category,category_real) {
+      // console.log(category_real);
+      // console.log(category);
        this.matchcategory = ''
+       this.statuscat = 0
+          this.colorcat = "background-color:#f9bdbb"
+          
+          if (category_real) {
       //  console.log('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real);
       axios.get('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         this.matchcategory = res.data
+        // console.log(this.matchcategory.includes('red'));
         if(this.matchcategory.includes('red')){
           this.statuscat = 1
           this.colorcat = "background-color:#a3e9a4"
         }
+      
       });
+    }
     },
     cut(word) {
       var wo = word.toString()
@@ -159,8 +172,10 @@ export default {
       return wo
     },
     async gettokenize(words,namereal_result) {
-      axios.get('http://127.0.0.1:5000/worktoken?text=' + words+'&&namereal_result='+namereal_result).then((res) => {
-        console.log(res.data);
+      // console.log(words);
+      // console.log(namereal_result);
+      axios.get('http://127.0.0.1:5000/worktoken?namereal_result=' + namereal_result+'&&text='+words).then((res) => {
+        // console.log(res.data);
         this.tokenize = res.data
       });
     },
@@ -265,6 +280,12 @@ export default {
     //       })
     //     },
     search() {
+      this.statusname=0,
+      this.statuscat=0,
+      this.statusfda=0,
+      this.colorname='background-color:#f9bdbb',
+      this.colorfda='background-color:#f9bdbb',
+      this.colorcat='background-color:#f9bdbb',
       this.list = []
       var data = {
         url: this.url
@@ -309,9 +330,9 @@ export default {
             fetch(url, options)
               .then((response) => response.json())
               .then((data) => {
-                console.log(data);
+                // console.log(data);
                 // productha
-                console.log(data.message);
+                // console.log(data.message);
                 if (data.message) {
                   data.produceng = ''
                   data.productha = ''
@@ -322,14 +343,35 @@ export default {
                 }
                   this.checkfdamatch(fdalist[f].name,data.productha+data.produceng)
 
-                // console.log(fdalist[f].detail,data.typepro);
+                // console.log(fdalist[f].detail);
                 var cat = this.findcategory(fdalist[f].detail)
+                // console.log(cat);
                 var fdatype = this.fdatype(data.typepro)
                 fdatype = fdatype.replaceAll(' ','')
-                console.log(fdatype);             
-                this.checkcategorymatch(cat,fdatype+fdatype+'เสริม')
+                // console.log(fdatype);    
                 var name = data.productha.replaceAll('ผลิตภัณฑ์','')
                 this.type = fdatype
+                // console.log(this.type);
+                // console.log(data.typepro);
+                if (this.type == '') {
+                  if (data.typepro) {
+                    this.type = data.typepro
+                    fdatype = data.typepro
+                  }
+                }
+                // console.log(fdatype);
+                FDATypesService.getfdatypes(fdatype).then(()=>{
+                  // console.log(res.data);
+                  if (res.data.length == 0) {
+                    var cattype = {
+                      name:fdatype
+                    }
+                    FDATypesService.createfdatype(cattype).then(()=>{
+                      // console.log(res.data);
+                    })
+                  }
+                })
+                this.checkcategorymatch(cat,fdatype)
                 this.gettokenize(res.data[0].content,fdatype+name+data.produceng)
                 if (!data.lcnno) {
                   fdalist[f].status = 0
@@ -427,7 +469,7 @@ export default {
 
                     // console.log(f+1, fdalist.length);
                     if (f + 1 == fdalist.length) {
-                      console.log(fdalist);
+                      // console.log(fdalist);
                       this.list = fdalist
                       this.status = false
                     }
@@ -442,13 +484,20 @@ export default {
       this.file = ''
     },
     findcategory(data){
+      // console.log(data);
       var text = ['หมวดหมู่']
-      var end = ['ยี่ห้อ']
+      var end = ['ยี่ห้อ','ประเทศ']
       var findfda = data
-      for (let t = 0; t < text.length; t++) {
-        findfda = findfda.substring(findfda.indexOf(text[t]),findfda.indexOf(end[0]));
+      for (let t = 0; t < end.length; t++) {
+        if (findfda.indexOf(end[t]) != -1) {
+          findfda = findfda.substring(findfda.indexOf(text[0]),findfda.indexOf(end[t]));    
+        }
 
       }
+      // if (findfda == 'อาหาร') {
+      //   findfda = findfda+ findfda+'เสริม'
+      // }
+      // console.log(findfda);
       return findfda
     },
     fdatype(data){
@@ -463,7 +512,6 @@ export default {
       }else{
         findfda = ''
       }
-      
       return findfda
     },
     findfda(data) {
@@ -501,7 +549,7 @@ export default {
       fetch(url, options)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
+          // console.log(data);
           return data
         });
     },

@@ -297,7 +297,7 @@ export default {
    findfda(data) {
     // console.log(data);
       var text = ['หมายเลขใบอนุญาต/อย.']
-      var end = ['จำนวนสินค้า']
+      var end = ['จำนวนสินค้า','ส่วนประกอบ']
       var findfda = data
       for (let t = 0; t < end.length; t++) {
         // console.log(findfda.indexOf(text[0]));
@@ -305,7 +305,7 @@ export default {
           findfda = findfda.substring(findfda.indexOf(text[0]),findfda.indexOf(end[t]));
 
       }
-      console.log(findfda);
+      // console.log(findfda);
 
       findfda = findfda.replaceAll("หมายเลขใบอนุญาต/อย.", "");
       findfda = findfda.replaceAll("-", "");
