@@ -183,7 +183,7 @@ export default {
       data:{},
       pro_id:0,
       category:[],
-      status:1,
+      status:0,
       imagelists:[]
     };
   },
