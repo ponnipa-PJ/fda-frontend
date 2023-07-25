@@ -29,9 +29,9 @@
           <td :style="colorfda">{{ list[0].fda }}</td>
           <td :style="colorfda">{{ list[0].list.cncnm }}</td>
           <td v-if="statusfda && statuscat && statusname" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
-          <span>ผ่าน</span></td>
+          <span>ผ่าน</span>{{ updatestatusfda() }}</td>
           <td v-else rowspan="3" style="text-align: center;vertical-align: middle;background-color:#f9bdbb">
-          <span>ไม่ผ่าน</span></td>
+          <span>ไม่ผ่าน</span>{{ updatestatusfda() }}</td>
         </tr>
         <tr>
           <td :style="colorcat">ประเภทผลิตภัณฑ์</td>
@@ -125,9 +125,29 @@ export default {
       colorname:'background-color:#f9bdbb',
       colorfda:'background-color:#f9bdbb',
       colorcat:'background-color:#f9bdbb',
+      id:''
     };
   },
   methods: {
+    updatestatusfda(){
+      // console.log(this.statusfda,this.statuscat,this.statusname)
+      var fda = {
+        }
+      if (this.statusfda && this.statuscat && this.statusname) {
+         fda = {
+          statusfda:true
+        }
+      }else{
+         fda = {
+          statusfda:false
+        }
+      }
+      // console.log(this.list[0].id);
+      ProductsService.updatefdastatus(this.list[0].id,fda).then(()=>{
+        // console.log(res.data);
+      })
+      return ''
+    },
     checkfdamatch(name,name_real) {
       this.matchname = ''
       this.statusname = 0
@@ -280,6 +300,7 @@ export default {
     //       })
     //     },
     search() {
+      console.log(this.url);
       this.statusname=0,
       this.statuscat=0,
       this.statusfda=0,
@@ -307,7 +328,9 @@ export default {
 // if (fda.length != 12) {
 //   alert('หมายเลขใบอนุญาตไม่ถูกต้อง')
 // }else{
+  fda = fda.replaceAll(' ','') 
           fdalist.push({
+            id: res.data[0].id,
             name: res.data[0].name,
             detail: detail,
             fda: fda,
@@ -391,6 +414,8 @@ export default {
                     fdalist[f].icon = 'color: red'
                     fdalist[f].bg = 'background-color:#f9bdbb'
                   }
+                  
+
                 }
 
                 // console.log(f+1, fdalist.length);
@@ -398,7 +423,138 @@ export default {
                   // console.log(fdalist);
                   this.list = fdalist
 
+                }
                 
+                // console.log(this.list);
+              });
+
+
+          }
+        }
+      // }
+      })
+    },
+    searchbyfda() {
+      this.statusname=0,
+      this.statuscat=0,
+      this.statusfda=0,
+      this.colorname='background-color:#f9bdbb',
+      this.colorfda='background-color:#f9bdbb',
+      this.colorcat='background-color:#f9bdbb',
+      this.list = []
+      ProductsService.getproduct(this.id).then(async (res) => {
+        // console.log(res.data);
+        if (res.data.content == '' || res.data.length == 0) {
+          alert('ไม่พบข้อมูลในระบบ')
+        } else {
+          // console.log(res.data[0].content);
+          // console.log(this.tokenize);
+          this.getimagefile(res.data.id)
+          var detail = res.data.content
+          // var detail = 'ข้อมูลจำเพาะของสินค้าหมวดหมู่Shopeeกลุ่มผลิตภัณฑ์เพื่อสุขภาพอาหารเสริมเพื่อความงามผิวยี่ห้อGlobal White(โกลบอลไวท์)หน้าที่ของอาหารเสริมสำหรับความงามคอลลาเจน, ผม ผิว และเล็บหมายเลขใบอนุญาต/อย.70-1-27160-5-0268จำนวนสินค้า258ส่งจากจังหวัดปทุมธานีรายละเอียดสินค้าหมายเลขใบอนุญาต/อย.🌼70-1-27160-5-0268อายุการเก็บรักษา 24 เดือน'
+          var fda = res.data.fda
+          // console.log(fda);
+          var fdalist = []
+          // console.log(res.data);
+// if (fda.length != 12) {
+//   alert('หมายเลขใบอนุญาตไม่ถูกต้อง')
+// }else{
+  fda = fda.replaceAll(' ','')
+  this.url = res.data.url
+          fdalist.push({
+            id: res.data.id,
+            name: res.data.name,
+            detail: detail,
+            fda: fda,
+            cat_name:res.data.cat_name
+          })
+          for (let f = 0; f < fdalist.length; f++) {
+
+            const url = "https://tawaiforhealth.org/api/oryor/check-product";
+            const data = { "number_src": fdalist[f].fda };
+// console.log(data);
+            const options = {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+              },
+              body: JSON.stringify(data),
+            };
+
+            fetch(url, options)
+              .then((response) => response.json())
+              .then((data) => {
+                // console.log(data);
+                // productha
+                // console.log(data.message);
+                if (data.message) {
+                  data.produceng = ''
+                  data.productha = ''
+                  data.typepro = ''
+                }
+                if (data.length > 1) {
+                  alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
+                }
+                  this.checkfdamatch(fdalist[f].name,data.productha+data.produceng)
+
+                // console.log(fdalist[f].detail);
+                var cat = this.findcategory(fdalist[f].detail)
+                // console.log(cat);
+                var fdatype = this.fdatype(data.typepro)
+                fdatype = fdatype.replaceAll(' ','')
+                // console.log(fdatype);    
+                var name = data.productha.replaceAll('ผลิตภัณฑ์','')
+                this.type = fdatype
+                // console.log(this.type);
+                // console.log(data.typepro);
+                if (this.type == '') {
+                  if (data.typepro) {
+                    this.type = data.typepro
+                    fdatype = data.typepro
+                  }
+                }
+                // console.log(fdatype);
+                FDATypesService.getfdatypes(fdatype).then(()=>{
+                  // console.log(res.data);
+                  if (res.data.length == 0) {
+                    var cattype = {
+                      name:fdatype
+                    }
+                    FDATypesService.createfdatype(cattype).then(()=>{
+                      // console.log(res.data);
+                    })
+                  }
+                })
+                this.checkcategorymatch(cat,fdatype)
+                this.gettokenize(res.data.content,fdatype+name+data.produceng)
+                if (!data.lcnno) {
+                  fdalist[f].status = 0
+                  fdalist[f].list = []
+                  fdalist[f].bg = 'background-color:#f9bdbb'
+                } else {
+                  fdalist[f].list = data
+                  fdalist[f].status = 1
+                  fdalist[f].bg = 'background-color:#a3e9a4'
+                  // console.log(data.STATUS_ID.includes(7))
+                  if (data.cncnm == "คงอยู่") {
+                    this.statusfda = 1
+                    this.colorfda = "background-color:#a3e9a4"
+                    fdalist[f].icon = 'color: green'
+
+                  } else {
+                    fdalist[f].icon = 'color: red'
+                    fdalist[f].bg = 'background-color:#f9bdbb'
+                  }
+                  
+
+                }
+
+                // console.log(f+1, fdalist.length);
+                if (f + 1 == fdalist.length) {
+                  // console.log(fdalist);
+                  this.list = fdalist
+
                 }
                 
                 // console.log(this.list);
@@ -561,6 +717,22 @@ export default {
     }
   },
   mounted() {
+    // console.log(this.$route.query.id);
+   
+    if (this.$route.query.id) {
+      this.id = this.$route.query.id
+//       var cuturl = this.$route.query.url.split('/')
+//       var l = this.$route.query.url.split('?')
+//       console.log(l);
+//       console.log(cuturl);
+//       // console.log(encodeURIComponent(cuturl[3]));
+//       var encodeurl = encodeURIComponent(cuturl[3])
+//       var lencode = encodeurl.split('%3Fsp_atk%') 
+//       console.log(lencode);
+// this.url = 'https://shopee.co.th/'+encodeURIComponent(lencode[0])+"?"+l[1]
+// console.log(this.url);
+      this.searchbyfda()
+    }
     // console.log(this.findcategory('ข้อมูลจำเพาะของสินค้าหมวดหมู่Shopeeอาหารและเครื่องดื่มเครื่องดื่มกาแฟยี่ห้อBe Easy(บีอีซี่)เครื่องดื่ม3-in-1 และกาแฟสำเร็จรูปอายุการเก็บรักษา24 เดือนน้ำหนัก150gวันหมดอายุ08-12-2023หมายเลขใบอนุญาต/อย.13-2-03657-2-0054จำนวนสินค้า95ส่งจากจังหวัดปทุมธานีรายละเอียดสินค้าBe Easy ที่สุดของกาแฟควบคุมน้ำหนัก เพียง 70 Kcal - กระชับสัดส่วน ไขมันส่วนเกิน - ดีท๊อกซ์ของเสียออกจากร่ายกาย - ผิวพรรณเปล่งปลั่ง กระจ่างใส - บำรุงร่างกาย บำรุงวมอง มีของพร้อมส่งตลอด สั่งได้เลยจ้า อย. เลขที่ 13-2-03657-2-0054 กาแฟบีอีซี่ กลิ่นหอม รสชาติ กลมกล่อม “คาปูชิโน่”นุ่มๆละมุนลิ้น 1 ห่อ มี 10 ซอง ให้ตายเถอะ! กาแฟบ้าอะไรยิ่งดื่มยิ่งหุ่นดี! น้ำหนักลด เอวนี่หดลงทุกวันๆ! โครตหอม โครตอร่อย โครตกลมกล่อม ลองสิแล้วคุณจะติดใจ! #กาแฟบีอีซี่ #กาแฟนางบี #Beeasycappuccino'))
     // var url = 'file:///Users/ponnipa/Documents/GitHub/shophtml/%F0%9F%8D%92%20(%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%81%E0%B8%97%E0%B9%89100%25)%20Jelly%20Fiber%20%E0%B9%80%E0%B8%88%E0%B8%A5%E0%B8%A5%E0%B8%B5%E0%B9%88%E0%B9%84%E0%B8%9F%E0%B9%80%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%20%E0%B8%A5%E0%B8%94%E0%B8%9E%E0%B8%B8%E0%B8%87%20%E0%B8%A5%E0%B8%94%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81%201%E0%B8%81%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%87_5%20%E0%B8%8B%E0%B8%AD%E0%B8%87%20_%20Shopee%20Thailand.html'
     // ProductsService.scraping(url).then((res)=>{

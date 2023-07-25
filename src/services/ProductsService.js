@@ -25,6 +25,9 @@ class ProductsService {
   updatescraping(id,data) {
     return http.put(`/products/updatescraping/${id}`, data);
   }
+  updatefdastatus(id,data) {
+    return http.put(`/products/updatefdastatus/${id}`, data);
+  }
   findproduct(data) {
     return http.post('/products/findproduct', data);
   } 

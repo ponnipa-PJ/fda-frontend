@@ -17,25 +17,29 @@
       <table class="table mt-3" v-if="list.length > 0">
         <thead>
           <tr>
-            <th scope="col">#</th>
+            <th scope="col">ชื่อไฟล์</th>
             <th scope="col">หมวด</th>
             <th scope="col" v-if="status ==1">ชื่อสินค้า</th>
-            <th scope="col" v-if="status ==1" style="width: 100px">ข้อมูลสินค้า</th>
-            <th scope="col">ชื่อไฟล์</th>
-            <th scope="col" style="width: 500px">url</th>
+            <th scope="col" v-if="status ==1">เลขที่อนุญาต</th>
+            <th scope="col" v-if="status ==1">ข้อมูลสินค้า</th>
+            <th scope="col" v-if="status ==1">สถานะการตรวจสอบ</th>
+            
+            <th scope="col">url</th>
             <th scope="col"></th>
             <th scope="col" v-if="status == 0"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(l, i) in list" :key="i">
-            <td :style="l.bg">{{ i + 1 }}</td>
+          <tr v-for="(l, i) in pageOfItems" :key="i">           
+             <td :style="l.bg"><a :href="l.url" target="_blank">{{ l.file }}</a></td>
+
             <td :style="l.bg">{{ l.cat_name }}</td>
             <!-- <img :src="imagelists[i].path" style="width:100%">{ -->
-            <td :style="l.bg" v-if="status ==1" style="width: 100px"><img :src="imagelists[i]" style="width:100%">{{ l.name }}</td>
+            <td :style="l.bg" v-if="status ==1"><img :src="l.src" style="width:100%">{{ l.name }}</td>
+            <td :style="l.bg" v-if="status ==1"><a :href="'/?id='+l.id" target="_blank">{{ l.fda }}</a></td>
             <td :style="l.bg" v-if="status ==1">{{ l.content }}</td>
-            <td :style="l.bg">{{ l.file }}</td>
-            <td :style="l.bg" style="width: 500px;word-break:break-word;">{{ l.url }}</td>
+            <td :style="l.bg" v-if="status ==1"> <span v-if="l.statusfda == null">ยังไม่ได้ตรวจสอบ</span>  <span v-if="l.statusfda == 0">ไม่ผ่าน</span><span v-if="l.statusfda == 1">ผ่าน</span></td>
+            <td :style="l.bg" v-if="status ==0" style="width: 500px;word-break:break-word;">{{ l.url }}</td>
             <td>
             <a @click="getid(l.id)" v-if="status == 0">
               <button
@@ -55,6 +59,7 @@
               >
                 <i class="fa fa-trash"></i></button
             ></a>
+            
           </td>
             <td :style="l.bg" v-if="status == 0">
               <button @click="scrape(l)" type="submit" class="mb-3 btn btn-success">
@@ -64,6 +69,15 @@
           </tr>
         </tbody>
       </table>
+      <div class="row" align="right">
+        <div class="col-md-12">
+          <jw-pagination
+            :items="list"
+            @changePage="onChangePage"
+            :labels="customLabels"
+          ></jw-pagination>
+        </div>
+      </div>
       <div v-if="list.length == 0" class="mt-5">
 <h3 style="text-align:center">ไม่พบข้อมูล</h3>
       </div>
@@ -169,6 +183,13 @@ import ProductsService from '../services/ProductsService.js'
 import axios from "axios";
 import CategoryService from '../services/CategoryService'
 
+const customLabels = {
+  first: "<<",
+  last: ">>",
+  previous: "<",
+  next: ">",
+};
+
 export default {
   name: "App",
   components: {},
@@ -183,18 +204,26 @@ export default {
       data:{},
       pro_id:0,
       category:[],
-      status:0,
-      imagelists:[]
+      status:1,
+      imagelists:[],
+      pageOfItems: [],
+      customLabels,
     };
   },
   methods: {
-    async getimagefile(id) {
-     await axios.get('http://127.0.0.1:5000/base64?id=' + id).then((res) => {
+    onChangePage(pageOfItems) {
+      // update page of items
+      this.pageOfItems = pageOfItems;
+      window.scrollTo(0,0);
+    },
+     getimagefile(id) {
+      axios.get('http://127.0.0.1:5000/base64?id=' + id).then((res) => {
         // console.log(res.data);
         // console.log('data:image/jpeg;base64,'+res.data);
-        // this.imagelists.push({id:id,
-        // path:'data:image/jpeg;base64,'+res.data})
-        this.imagelists.push('data:image/jpeg;base64,'+res.data)
+        this.imagelists.push({id:id,
+        path:'data:image/jpeg;base64,'+res.data})
+        // this.imagelists.push('data:image/jpeg;base64,'+res.data)
+        // console.log('data:image/jpeg;base64,'+res.data);
         return 'data:image/jpeg;base64,'+res.data
       });
         
@@ -222,7 +251,7 @@ export default {
           file: this.data.file,
           path:'uploads/'+this.data.file+'.html',
           image_path:'uploads/'+this.data.file+'_files',
-          status:1,
+          status:0,
           url: this.data.url,
           statusdelete:1
         };
@@ -271,38 +300,27 @@ export default {
       }
     },
    getproduct(){
+    // console.log(this.status);
     ProductsService.getproducts(this.status).then(async (res)=>{
+      // console.log(res.data);
       this.imagelists = []
-      if (this.status != 0) {
-      for (let l = 0; l < res.data.length; l++) {
-        this.getimagefile(res.data[l].id)
-      }
-        
-      }
-     this.list = res.data
-  //    this.imagelists = this.imagelists.sort((a, b) => {
-  // if (a.id < b.id) {
-  //   return -1;
-  // }
-// });
-// console.log(this.imagelists);
-      // var list = res.data
-      // for (let l = 0; l < list.length; l++) {
-      //   list[l].imagelists = await this.getimagefile(list[l].id)
-      // }
-      // this.list = list
-      // console.log(list);
+      this.list = res.data
     })
    },
    findfda(data) {
-    // console.log(data);
+    console.log(data);
       var text = ['หมายเลขใบอนุญาต/อย.']
-      var end = ['จำนวนสินค้า','ส่วนประกอบ']
+      var end = ['จำนวนสินค้า','ส่วนประกอบ','น้ำหนัก']
       var findfda = data
       for (let t = 0; t < end.length; t++) {
+        // console.log(findfda.indexOf(end[t]));
         // console.log(findfda.indexOf(text[0]));
         // console.log(findfda.indexOf(end[t]));
+        if (findfda.indexOf(end[t]) != -1) {
+          // console.log(end[t]);
           findfda = findfda.substring(findfda.indexOf(text[0]),findfda.indexOf(end[t]));
+        }
+         
 
       }
       // console.log(findfda);
@@ -333,6 +351,7 @@ export default {
       axios.get('http://127.0.0.1:5000/scrapingcontent?path=' + data.path).then((res) => {
         // console.log(res.data);
       var con = res.data
+      // console.log(con);
       var fda = this.findfda(con)
       fda = fda.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
       fda = fda.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
@@ -357,8 +376,13 @@ export default {
       //   // console.log(pro);
         ProductsService.updatescraping(data.id,pro).then(()=>{
           // console.log(res.data);
-          alert('บันทึกเรียบร้อย')
-          this.getproduct()
+          // alert('บันทึกเรียบร้อย')
+          // this.getproduct()
+                setTimeout(function () {
+              location.reload();
+            }, 500);
+            window.scrollTo(0, 0);
+          this.$router.push("/?id="+data.id);
         })
     
       }

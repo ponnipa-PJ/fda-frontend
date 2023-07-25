@@ -4,6 +4,7 @@ import router from './router'
 import VueApexCharts from 'vue-apexcharts'
 import VueExcelXlsx from "vue-excel-xlsx";
 import store from './store';
+import JwPagination from 'jw-vue-pagination';
 
 Vue.use(VueApexCharts)
 Vue.component('apexchart', VueApexCharts)
@@ -11,6 +12,7 @@ Vue.component('apexchart', VueApexCharts)
 Vue.config.productionTip = false
 
 Vue.use(VueExcelXlsx);
+Vue.component('jw-pagination', JwPagination);
 
 new Vue({
   router,

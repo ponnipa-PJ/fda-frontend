@@ -16,6 +16,7 @@
     "device-uuid": "^1.0.4",
     "express-useragent": "^1.0.15",
     "hddserial": "^0.0.7",
+    "jw-vue-pagination": "^1.0.3",
     "longdo-map-vue": "^2.0.0",
     "mocha": "^10.2.0",
     "moment": "^2.29.3",
