@@ -37,11 +37,17 @@ export default {
       path:'/scraping',
       class:''
     },
+    // {
+    //   name:'หมวด',
+    //   path:'/category',
+    //   class:''
+    // },
     {
-      name:'หมวด',
-      path:'/category',
+      name:'รายการสินค้าที่ยกเลิกการตรวจสอบ',
+      path:'/scrapingdelete',
       class:''
     },
+    
     {
       name:'Corpus',
       path:'/Corpus',

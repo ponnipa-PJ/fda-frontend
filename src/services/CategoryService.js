@@ -7,6 +7,10 @@ class CategoryService {
   getcategory(id) {
     return http.get('/category/'+id);
   }
+  database_path() {
+    return http.get('/database_path');
+  }
+  
   createcategory(data) {
     return http.post('/category', data);
   } 

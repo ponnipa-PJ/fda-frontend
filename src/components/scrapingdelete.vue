@@ -1,47 +1,6 @@
 <template>
   <div class="container mt-5">
-    <!-- <div class="col-md-4">
-      <label>สถานะ</label>
-      <select class="form-select" v-model="status" @change="getproduct">
-  <option value="1">ดึงข้อมูลแล้ว</option>
-  <option value="0">ยังไม่ได้ดึงข้อมูล</option>
-</select>
-    </div> -->
-   <div class="row">
-    <div class="col-md-12">
-      <div class="card-body">
-
-<div class="form-group">
-                  <!-- <label for="password">หมวด</label>
-                  <select class="form-control" v-model="data.cat_id">
-  <option v-for="(i,r) in category" :key="r" :value="i.id">{{i.name}}</option>
-</select> -->
-                </div>
-                <div class="form-group">
-                  <label>ชื่อไฟล์</label>
-                  <input
-                    v-model="data.file"
-                    type="text"
-                    min="1"
-                    class="form-control form-control-sm"
-                  />
-                </div>
-                <div class="form-group mt-3">
-                  <label>URL</label>
-                  <textarea
-                  rows="10"
-                    v-model="data.url"
-                    type="text"
-                    class="form-control form-control-sm"
-                  ></textarea>
-                </div>
-                <button type="button" class="btn btn-success" @click="save()">
-              บันทึก
-            </button>
-              </div>
-    </div>
-   </div>
-   รายการสินค้าที่ตรวจสอบ
+    รายการสินค้าที่ยกเลิกการตรวจสอบ
     <div style="text-align:right" v-if="status == 0"> <button @click="getid(0)"
           data-bs-toggle="modal"
           data-bs-target="#AddProduct"
@@ -66,17 +25,17 @@
         </thead>
         <tbody>
           <tr v-for="(l, i) in pageOfItems" :key="i">           
-             <td :style="l.bg">{{ l.file }}</td>
-             <td :style="l.bg+';cursor: pointer;'" v-if="status ==1" @click="gotosearch(l.id)">{{ l.fda }}</td>
+             <td :style="l.bg" >{{ l.file }}</td>
+             <td :style="l.bg" v-if="status ==1">{{ l.fda }}</td>
 
-            <td :style="l.bg+';cursor: pointer;'" @click="gotosearch(l.id)">{{ l.cat_fda }}</td>
+            <td :style="l.bg" >{{ l.cat_fda }}</td>
             <!-- <img :src="imagelists[i].path" style="width:100%">{ -->
-            <td :style="l.bg+';cursor: pointer;'" v-if="status ==1" @click="gotosearch(l.id)"><img :src="l.src" style="width:100%">{{ l.name }}</td>
-            <td :style="l.bg+';cursor: pointer;'" v-if="status ==1" @click="gotosearch(l.id)">{{ l.content }}</td>
-            <td :style="l.bg+';cursor: pointer;'" v-if="status ==1" @click="gotosearch(l.id)"> <span v-if="l.statusfda == null">ยังไม่ได้ตรวจสอบ</span>  <span v-if="l.statusfda == 0">ไม่ผ่าน</span><span v-if="l.statusfda == 1">ผ่าน</span></td>
+            <td :style="l.bg" v-if="status ==1" ><img :src="l.src" style="width:100%">{{ l.name }}</td>
+            <td :style="l.bg" v-if="status ==1" >{{ l.content }}</td>
+            <td :style="l.bg" v-if="status ==1" > <span v-if="l.statusfda == null">ยังไม่ได้ตรวจสอบ</span>  <span v-if="l.statusfda == 0">ไม่ผ่าน</span><span v-if="l.statusfda == 1">ผ่าน</span></td>
             <td :style="l.bg" v-if="status ==0" style="width: 500px;word-break:break-word;">{{ l.url }}</td>
             <td>
-            <a @click="getid(l.id)">
+            <a @click="getid(l.id)" v-if="status == 0">
               <button
                 type="button"
                 class="btn btn-warning"
@@ -84,17 +43,17 @@
                 data-bs-target="#AddProduct"
               >
                 <i class="fa fa-edit"></i></button
-            ></a><br/><br/>
+            ></a>&nbsp;
             <a @click="getid(l.id)">
               <button
                 type="button"
-                class="btn btn-danger" 
+                class="btn btn-success" 
                 data-bs-toggle="modal"
                 data-bs-target="#DeleteProduct"
               >
-                <i class="fa fa-trash"></i></button
-            ></a><br/><br/>
-            <a :href="l.url" target="_blank"><i class="fa fa-globe fa-2x" aria-hidden="true"></i></a>
+                <i class="fa fa-repeat"></i></button
+            ></a>
+            <!-- <a :href="l.url" target="_blank"><i class="fa fa-globe fa-2x" aria-hidden="true"></i></a> -->
             
           </td>
             <td :style="l.bg" v-if="status == 0">
@@ -135,12 +94,12 @@
             <form>
               <div class="card-body mt-3">
 
-<!-- <div class="form-group mt-3">
+<div class="form-group mt-3">
                   <label for="password">หมวด</label>
                   <select class="form-control" v-model="data.cat_id">
   <option v-for="(i,r) in category" :key="r" :value="i.id">{{i.name}}</option>
 </select>
-                </div> -->
+                </div>
                 <div class="form-group mt-3">
                   <label>Name File</label>
                   <input
@@ -189,7 +148,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">ยืนยันการลบสินค้า</h5>
+            <h5 class="modal-title" id="exampleModalLabel">ยืนยัน</h5>
             
           </div>
          
@@ -268,16 +227,13 @@ export default {
     },
     deleteproduct(){
       var deletestatus ={
-        statusdelete:0
+        statusdelete:1
       }
       ProductsService.deleteproduct(this.pro_id,deletestatus).then(()=>{
         // console.log(res.data);
         document.getElementById("closedDeleteProduct").click();
         this.getproduct();
-        setTimeout(function () {
-              location.reload();
-            }, 500);
-
+        alert('บันทึกสำเร็จ')
       })
     },
     save() {
@@ -321,12 +277,6 @@ export default {
             // console.log(res.data);
             document.getElementById("closedproduct").click();
             this.getproduct();
-            var data = {
-              id:this.pro_id,
-              path:'uploads/'+this.data.file+'.html',
-            }
-            
-            this.scrape(data)
             alert('บันทึกสำเร็จ')
             //       setTimeout(function () {
             //   location.reload();
@@ -357,7 +307,7 @@ export default {
     },
    getproduct(){
     // console.log(this.status);
-    ProductsService.getproducts(this.status,'').then(async (res)=>{
+    ProductsService.getproducts('',0).then(async (res)=>{
       // console.log(res.data);
       this.imagelists = []
       this.list = res.data

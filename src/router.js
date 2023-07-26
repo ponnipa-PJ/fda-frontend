@@ -4,6 +4,7 @@ import Import from './components/Import.vue';
 import scraping from './components/scraping.vue';
 import category from './components/category.vue';
 import scopus from './components/scopus.vue';
+import scrapingdelete from './components/scrapingdelete.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -32,6 +33,12 @@ const router = new Router({
       alias: "/Corpus",
       name: "Corpus",
       component: scopus
+    },
+    {
+      path: "/scrapingdelete",
+      alias: "/scrapingdelete",
+      name: "scrapingdelete",
+      component: scrapingdelete
     },
     
   ]

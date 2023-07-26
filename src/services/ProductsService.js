@@ -1,8 +1,8 @@
 import http from "../http-common";
 
 class ProductsService {
-  getproducts(status) {
-    return http.get('/products?status='+status);
+  getproducts(status,statusdelete) {
+    return http.get('/products?status='+status+'&&statusdelete='+statusdelete);
   }
   scraping(data) {
     return http.post('/products/findscraping',data);
@@ -31,8 +31,8 @@ class ProductsService {
   findproduct(data) {
     return http.post('/products/findproduct', data);
   } 
-  deleteproduct(id) {
-    return http.delete(`/products/${id}`);
+  deleteproduct(id,data) {
+    return http.put(`/products/updatedeletestatus/${id}`,data);
   }
 }
 
