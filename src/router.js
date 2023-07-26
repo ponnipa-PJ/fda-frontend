@@ -28,9 +28,9 @@ const router = new Router({
       component: category
     },
     {
-      path: "/scopus",
-      alias: "/scopus",
-      name: "scopus",
+      path: "/Corpus",
+      alias: "/Corpus",
+      name: "Corpus",
       component: scopus
     },
     

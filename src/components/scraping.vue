@@ -1,13 +1,46 @@
 <template>
   <div class="container mt-5">
-    <div class="col-md-4">
+    <!-- <div class="col-md-4">
       <label>สถานะ</label>
       <select class="form-select" v-model="status" @change="getproduct">
   <option value="1">ดึงข้อมูลแล้ว</option>
   <option value="0">ยังไม่ได้ดึงข้อมูล</option>
 </select>
+    </div> -->
+   <div class="row">
+    <div class="col-md-12">
+      <div class="card-body">
+
+<div class="form-group">
+                  <!-- <label for="password">หมวด</label>
+                  <select class="form-control" v-model="data.cat_id">
+  <option v-for="(i,r) in category" :key="r" :value="i.id">{{i.name}}</option>
+</select> -->
+                </div>
+                <div class="form-group">
+                  <label>ชื่อไฟล์</label>
+                  <input
+                    v-model="data.file"
+                    type="text"
+                    min="1"
+                    class="form-control form-control-sm"
+                  />
+                </div>
+                <div class="form-group mt-3">
+                  <label>URL</label>
+                  <textarea
+                  rows="10"
+                    v-model="data.url"
+                    type="text"
+                    class="form-control form-control-sm"
+                  ></textarea>
+                </div>
+                <button type="button" class="btn btn-success" @click="save()">
+              บันทึก
+            </button>
+              </div>
     </div>
-   
+   </div>
     <div style="text-align:right" v-if="status == 0"> <button @click="getid(0)"
           data-bs-toggle="modal"
           data-bs-target="#AddProduct"
@@ -17,10 +50,11 @@
       <table class="table mt-3" v-if="list.length > 0">
         <thead>
           <tr>
-            <th scope="col">ชื่อไฟล์</th>
+            <th scope="col">ชื่อไฟล์</th>           
+             <th scope="col" v-if="status ==1">เลขที่อนุญาต</th>
+
             <th scope="col">หมวด</th>
             <th scope="col" v-if="status ==1">ชื่อสินค้า</th>
-            <th scope="col" v-if="status ==1">เลขที่อนุญาต</th>
             <th scope="col" v-if="status ==1">ข้อมูลสินค้า</th>
             <th scope="col" v-if="status ==1">สถานะการตรวจสอบ</th>
             
@@ -32,11 +66,11 @@
         <tbody>
           <tr v-for="(l, i) in pageOfItems" :key="i">           
              <td :style="l.bg"><a :href="l.url" target="_blank">{{ l.file }}</a></td>
+             <td :style="l.bg" v-if="status ==1"><a :href="'/?id='+l.id" target="_blank">{{ l.fda }}</a></td>
 
-            <td :style="l.bg">{{ l.cat_name }}</td>
+            <td :style="l.bg">{{ l.cat_fda }}</td>
             <!-- <img :src="imagelists[i].path" style="width:100%">{ -->
             <td :style="l.bg" v-if="status ==1"><img :src="l.src" style="width:100%">{{ l.name }}</td>
-            <td :style="l.bg" v-if="status ==1"><a :href="'/?id='+l.id" target="_blank">{{ l.fda }}</a></td>
             <td :style="l.bg" v-if="status ==1">{{ l.content }}</td>
             <td :style="l.bg" v-if="status ==1"> <span v-if="l.statusfda == null">ยังไม่ได้ตรวจสอบ</span>  <span v-if="l.statusfda == 0">ไม่ผ่าน</span><span v-if="l.statusfda == 1">ผ่าน</span></td>
             <td :style="l.bg" v-if="status ==0" style="width: 500px;word-break:break-word;">{{ l.url }}</td>
@@ -238,10 +272,11 @@ export default {
       })
     },
     save() {
-      console.log(this.data);
-      if (this.data.cat_id == null || this.data.cat_id == "") {
-        alert("กรุณาเลือกหมวด");
-      } else if (this.data.file == null || this.data.file == "") {
+      // console.log(this.data);
+      // if (this.data.cat_id == null || this.data.cat_id == "") {
+      //   alert("กรุณาเลือกหมวด");
+      // } else 
+      if (this.data.file == null || this.data.file == "") {
         alert("กรุณากรอกชื่อไฟล์");
       }else if (this.data.url == null ||  this.data.url == "") {
         alert("กรุณากรอก url");
@@ -255,12 +290,18 @@ export default {
           url: this.data.url,
           statusdelete:1
         };
-        console.log(prodata);
+        // console.log(prodata);
         if (this.pro_id == 0) {
-          ProductsService.createproduct(prodata).then(() => {
+          ProductsService.createproduct(prodata).then((res) => {
             document.getElementById("closedproduct").click();
             this.getproduct();
-            alert('บันทึกสำเร็จ')
+            // alert('บันทึกสำเร็จ')
+            var data = {
+              id:res.data.id,
+              path:'uploads/'+this.data.file+'.html',
+            }
+            
+            this.scrape(data)
             //       setTimeout(function () {
             //   location.reload();
             // }, 500);
@@ -308,7 +349,7 @@ export default {
     })
    },
    findfda(data) {
-    console.log(data);
+    // console.log(data);
       var text = ['หมายเลขใบอนุญาต/อย.']
       var end = ['จำนวนสินค้า','ส่วนประกอบ','น้ำหนัก']
       var findfda = data
@@ -341,10 +382,10 @@ export default {
       });
     // http://127.0.0.1:5000/scraping?id=1&&path=%27uploads/1.html%27
     // var url = 'file:///Users/ponnipa/Documents/GitHub/shophtml/%F0%9F%8D%92%20(%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%81%E0%B8%97%E0%B9%89100%25)%20Jelly%20Fiber%20%E0%B9%80%E0%B8%88%E0%B8%A5%E0%B8%A5%E0%B8%B5%E0%B9%88%E0%B9%84%E0%B8%9F%E0%B9%80%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%20%E0%B8%A5%E0%B8%94%E0%B8%9E%E0%B8%B8%E0%B8%87%20%E0%B8%A5%E0%B8%94%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81%201%E0%B8%81%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%87_5%20%E0%B8%8B%E0%B8%AD%E0%B8%87%20_%20Shopee%20Thailand.html'
-    var paths = {
-      id:data.id,
-      path:data.path
-    }
+    // var paths = {
+    //   id:data.id,
+    //   path:data.path
+    // }
     // console.log(path);
     // ProductsService.saveimageproduct(path).then(()=>{
     // ProductsService.scraping(paths).then((res)=>{
@@ -359,8 +400,10 @@ export default {
       // console.log(fda);
       con = con.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
       con = con.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
-      // // console.log(con);
-      ProductsService.scrapingheader(paths).then((res)=>{
+      // // console.log(con);scrapingheader
+      // ProductsService.scrapingheader(paths).then((res)=>{
+              axios.get('http://127.0.0.1:5000/scrapingheader?path=' + data.path).then((res) => {
+// console.log(res.data);
         var name = res.data
         name = name.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
 
@@ -373,22 +416,33 @@ export default {
           status:1,
       fda:fda
         }
-      //   // console.log(pro);
+        // console.log(pro);
         ProductsService.updatescraping(data.id,pro).then(()=>{
           // console.log(res.data);
-          // alert('บันทึกเรียบร้อย')
-          // this.getproduct()
-                setTimeout(function () {
-              location.reload();
-            }, 500);
-            window.scrollTo(0, 0);
-          this.$router.push("/?id="+data.id);
+          alert('บันทึกเรียบร้อย')
+          this.data = {}
+          // let route = this.$router.resolve({ path: "/"+ data.id});
+          // window.open(route.href);
+          // window.location = '/';
+          this.gotosearch(data.id)
+//           const router = useRouter();
+// const routeData = router.resolve({name: '/', query: {id: data.id}});
+// window.open(routeData.href, '_blank');
+          this.getproduct()
+            //     setTimeout(function () {
+            //   location.reload();
+            // }, 500);
+            // window.scrollTo(0, 0);
+          // this.$router.push("/?id="+data.id,'_blank');
         })
     
       }
     });
     })
   // });
+   },
+   gotosearch(id){
+    window.open('/?id='+id, '_blank');
    }
   },
   mounted() {

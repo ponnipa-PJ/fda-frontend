@@ -43,8 +43,8 @@ export default {
       class:''
     },
     {
-      name:'scopus',
-      path:'/scopus',
+      name:'Corpus',
+      path:'/Corpus',
       class:''
     })
     for (let m = 0; m < this.menu.length; m++) {

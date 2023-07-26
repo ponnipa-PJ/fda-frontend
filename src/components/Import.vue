@@ -131,15 +131,20 @@ export default {
   methods: {
     updatestatusfda(){
       // console.log(this.statusfda,this.statuscat,this.statusname)
+      // var cat = this.matchcategory.replaceAll('<span style="color:red">','')
+      // cat = cat.replaceAll('</span>','')
+      // console.log(cat);
       var fda = {
         }
       if (this.statusfda && this.statuscat && this.statusname) {
          fda = {
-          statusfda:true
+          statusfda:true,
+          cat_fda:this.type
         }
       }else{
          fda = {
-          statusfda:false
+          statusfda:false,
+          cat_fda:this.type
         }
       }
       // console.log(this.list[0].id);
