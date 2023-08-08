@@ -5,6 +5,9 @@ import scraping from './components/scraping.vue';
 import category from './components/category.vue';
 import scopus from './components/scopus.vue';
 import scrapingdelete from './components/scrapingdelete.vue';
+import searchbyfda from './components/searchbyfda.vue';
+import Dashboard from './components/Dashboard.vue';
+import DetailTypeGraph from './components/DetailTypeGraph.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -40,7 +43,24 @@ const router = new Router({
       name: "scrapingdelete",
       component: scrapingdelete
     },
-    
+    {
+      path: "/searchbyfda",
+      alias: "/searchbyfda",
+      name: "searchbyfda",
+      component: searchbyfda
+    },
+    {
+      path: "/Dashboard",
+      alias: "/Dashboard",
+      name: "Dashboard",
+      component: Dashboard
+    },
+    {
+      path: "/detailtype/:id",
+      alias: "/detailtype",
+      name: "detailtype",
+      component: DetailTypeGraph
+    },  
   ]
 });
 

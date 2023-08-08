@@ -1,47 +1,6 @@
 <template>
   <div class="container mt-5">
-    <!-- <div class="col-md-4">
-      <label>สถานะ</label>
-      <select class="form-select" v-model="status" @change="getproduct">
-  <option value="1">ดึงข้อมูลแล้ว</option>
-  <option value="0">ยังไม่ได้ดึงข้อมูล</option>
-</select>
-    </div> -->
-   <div class="row">
-    <div class="col-md-12">
-      <div class="card-body">
-
-<div class="form-group">
-                  <!-- <label for="password">หมวด</label>
-                  <select class="form-control" v-model="data.cat_id">
-  <option v-for="(i,r) in category" :key="r" :value="i.id">{{i.name}}</option>
-</select> -->
-                </div>
-                <div class="form-group">
-                  <label>ชื่อไฟล์</label>
-                  <input
-                    v-model="data.file"
-                    type="text"
-                    min="1"
-                    class="form-control form-control-sm"
-                  />
-                </div>
-                <div class="form-group mt-3">
-                  <label>URL</label>
-                  <textarea
-                  rows="10"
-                    v-model="data.url"
-                    type="text"
-                    class="form-control form-control-sm"
-                  ></textarea>
-                </div>
-                <button type="button" class="btn btn-success" @click="save()">
-              บันทึก
-            </button>
-              </div>
-    </div>
-   </div>
-   รายการสินค้าที่ตรวจสอบ
+   รายการสินค้าที่<span v-if="id == 1">ผ่านการตรวจสอบ</span><span v-if="id == 0">ไม่ผ่านการตรวจสอบ</span><span v-if="id == 3">ไม่สามารถตรวจสอบได้</span> จำนวน {{ list.length }} รายการ
     <div style="text-align:right" v-if="status == 0"> <button @click="getid(0)"
           data-bs-toggle="modal"
           data-bs-target="#AddProduct"
@@ -244,7 +203,8 @@ export default {
       imagelists:[],
       pageOfItems: [],
       customLabels,
-      filepath:''
+      filepath:'',
+      id:''
     };
   },
   methods: {
@@ -280,62 +240,6 @@ export default {
 
       })
     },
-    save() {
-      // console.log(this.data);
-      // if (this.data.cat_id == null || this.data.cat_id == "") {
-      //   alert("กรุณาเลือกหมวด");
-      // } else 
-      if (this.data.file == null || this.data.file == "") {
-        alert("กรุณากรอกชื่อไฟล์");
-      }else if (this.data.url == null ||  this.data.url == "") {
-        alert("กรุณากรอก url");
-      } else {
-        var prodata = {
-          cat_id: this.data.cat_id,
-          file: this.data.file,
-          path:'uploads/'+this.data.file+'.html',
-          image_path:'uploads/'+this.data.file+'_files',
-          status:0,
-          url: this.data.url,
-          statusdelete:1
-        };
-        // console.log(prodata);
-        if (this.pro_id == 0) {
-          ProductsService.createproduct(prodata).then((res) => {
-            document.getElementById("closedproduct").click();
-            this.getproduct();
-            // alert('บันทึกสำเร็จ')
-            var data = {
-              id:res.data.id,
-              path:'uploads/'+this.data.file+'.html',
-            }
-            
-            this.scrape(data)
-            //       setTimeout(function () {
-            //   location.reload();
-            // }, 500);
-            // window.scrollTo(0, 0);
-          });
-        } else {
-          ProductsService.updateproduct(this.pro_id, prodata).then(() => {
-            // console.log(res.data);
-            document.getElementById("closedproduct").click();
-            this.getproduct();
-            var data = {
-              id:this.pro_id,
-              path:'uploads/'+this.data.file+'.html',
-            }
-            
-            this.scrape(data)
-            alert('บันทึกสำเร็จ')
-            //       setTimeout(function () {
-            //   location.reload();
-            // }, 500);
-            // window.scrollTo(0, 0);
-          });
-        }
-      }
-    },
     getcategory(){
       CategoryService.getcategorys(1).then((res)=>{
         this.category = res.data
@@ -357,7 +261,7 @@ export default {
     },
    getproduct(){
     // console.log(this.status);
-    ProductsService.getproducts(this.status,'','').then(async (res)=>{
+    ProductsService.getproducts('','',this.id).then(async (res)=>{
       console.log(res.data);
       this.imagelists = []
       this.list = res.data
@@ -473,11 +377,10 @@ return result
    }
   },
   mounted() {
+    this.id = this.$route.params.id
     this.getproduct()
     this.getcategory()
-    CategoryService.database_path().then((res)=>{
-      this.filepath = res.data.backend_path
-    })
+    // console.log(this.$route.params.id);
     // this.getimagefile(1)
 //     var data = [
 //   { id: 2, name: "FIAT", active: true, parentId: "1" },

@@ -2,8 +2,8 @@
   <div class="container" style="height: 600px">
     <div class="form-group mt-5">
 
-      <label for="exampleFormControlTextarea1">URL</label>
-      <textarea v-model="url" class="form-control" id="exampleFormControlTextarea1" rows="7"></textarea>
+      <label for="exampleFormControlTextarea1">FDA</label>
+      <input v-model="url" class="form-control" style="width:500px" id="exampleFormControlTextarea1"/>
     </div>
     <button @click="search()" type="submit" class="mb-3 btn btn-success">
       ค้นหา
@@ -311,7 +311,7 @@ export default {
     //       })
     //     },
     search() {
-      console.log(this.url);
+      // console.log(this.url);
       this.statusname=0,
       this.statuscat=0,
       this.statusfda=0,
@@ -320,10 +320,10 @@ export default {
       this.colorcat='background-color:#f9bdbb',
       this.list = []
       var data = {
-        url: this.url
+        fda: this.url
       }
-      ProductsService.findproduct(data).then(async (res) => {
-        // console.log();
+      ProductsService.findproductfda(data).then(async (res) => {
+        // console.log(res.data.length);
         if (res.data[0].content == '' || res.data.length == 0) {
           alert('ไม่พบข้อมูลในระบบ')
         } else {

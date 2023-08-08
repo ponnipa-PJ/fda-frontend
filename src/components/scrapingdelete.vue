@@ -307,7 +307,7 @@ export default {
     },
    getproduct(){
     // console.log(this.status);
-    ProductsService.getproducts('',0).then(async (res)=>{
+    ProductsService.getproducts('',0,'').then(async (res)=>{
       // console.log(res.data);
       this.imagelists = []
       this.list = res.data

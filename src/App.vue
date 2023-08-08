@@ -27,9 +27,20 @@ export default {
     if (this.$route.params.name == "map" || this.$route.name == "login" || this.$route.name == "register") {
       this.show = false;
     }
-    this.menu.push({
-      name:'ค้นหาสินค้า',
+    this.menu.push(
+    {
+      name:'แดชบอร์ด',
+      path:'/Dashboard',
+      class:''
+    },
+      {
+      name:'ค้นหาสินค้าจากลิงก์',
       path:'/',
+      class:''
+    },
+    {
+      name:'ค้นหาสินค้าจากเลขผลิตภัณฑ์',
+      path:'/searchbyfda',
       class:''
     },
     {
