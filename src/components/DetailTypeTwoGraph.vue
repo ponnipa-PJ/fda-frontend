@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-5">
-   รายการสินค้าที่<span v-if="id == 1">ผ่านการตรวจสอบ</span><span v-if="id == 0">ไม่ผ่านการตรวจสอบ</span><span v-if="id == 3">ไม่สามารถตรวจสอบได้</span> จำนวน {{ list.length }} รายการ
+   รายการสินค้าที่ผ่านการตรวจสอบตามเงื่อนไข<span v-if="id == 1">เลขที่อนุญาต</span><span v-if="id == 2">ประเภทผลิตภัณฑ์</span><span v-if="id == 3">ชื่อผลิตภัณฑ์</span> จำนวน {{ list.length }} รายการ
     <div style="text-align:right" v-if="status == 0"> <button @click="getid(0)"
           data-bs-toggle="modal"
           data-bs-target="#AddProduct"
@@ -261,7 +261,7 @@ export default {
     },
    getproduct(){
     // console.log(this.status);
-    ProductsService.getproducts('','',this.id).then(async (res)=>{
+    ProductsService.findGraphTwo(this.id).then(async (res)=>{
       console.log(res.data);
       this.imagelists = []
       this.list = res.data

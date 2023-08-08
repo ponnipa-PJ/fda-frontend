@@ -466,7 +466,7 @@ return result
   // });
    },
    gotosearch(id){
-    window.open('/?id='+id, '_blank');
+    window.open('/import?id='+id, '_blank');
    },
    gotofile(url){
     window.open(this.filepath+url, '_blank');

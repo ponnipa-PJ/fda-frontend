@@ -1,13 +1,23 @@
 <template>
-  <div class="container-fluid row mt-3" style="padding: 30px">
-     <div class="col-md-6">
+  <div class="container">
+  <div class=" row mt-3">
+    <div class="col-md-1">
+    </div>
+     <div class="card col-md-5">
 <TypeOneGraph/>
     </div>
+    <div class="col-md-1">
+    </div>
+    <div class="card col-md-5">
+<TypeTwoGraph/>
+    </div>
   </div>
+</div>
 </template>
 
 <script>
 import TypeOneGraph from './TypeOneGraph.vue'
+import TypeTwoGraph from './TypeTwoGraph.vue'
 
 export default {
   name: "Nav",
@@ -16,6 +26,7 @@ export default {
   },
   components:{
     TypeOneGraph,
+    TypeTwoGraph
   },
   data() {
     return {

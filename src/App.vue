@@ -30,12 +30,12 @@ export default {
     this.menu.push(
     {
       name:'แดชบอร์ด',
-      path:'/Dashboard',
+      path:'/',
       class:''
     },
       {
       name:'ค้นหาสินค้าจากลิงก์',
-      path:'/',
+      path:'/import',
       class:''
     },
     {

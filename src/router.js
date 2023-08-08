@@ -8,13 +8,14 @@ import scrapingdelete from './components/scrapingdelete.vue';
 import searchbyfda from './components/searchbyfda.vue';
 import Dashboard from './components/Dashboard.vue';
 import DetailTypeGraph from './components/DetailTypeGraph.vue';
+import DetailTypeTwoGraph from './components/DetailTypeTwoGraph.vue';
 
 Vue.use(Router);
 const router = new Router({
   mode: "history",
   routes: [
     {
-      path: "/",
+      path: "/import",
       alias: "/import",
       name: "import",
       component: Import
@@ -50,7 +51,7 @@ const router = new Router({
       component: searchbyfda
     },
     {
-      path: "/Dashboard",
+      path: "/",
       alias: "/Dashboard",
       name: "Dashboard",
       component: Dashboard
@@ -61,6 +62,12 @@ const router = new Router({
       name: "detailtype",
       component: DetailTypeGraph
     },  
+    {
+      path: "/detailtypetwo/:id",
+      alias: "/detailtypetwo",
+      name: "detailtypetwo",
+      component: DetailTypeTwoGraph
+    },
   ]
 });
 
