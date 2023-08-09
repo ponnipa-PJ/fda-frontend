@@ -39,12 +39,12 @@ export default {
       class:''
     },
     {
-      name:'ค้นหาสินค้าจากเลขผลิตภัณฑ์',
+      name:'ค้นหาสินค้าจากเลขอย.',
       path:'/searchbyfda',
       class:''
     },
     {
-      name:'รายการสินค้า',
+      name:'รายการสินค้าที่ตรวจสอบทั้งหมด',
       path:'/scraping',
       class:''
     },
@@ -53,11 +53,11 @@ export default {
     //   path:'/category',
     //   class:''
     // },
-    {
-      name:'รายการสินค้าที่ยกเลิกการตรวจสอบ',
-      path:'/scrapingdelete',
-      class:''
-    },
+    // {
+    //   name:'รายการสินค้าที่ยกเลิกการตรวจสอบ',
+    //   path:'/scrapingdelete',
+    //   class:''
+    // },
     
     {
       name:'Corpus',

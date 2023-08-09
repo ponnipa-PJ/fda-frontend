@@ -52,6 +52,11 @@ export default {
         colors: this.color,
         series: this.data,
     labels: this.category,
+    dataLabels: {
+        formatter: function (val, opts) {
+            return opts.w.config.series[opts.seriesIndex]
+        },
+      },
         chart: {
           type: "pie",
           events: {
@@ -75,7 +80,7 @@ export default {
           },
         },
         title: {
-          text: "กราฟแสดงจำนวนการตรวจสอบผลิตภัณฑ์",
+          text: "กราฟแสดงจำนวนผลิตภัณฑ์ที่ไม่ผ่านการตรวจสอบตามเงื่อนไข",
         },
         style: {
           fontSize: "9px",
@@ -83,6 +88,7 @@ export default {
           fontFamily: "Niramit",
         }
       };
+      
     },
   },
   computed: {

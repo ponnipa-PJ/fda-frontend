@@ -1,8 +1,6 @@
 <template>
   <div class="container">
-  <div class=" row mt-3">
-    <div class="col-md-1">
-    </div>
+  <div class=" row mt-5">
      <div class="card col-md-5">
 <TypeOneGraph/>
     </div>

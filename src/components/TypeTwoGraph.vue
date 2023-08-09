@@ -52,8 +52,14 @@ export default {
         // colors: this.color,
         series: this.data,
     labels: this.category,
+    dataLabels: {
+        formatter: function (val, opts) {
+            return opts.w.config.series[opts.seriesIndex]
+        },
+      },
         chart: {
           type: "pie",
+          // width:"100%",
           events: {
             dataPointSelection: (event, chartContext, config) => {
               // console.log(config);
@@ -75,13 +81,13 @@ export default {
           },
         },
         title: {
-          text: "กราฟแสดงจำนวนการตรวจสอบผลิตภัณฑ์ตามเงื่อนไข",
+          text: "กราฟแสดงจำนวนผลิตภัณฑ์ที่ไม่ผ่านการตรวจสอบตามเงื่อนไข",
         },
         style: {
           fontSize: "9px",
           fontWeight: "bold",
           fontFamily: "Niramit",
-        }
+        },
       };
     },
   },

@@ -323,7 +323,7 @@ export default {
         fda: this.url
       }
       ProductsService.findproductfda(data).then(async (res) => {
-        // console.log(res.data.length);
+        console.log(res.data);
         if (res.data[0].content == '' || res.data.length == 0) {
           alert('ไม่พบข้อมูลในระบบ')
         } else {

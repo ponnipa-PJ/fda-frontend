@@ -4,6 +4,10 @@ class ProductsService {
   getproducts(status,statusdelete,statusfda) {
     return http.get('/products?status='+status+'&&statusdelete='+statusdelete+'&&statusfda='+statusfda);
   }
+  
+  findGraphOne(status) {
+    return http.get('/products/findGraphOne?status='+status);
+  }
   findGraphTwo(status) {
     return http.get('/products/findGraphTwo?status='+status);
   }
