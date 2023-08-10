@@ -48,6 +48,7 @@ export default {
       path:'/scraping',
       class:''
     },
+    
     // {
     //   name:'หมวด',
     //   path:'/category',
@@ -63,7 +64,13 @@ export default {
       name:'Corpus',
       path:'/Corpus',
       class:''
-    })
+    },
+    // {
+    //   name:'keywords',
+    //   path:'/keywords',
+    //   class:''
+    // }
+    )
     for (let m = 0; m < this.menu.length; m++) {
       if (this.menu[m].path == this.$route.path) {
         this.menu[m].class = 'active'

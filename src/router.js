@@ -9,6 +9,7 @@ import searchbyfda from './components/searchbyfda.vue';
 import Dashboard from './components/Dashboard.vue';
 import DetailTypeGraph from './components/DetailTypeGraph.vue';
 import DetailTypeTwoGraph from './components/DetailTypeTwoGraph.vue';
+import keywords from './components/keywords.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -67,6 +68,12 @@ const router = new Router({
       alias: "/detailtypetwo",
       name: "detailtypetwo",
       component: DetailTypeTwoGraph
+    },
+    {
+      path: "/keywords",
+      alias: "/keywords",
+      name: "keywords",
+      component: keywords
     },
   ]
 });

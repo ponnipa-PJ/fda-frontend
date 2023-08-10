@@ -12,7 +12,7 @@
         <label for="exampleFormControlFile1">นำเข้าไฟล์&nbsp;</label>
         <input type="file" @change="onChangeA1" class="form-control-file" id="exampleFormControlFile1" />
       </div> -->
-      <table class="table table-bordered" v-if="list[0].fda">
+      <table class="table table-bordered">
       <thead>
         <tr>
           <th scope="col" style="text-align:center">เงื่อนไขการตรวจสอบข้อที่ 1</th>
@@ -25,7 +25,7 @@
       <tbody>
         <tr>
           <td :style="colorfda">เลขที่อนุญาต</td>
-          <td :style="colorfda"><span v-if="!list[0].status == 0">{{ list[0].fda }}</span><span v-else></span></td>
+          <td :style="colorfda"><span>{{ list[0].fda }}</span></td>
           <td :style="colorfda">{{ list[0].fda }}</td>
           <td :style="colorfda">{{ list[0].list.cncnm || '' }}</td>
           <td v-if="statusfda && statuscat && statusname" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
@@ -69,8 +69,9 @@
           </div>
         </div>
             </td> -->
-          <td :style="l.bg" style="width:300px"><div >เลขที่อนุญาต : <span style="color:red">{{ l.fda }}</span><br/>
-            ชื่อผลิตภัณฑ์: <span v-html="matchname"></span>
+          <td :style="l.bg" style="width:300px"><div >เลขที่อนุญาต : {{ l.fda }}<br/>
+            <!-- ชื่อผลิตภัณฑ์: <span v-html="matchname"></span> -->
+            ชื่อผลิตภัณฑ์: {{l.list.productha}}
            </div></td>
           <td :style="l.bg"><div v-html="cut(tokenize)"></div></td>
           <td style="background-color:#BDEDFF" v-if="l.status == 1">
@@ -167,7 +168,8 @@ export default {
       this.matchname = ''
       this.statusname = 0
           this.colorname = "background-color:#f9bdbb"
-       this.matchname = ''
+      //     console.log(name_real);
+      //  console.log('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real);
       axios.get('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
         // console.log(res.data);
         this.matchname = res.data
@@ -338,14 +340,14 @@ export default {
           this.getimagefile(res.data[0].id)
           var detail = res.data[0].content
           // var detail = 'ข้อมูลจำเพาะของสินค้าหมวดหมู่Shopeeกลุ่มผลิตภัณฑ์เพื่อสุขภาพอาหารเสริมเพื่อความงามผิวยี่ห้อGlobal White(โกลบอลไวท์)หน้าที่ของอาหารเสริมสำหรับความงามคอลลาเจน, ผม ผิว และเล็บหมายเลขใบอนุญาต/อย.70-1-27160-5-0268จำนวนสินค้า258ส่งจากจังหวัดปทุมธานีรายละเอียดสินค้าหมายเลขใบอนุญาต/อย.🌼70-1-27160-5-0268อายุการเก็บรักษา 24 เดือน'
-          var fda = res.data[0].fda
+          var fda = ''
           // console.log(fda);
           var fdalist = []
           // console.log(res.data[0]);
 // if (fda.length != 12) {
 //   alert('หมายเลขใบอนุญาตไม่ถูกต้อง')
 // }else{
-  if (res.data.fda) {
+  if (res.data[0].fda) {
   fda = res.data.fda.replaceAll(' ','')
   }else{
     fda = ''
@@ -391,10 +393,18 @@ export default {
                 if (data.length > 1) {
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
-                  this.checkfdamatch(fdalist[f].name,data.productha+data.produceng)
+                var namefull =fdalist[f].name+fdalist[f].detail
+                namefull = namefull.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
+                namefull = namefull.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
+                namefull = namefull.replaceAll(/(\r\n|\n|\r)/gm, "");
+                namefull = namefull.replaceAll("_", "");
+                namefull = namefull.replaceAll("!", "");
+                namefull = namefull.replaceAll("*", "");
+                namefull = namefull.replaceAll("#", "");
+                  this.checkfdamatch(namefull,data.productha+data.produceng)
 
                 // console.log(fdalist[f].detail);
-                var cat = this.findcategory(fdalist[f].detail)
+                // var cat = this.findcategory(fdalist[f].detail)
                 // console.log(cat);
                 var fdatype = this.fdatype(data.typepro)
                 fdatype = fdatype.replaceAll(' ','')
@@ -421,7 +431,7 @@ export default {
                     })
                   }
                 })
-                this.checkcategorymatch(cat,fdatype)
+                this.checkcategorymatch(res.data[0].content,fdatype)
                 this.gettokenize(res.data[0].content,fdatype+name+data.produceng)
                 if (!data.lcnno) {
                   fdalist[f].status = 0
@@ -541,7 +551,15 @@ export default {
                 if (data.length > 1) {
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
-                  this.checkfdamatch(fdalist[f].name,data.productha+data.produceng)
+                var namefull =fdalist[f].name+fdalist[f].detail
+                namefull = namefull.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
+                namefull = namefull.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
+                namefull = namefull.replaceAll(/(\r\n|\n|\r)/gm, "");
+                namefull = namefull.replaceAll("_", "");
+                namefull = namefull.replaceAll("!", "");
+                namefull = namefull.replaceAll("*", "");
+                namefull = namefull.replaceAll("#", "");
+                  this.checkfdamatch(namefull,data.productha+data.produceng)
 
                 // console.log(fdalist[f].detail);
                 var cat = this.findcategory(fdalist[f].detail)
