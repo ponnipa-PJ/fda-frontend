@@ -33,7 +33,7 @@ export default {
   methods: {
     getData() {
       DashboardService.getTypeTwoDashboards().then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         this.list = res.data
         for (let r = 0; r < res.data.length; r++) {
           this.category.push(res.data[r].categories)
@@ -41,8 +41,8 @@ export default {
         this.color.push(res.data[r].color)
         }
         
-        console.log(this.category );
-         console.log(this.data );
+        // console.log(this.category );
+        //  console.log(this.data );
         this.loadOption();
       });
     },

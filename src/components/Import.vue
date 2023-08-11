@@ -12,7 +12,7 @@
         <label for="exampleFormControlFile1">นำเข้าไฟล์&nbsp;</label>
         <input type="file" @change="onChangeA1" class="form-control-file" id="exampleFormControlFile1" />
       </div> -->
-      <table class="table table-bordered">
+      <table class="table table-bordered" v-if="list.length > 0 && url">
       <thead>
         <tr>
           <th scope="col" style="text-align:center">เงื่อนไขการตรวจสอบข้อที่ 1</th>
@@ -25,8 +25,8 @@
       <tbody>
         <tr>
           <td :style="colorfda">เลขที่อนุญาต</td>
-          <td :style="colorfda"><span>{{ list[0].fda }}</span></td>
-          <td :style="colorfda">{{ list[0].fda }}</td>
+          <td :style="colorfda"><span v-if="list[0].status">{{ list[0].fda }}</span></td>
+          <td :style="colorfda">{{ list[0].fda }} </td>
           <td :style="colorfda">{{ list[0].list.cncnm || '' }}</td>
           <td v-if="statusfda && statuscat && statusname" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
           <span>ผ่าน</span>{{ updatestatusfda() }}</td>
@@ -47,7 +47,7 @@
         </tr>
       </tbody>
       </table>
-    <table class="table mt-3" v-if="list.length > 0">
+    <table class="table mt-3" v-if="list.length > 0 && url">
       <thead>
         <tr>
           <th scope="col">สินค้า</th>
@@ -126,7 +126,8 @@ export default {
       colorname:'background-color:#f9bdbb',
       colorfda:'background-color:#f9bdbb',
       colorcat:'background-color:#f9bdbb',
-      id:''
+      id:'',
+      
     };
   },
   methods: {
@@ -319,7 +320,7 @@ export default {
     //       })
     //     },
     search() {
-      console.log(this.url);
+      // console.log(this.url);
       this.statusname=0,
       this.statuscat=0,
       this.statusfda=0,
@@ -348,7 +349,7 @@ export default {
 //   alert('หมายเลขใบอนุญาตไม่ถูกต้อง')
 // }else{
   if (res.data[0].fda) {
-  fda = res.data.fda.replaceAll(' ','')
+  fda = res.data[0].fda.replaceAll(' ','')
   }else{
     fda = ''
   }
@@ -360,7 +361,7 @@ export default {
             cat_name:res.data[0].cat_name
           })
           for (let f = 0; f < fdalist.length; f++) {
-            if (!fdalist[f].fda) {
+            if (!fdalist[f].fda || isNaN(fda) || fda ==0) {
               fdalist[f].status = 0
               this.gettokenize(fdalist[f].detail,'')
               this.list = fdalist
@@ -391,6 +392,11 @@ export default {
                   data.typepro = ''
                 }
                 if (data.length > 1) {
+                  fdalist[f].status = 0
+                  fdalist[f].list = {}
+                  // console.log(fdalist[f]);
+                  this.gettokenize(fdalist[f].detail,'')
+                  this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
                 var namefull =fdalist[f].name+fdalist[f].detail
@@ -505,7 +511,7 @@ export default {
   }else{
     fda = ''
   }
-  console.log(fda);
+  // console.log(fda);
           fdalist.push({
             id: res.data.id,
             name: res.data.name,
@@ -517,7 +523,7 @@ export default {
           for (let f = 0; f < fdalist.length; f++) {
             // console.log(fdalist[f].fda.length);
             // console.log(fdalist[f].fda);
-            if (!fda) { 
+            if (!fda || isNaN(fda) || fda ==0) { 
               fdalist[f].status = 0
               fdalist[f].list = {}
               // console.log(fdalist[f]);
@@ -549,6 +555,11 @@ export default {
                   data.typepro = ''
                 }
                 if (data.length > 1) {
+                  fdalist[f].status = 0
+                  fdalist[f].list = {}
+                  // console.log(fdalist[f]);
+                  this.gettokenize(fdalist[f].detail,'')
+                  this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
                 var namefull =fdalist[f].name+fdalist[f].detail

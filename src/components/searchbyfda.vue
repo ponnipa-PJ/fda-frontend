@@ -2,7 +2,7 @@
   <div class="container" style="height: 600px">
     <div class="form-group mt-5">
 
-      <label for="exampleFormControlTextarea1">FDA</label>
+      <label for="exampleFormControlTextarea1">URL</label>
       <input v-model="url" class="form-control" style="width:500px" id="exampleFormControlTextarea1"/>
     </div>
     <button @click="search()" type="submit" class="mb-3 btn btn-success">
@@ -12,7 +12,7 @@
         <label for="exampleFormControlFile1">นำเข้าไฟล์&nbsp;</label>
         <input type="file" @change="onChangeA1" class="form-control-file" id="exampleFormControlFile1" />
       </div> -->
-      <table class="table table-bordered" v-if="list.length > 0">
+      <table class="table table-bordered" v-if="list.length > 0 && url">
       <thead>
         <tr>
           <th scope="col" style="text-align:center">เงื่อนไขการตรวจสอบข้อที่ 1</th>
@@ -25,9 +25,9 @@
       <tbody>
         <tr>
           <td :style="colorfda">เลขที่อนุญาต</td>
-          <td :style="colorfda">{{ list[0].fda }}</td>
-          <td :style="colorfda">{{ list[0].fda }}</td>
-          <td :style="colorfda">{{ list[0].list.cncnm }}</td>
+          <td :style="colorfda"><span v-if="list[0].status">{{ list[0].fda }}</span></td>
+          <td :style="colorfda">{{ list[0].fda }} </td>
+          <td :style="colorfda">{{ list[0].list.cncnm || '' }}</td>
           <td v-if="statusfda && statuscat && statusname" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
           <span>ผ่าน</span>{{ updatestatusfda() }}</td>
           <td v-else rowspan="3" style="text-align: center;vertical-align: middle;background-color:#f9bdbb">
@@ -47,7 +47,7 @@
         </tr>
       </tbody>
       </table>
-    <table class="table mt-3" v-if="list.length > 0">
+    <table class="table mt-3" v-if="list.length > 0 && url">
       <thead>
         <tr>
           <th scope="col">สินค้า</th>
@@ -69,12 +69,13 @@
           </div>
         </div>
             </td> -->
-          <td :style="l.bg" style="width:300px"><div >เลขที่อนุญาต : <span style="color:red">{{ l.fda }}</span><br/>
-            ชื่อผลิตภัณฑ์: <span v-html="matchname"></span>
+          <td :style="l.bg" style="width:300px"><div >เลขที่อนุญาต : {{ l.fda }}<br/>
+            <!-- ชื่อผลิตภัณฑ์: <span v-html="matchname"></span> -->
+            ชื่อผลิตภัณฑ์: {{l.list.productha}}
            </div></td>
           <td :style="l.bg"><div v-html="cut(tokenize)"></div></td>
           <td style="background-color:#BDEDFF" v-if="l.status == 1">
-            <p class="card-text">สถานะ : {{ l.list.cncnm }}</p>
+            <p class="card-text">สถานะ : {{ l.list.cncnm || '' }}</p>
             <p class="card-text">ประเภทผลิตภัณฑ์ :<span style="color:red"> {{ l.list.typepro }}</span></p>
             <p class="card-text">ใบสำคัญ/เลขที่อนุญาต : <span style="color:red"> {{ l.list.lcnno }}</span></p>
             <p class="card-text">ชื่อผลิตภัณฑ์ (TH) : <span style="color:red"> {{ l.list.productha }}</span></p>
@@ -125,7 +126,8 @@ export default {
       colorname:'background-color:#f9bdbb',
       colorfda:'background-color:#f9bdbb',
       colorcat:'background-color:#f9bdbb',
-      id:''
+      id:'',
+      
     };
   },
   methods: {
@@ -134,7 +136,9 @@ export default {
       // var cat = this.matchcategory.replaceAll('<span style="color:red">','')
       // cat = cat.replaceAll('</span>','')
       // console.log(cat);
-      var fda = {
+      // console.log(this.list[0].status);
+      if (this.list[0].status ==1) {
+        var fda = {
         }
       if (this.statusfda && this.statuscat && this.statusname) {
          fda = {
@@ -157,13 +161,16 @@ export default {
       ProductsService.updatefdastatus(this.list[0].id,fda).then(()=>{
         // console.log(res.data);
       })
+      }
+      
       return ''
     },
     checkfdamatch(name,name_real) {
       this.matchname = ''
       this.statusname = 0
           this.colorname = "background-color:#f9bdbb"
-       this.matchname = ''
+      //     console.log(name_real);
+      //  console.log('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real);
       axios.get('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
         // console.log(res.data);
         this.matchname = res.data
@@ -204,7 +211,9 @@ export default {
     },
     async gettokenize(words,namereal_result) {
       // console.log(words);
-      // console.log(namereal_result);
+      if (!namereal_result) {
+        namereal_result = 'xxx'
+      }
       axios.get('http://127.0.0.1:5000/worktoken?namereal_result=' + namereal_result+'&&text='+words).then((res) => {
         // console.log(res.data);
         this.tokenize = res.data
@@ -323,23 +332,29 @@ export default {
         fda: this.url
       }
       ProductsService.findproductfda(data).then(async (res) => {
-        console.log(res.data);
-        if (res.data[0].content == '' || res.data.length == 0) {
+        console.log(res.data.length);
+        if (res.data.length == 0) {
           alert('ไม่พบข้อมูลในระบบ')
-        } else {
+        } else if(res.data.length == 0){
+          alert('ไม่พบข้อมูลในระบบ')
+        }else{
           // console.log(res.data[0].content);
           // console.log(this.tokenize);
           this.getimagefile(res.data[0].id)
           var detail = res.data[0].content
           // var detail = 'ข้อมูลจำเพาะของสินค้าหมวดหมู่Shopeeกลุ่มผลิตภัณฑ์เพื่อสุขภาพอาหารเสริมเพื่อความงามผิวยี่ห้อGlobal White(โกลบอลไวท์)หน้าที่ของอาหารเสริมสำหรับความงามคอลลาเจน, ผม ผิว และเล็บหมายเลขใบอนุญาต/อย.70-1-27160-5-0268จำนวนสินค้า258ส่งจากจังหวัดปทุมธานีรายละเอียดสินค้าหมายเลขใบอนุญาต/อย.🌼70-1-27160-5-0268อายุการเก็บรักษา 24 เดือน'
-          var fda = res.data[0].fda
+          var fda = ''
           // console.log(fda);
           var fdalist = []
           // console.log(res.data[0]);
 // if (fda.length != 12) {
 //   alert('หมายเลขใบอนุญาตไม่ถูกต้อง')
 // }else{
-  fda = fda.replaceAll(' ','') 
+  if (res.data[0].fda) {
+  fda = res.data[0].fda.replaceAll(' ','')
+  }else{
+    fda = ''
+  }
           fdalist.push({
             id: res.data[0].id,
             name: res.data[0].name,
@@ -348,7 +363,13 @@ export default {
             cat_name:res.data[0].cat_name
           })
           for (let f = 0; f < fdalist.length; f++) {
-
+            if (!fdalist[f].fda || isNaN(fda) || fda ==0) {
+              fdalist[f].status = 0
+              this.gettokenize(fdalist[f].detail,'')
+              this.list = fdalist
+              // console.log(this.list);
+              alert('เลขอย.ของผลิตภัณฑ์นี้ไม่ถูกต้อง')
+            }else{
             const url = "https://tawaiforhealth.org/api/oryor/check-product";
             const data = { "number_src": fdalist[f].fda };
 // console.log(data);
@@ -373,12 +394,25 @@ export default {
                   data.typepro = ''
                 }
                 if (data.length > 1) {
+                  fdalist[f].status = 0
+                  fdalist[f].list = {}
+                  // console.log(fdalist[f]);
+                  this.gettokenize(fdalist[f].detail,'')
+                  this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
-                  this.checkfdamatch(fdalist[f].name,data.productha+data.produceng)
+                var namefull =fdalist[f].name+fdalist[f].detail
+                namefull = namefull.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
+                namefull = namefull.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
+                namefull = namefull.replaceAll(/(\r\n|\n|\r)/gm, "");
+                namefull = namefull.replaceAll("_", "");
+                namefull = namefull.replaceAll("!", "");
+                namefull = namefull.replaceAll("*", "");
+                namefull = namefull.replaceAll("#", "");
+                  this.checkfdamatch(namefull,data.productha+data.produceng)
 
                 // console.log(fdalist[f].detail);
-                var cat = this.findcategory(fdalist[f].detail)
+                // var cat = this.findcategory(fdalist[f].detail)
                 // console.log(cat);
                 var fdatype = this.fdatype(data.typepro)
                 fdatype = fdatype.replaceAll(' ','')
@@ -405,7 +439,7 @@ export default {
                     })
                   }
                 })
-                this.checkcategorymatch(cat,fdatype)
+                this.checkcategorymatch(res.data[0].content,fdatype)
                 this.gettokenize(res.data[0].content,fdatype+name+data.produceng)
                 if (!data.lcnno) {
                   fdalist[f].status = 0
@@ -438,7 +472,7 @@ export default {
                 
                 // console.log(this.list);
               });
-
+            }
 
           }
         }
@@ -454,24 +488,32 @@ export default {
       this.colorcat='background-color:#f9bdbb',
       this.list = []
       ProductsService.getproduct(this.id).then(async (res) => {
+        
         // console.log(res.data);
         if (res.data.content == '' || res.data.length == 0) {
           alert('ไม่พบข้อมูลในระบบ')
         } else {
+
+  this.url = res.data.url
           // console.log(res.data[0].content);
           // console.log(this.tokenize);
           this.getimagefile(res.data.id)
           var detail = res.data.content
           // var detail = 'ข้อมูลจำเพาะของสินค้าหมวดหมู่Shopeeกลุ่มผลิตภัณฑ์เพื่อสุขภาพอาหารเสริมเพื่อความงามผิวยี่ห้อGlobal White(โกลบอลไวท์)หน้าที่ของอาหารเสริมสำหรับความงามคอลลาเจน, ผม ผิว และเล็บหมายเลขใบอนุญาต/อย.70-1-27160-5-0268จำนวนสินค้า258ส่งจากจังหวัดปทุมธานีรายละเอียดสินค้าหมายเลขใบอนุญาต/อย.🌼70-1-27160-5-0268อายุการเก็บรักษา 24 เดือน'
-          var fda = res.data.fda
+          var fda = ''
           // console.log(fda);
           var fdalist = []
           // console.log(res.data);
 // if (fda.length != 12) {
 //   alert('หมายเลขใบอนุญาตไม่ถูกต้อง')
 // }else{
-  fda = fda.replaceAll(' ','')
-  this.url = res.data.url
+  if (res.data.fda) {
+  fda = res.data.fda.replaceAll(' ','')
+  fda = res.data.fda.replaceAll('\n\n','')
+  }else{
+    fda = ''
+  }
+  // console.log(fda);
           fdalist.push({
             id: res.data.id,
             name: res.data.name,
@@ -479,8 +521,18 @@ export default {
             fda: fda,
             cat_name:res.data.cat_name
           })
+          // console.log(fdalist);
           for (let f = 0; f < fdalist.length; f++) {
-
+            // console.log(fdalist[f].fda.length);
+            // console.log(fdalist[f].fda);
+            if (!fda || isNaN(fda) || fda ==0) { 
+              fdalist[f].status = 0
+              fdalist[f].list = {}
+              // console.log(fdalist[f]);
+              this.gettokenize(fdalist[f].detail,'')
+              this.list = fdalist
+              alert('เลขอย.ของผลิตภัณฑ์นี้ไม่ถูกต้อง')
+            }else{
             const url = "https://tawaiforhealth.org/api/oryor/check-product";
             const data = { "number_src": fdalist[f].fda };
 // console.log(data);
@@ -505,9 +557,22 @@ export default {
                   data.typepro = ''
                 }
                 if (data.length > 1) {
+                  fdalist[f].status = 0
+                  fdalist[f].list = {}
+                  // console.log(fdalist[f]);
+                  this.gettokenize(fdalist[f].detail,'')
+                  this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
-                  this.checkfdamatch(fdalist[f].name,data.productha+data.produceng)
+                var namefull =fdalist[f].name+fdalist[f].detail
+                namefull = namefull.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
+                namefull = namefull.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
+                namefull = namefull.replaceAll(/(\r\n|\n|\r)/gm, "");
+                namefull = namefull.replaceAll("_", "");
+                namefull = namefull.replaceAll("!", "");
+                namefull = namefull.replaceAll("*", "");
+                namefull = namefull.replaceAll("#", "");
+                  this.checkfdamatch(namefull,data.productha+data.produceng)
 
                 // console.log(fdalist[f].detail);
                 var cat = this.findcategory(fdalist[f].detail)
@@ -571,7 +636,7 @@ export default {
                 // console.log(this.list);
               });
 
-
+            }
           }
         }
       // }
@@ -599,7 +664,9 @@ export default {
             if (i + 1 == excel.length) {
               // console.log(fdalist);
               for (let f = 0; f < fdalist.length; f++) {
-
+                if (!fdalist[f].fda) {
+              alert('เลขอย.ของผลิตภัณฑ์นี้ไม่ถูกต้อง')
+            }else{
                 const url = "https://tawaiforhealth.org/api/oryor/check-product";
                 const data = { "number_src": fdalist[f].fda };
 
@@ -642,7 +709,7 @@ export default {
                     }
                   });
 
-
+                }
               }
             }
           }
