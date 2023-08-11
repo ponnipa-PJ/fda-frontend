@@ -73,7 +73,7 @@
             <!-- <img :src="imagelists[i].path" style="width:100%">{ -->
             <td :style="l.bg+';cursor: pointer;'" v-if="status ==1" @click="gotosearch(l.id)"><img :src="l.src" style="width:100%">{{ l.name }}</td>
             <td :style="l.bg+';cursor: pointer;'" v-if="status ==1" @click="gotosearch(l.id)">{{ l.content }}</td>
-            <td :style="l.bg+';cursor: pointer;width: 100px!important;'" v-if="status ==1" @click="gotosearch(l.id)"> <span v-if="l.statusfda == null">ไม่มีเลขอย.</span>  <span v-if="l.statusfda == 0">ไม่ผ่าน <br/>วันที่ตรวจสอบ : {{changdata(l.created_date)}}</span><span v-if="l.statusfda == 1">ผ่าน<br/>วันที่ตรวจสอบ : {{changdata(l.created_date)}}</span></td>
+            <td :style="l.bg+';width: 100px!important;'" v-if="status ==1"> <span v-if="l.statusfda == null">ไม่มีเลขอย.</span>  <span v-if="l.statusfda == 0">ไม่ผ่าน <br/>วันที่ตรวจสอบ : {{changdata(l.created_date)}}</span><span v-if="l.statusfda == 1">ผ่าน<br/>วันที่ตรวจสอบ : {{changdata(l.created_date)}}</span></td>
             <td :style="l.bg" v-if="status ==0" style="width: 500px;word-break:break-word;">{{ l.url }}</td>
             <td>
             <a @click="getid(l.id)">

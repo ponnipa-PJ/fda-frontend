@@ -214,6 +214,7 @@ export default {
       if (!namereal_result) {
         namereal_result = 'xxx'
       }
+      // console.log('http://127.0.0.1:5000/worktoken?namereal_result=' + namereal_result+'&&text='+words);
       axios.get('http://127.0.0.1:5000/worktoken?namereal_result=' + namereal_result+'&&text='+words).then((res) => {
         // console.log(res.data);
         this.tokenize = res.data
@@ -363,6 +364,9 @@ export default {
           for (let f = 0; f < fdalist.length; f++) {
             if (!fdalist[f].fda || isNaN(fda) || fda ==0) {
               fdalist[f].status = 0
+              fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
+              fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
+              console.log(fdalist[f].detail);
               this.gettokenize(fdalist[f].detail,'')
               this.list = fdalist
               // console.log(this.list);
@@ -395,6 +399,8 @@ export default {
                   fdalist[f].status = 0
                   fdalist[f].list = {}
                   // console.log(fdalist[f]);
+                  fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
+                  fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
                   this.gettokenize(fdalist[f].detail,'')
                   this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
@@ -438,7 +444,10 @@ export default {
                   }
                 })
                 this.checkcategorymatch(res.data[0].content,fdatype)
-                this.gettokenize(res.data[0].content,fdatype+name+data.produceng)
+
+              fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
+              fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
+                this.gettokenize(fdalist[f].detail,fdatype+name+data.produceng)
                 if (!data.lcnno) {
                   fdalist[f].status = 0
                   fdalist[f].list = []
@@ -511,8 +520,8 @@ export default {
   }else{
     fda = ''
   }
-  // console.log(fda);
-          fdalist.push({
+
+            fdalist.push({
             id: res.data.id,
             name: res.data.name,
             detail: detail,
@@ -527,6 +536,10 @@ export default {
               fdalist[f].status = 0
               fdalist[f].list = {}
               // console.log(fdalist[f]);
+
+              fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
+              fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
+              console.log(fdalist[f].detail);
               this.gettokenize(fdalist[f].detail,'')
               this.list = fdalist
               alert('เลขอย.ของผลิตภัณฑ์นี้ไม่ถูกต้อง')
@@ -558,6 +571,9 @@ export default {
                   fdalist[f].status = 0
                   fdalist[f].list = {}
                   // console.log(fdalist[f]);
+
+              fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
+              fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
                   this.gettokenize(fdalist[f].detail,'')
                   this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
@@ -601,7 +617,11 @@ export default {
                   }
                 })
                 this.checkcategorymatch(cat,fdatype)
-                this.gettokenize(res.data.content,fdatype+name+data.produceng)
+
+              fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
+              fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
+              console.log(fdalist[f].detail);
+                this.gettokenize(fdalist[f].detail,fdatype+name+data.produceng)
                 if (!data.lcnno) {
                   fdalist[f].status = 0
                   fdalist[f].list = []
