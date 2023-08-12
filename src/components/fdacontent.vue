@@ -3,11 +3,11 @@
       <table class="table table-bordered" v-if="list.length > 0 && url">
       <thead>
         <tr>
-          <th scope="col" style="text-align:center">เงื่อนไขการตรวจสอบข้อที่ 1</th>
-          <th scope="col" style="text-align:center">ข้อมูลจากฐานข้อมูลอย.</th>
-          <th scope="col" style="text-align:center">ข้อมูลจากเว็บไซต์</th>
-          <th scope="col" style="text-align:center">ผลการตรวจสอบ</th>
-          <th scope="col" style="text-align:center">ข้อสรุป</th>
+          <th scope="col" style="text-align:center;background-color:#ffb454">เงื่อนไขการตรวจสอบข้อที่ 1</th>
+          <th scope="col" style="text-align:center;background-color:#ffb454">ข้อมูลจากฐานข้อมูลอย.</th>
+          <th scope="col" style="text-align:center;background-color:#ffb454">ข้อมูลจากเว็บไซต์</th>
+          <th scope="col" style="text-align:center;background-color:#ffb454">ผลการตรวจสอบ</th>
+          <th scope="col" style="text-align:center;background-color:#ffb454">ข้อสรุป</th>
         </tr>
       </thead>
       <tbody>
@@ -32,6 +32,20 @@
           <td :style="colorname">{{ list[0].list.productha }}<br/>{{ list[0].list.produceng }}</td>
           <td :style="colorname"><span v-html="matchname"></span></td>
           <td :style="colorname"><span v-if="statusname">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
+        </tr>
+      </tbody>
+      </table>
+      <table class="table table-bordered" v-if="list.length > 0 && url">
+      <thead>
+        <tr>
+          <th scope="col" style="text-align:center;background-color:#ffb454" colspan="2">เงื่อนไขการตรวจสอบข้อที่ 2</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td :style="colorkey">โฆษณาเกินจริง</td>
+          <td :style="colorkey" v-if="keyword.length"><div v-for="(k, i) in keyword" :key="i"><span v-html="k"></span></div><br/></td>
+          <td :style="colorkey" v-else>ไม่พบข้อความโฆษณาเกินจริง</td>
         </tr>
       </tbody>
       </table>
@@ -118,10 +132,60 @@ export default {
       colorfda:'background-color:#f9bdbb',
       colorcat:'background-color:#f9bdbb',
       id:'',
-      
+      keyword:[],
+      colorkey:'background-color:#f9bdbb',
+
     };
   },
   methods: {
+    checkkeyword(name){
+      var listkeywords = []
+      var namesplit = name.split(" ")
+      // console.log(namesplit);
+      axios.get('http://localhost:8081/api/keywords?name=1').then((res) => {
+        var keylist = []
+        for (let r = 0; r < res.data.length; r++) {
+          res.data[r].name = res.data[r].name.replaceAll(".","")
+          var kk = res.data[r].name.split(" ")
+          for (let k = 0; k < kk.length; k++) {
+            keylist.push(kk[k])
+          }
+        }
+        for (let key = 0; key < keylist.length; key++) {
+          for (let n = 0; n < namesplit.length; n++) {
+            if (namesplit[n] == keylist[key] && keylist[key] != '' && isNaN(keylist[key])) {
+              listkeywords.push(keylist[key])
+            }
+            
+          }
+        }
+
+        console.log(listkeywords.length);
+        if (listkeywords.length == 0) {
+          
+          this.colorkey = "background-color:#a3e9a4"
+        }
+
+        // console.log(keylist);
+        // console.log(listkeywords);
+        var result = [];
+        listkeywords.forEach(function(item) {
+     if(result.indexOf(item) < 0) {
+         result.push(item);
+     }
+});
+console.log(result);
+listkeywords = result
+        for (let l = 0; l < listkeywords.length; l++) {
+          axios.get('http://127.0.0.1:5000/checkkeyword?name=' + name+'&&name_real=' + listkeywords[l]).then((res) => {
+            // console.log(res.data);
+        this.keyword.push(res.data)
+      });
+          
+        }
+      });
+      
+    },
     updatestatusfda(){
       // console.log(this.statusfda,this.statuscat,this.statusname)
       // var cat = this.matchcategory.replaceAll('<span style="color:red">','')
@@ -357,8 +421,9 @@ export default {
               fdalist[f].status = 0
               fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
               fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
-              console.log(fdalist[f].detail);
+              // console.log(fdalist[f].detail);
               this.gettokenize(fdalist[f].detail,'')
+              this.checkkeyword(fdalist[f].detail)
               this.list = fdalist
               // console.log(this.list);
               alert('เลขอย.ของผลิตภัณฑ์นี้ไม่ถูกต้อง')
@@ -393,6 +458,7 @@ export default {
                   fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
                   fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
                   this.gettokenize(fdalist[f].detail,'')
+                  this.checkkeyword(fdalist[f].detail)
                   this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
@@ -439,6 +505,7 @@ export default {
               fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
               fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
                 this.gettokenize(fdalist[f].detail,fdatype+name+data.produceng)
+                this.checkkeyword(fdalist[f].detail)
                 if (!data.lcnno) {
                   fdalist[f].status = 0
                   fdalist[f].list = []
@@ -532,6 +599,7 @@ export default {
               fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
               console.log(fdalist[f].detail);
               this.gettokenize(fdalist[f].detail,'')
+              this.checkkeyword(fdalist[f].detail)
               this.list = fdalist
               alert('เลขอย.ของผลิตภัณฑ์นี้ไม่ถูกต้อง')
             }else{
@@ -566,6 +634,7 @@ export default {
               fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
               fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
                   this.gettokenize(fdalist[f].detail,'')
+                  this.checkkeyword(fdalist[f].detail)
                   this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
@@ -613,6 +682,7 @@ export default {
               fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
               // console.log(fdalist[f].detail);
                 this.gettokenize(fdalist[f].detail,fdatype+name+data.produceng)
+                this.checkkeyword(fdalist[f].detail)
                 if (!data.lcnno) {
                   fdalist[f].status = 0
                   fdalist[f].list = []
