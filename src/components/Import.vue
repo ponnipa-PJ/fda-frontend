@@ -148,51 +148,66 @@ export default {
   },
   methods: {
     checkkeyword(name){
-      var listkeywords = []
-      var namesplit = name.split(" ")
-      // console.log(namesplit);
-      axios.get('http://localhost:8081/api/keywords?name=1').then((res) => {
-        var keylist = []
-        for (let r = 0; r < res.data.length; r++) {
-          res.data[r].name = res.data[r].name.replaceAll(".","")
-          var kk = res.data[r].name.split(" ")
-          for (let k = 0; k < kk.length; k++) {
-            keylist.push(kk[k])
-          }
-        }
-        for (let key = 0; key < keylist.length; key++) {
-          for (let n = 0; n < namesplit.length; n++) {
-            if (namesplit[n] == keylist[key] && keylist[key] != '' && isNaN(keylist[key])) {
-              listkeywords.push(keylist[key])
-            }
-            
-          }
-        }
-        // console.log(keylist);
-        // console.log(listkeywords);
-
-      console.log(listkeywords.length);
-        if (listkeywords.length == 0) {
-          
-          this.colorkey = "background-color:#a3e9a4"
-        }
-        var result = [];
-        listkeywords.forEach(function(item) {
-     if(result.indexOf(item) < 0) {
-         result.push(item);
-     }
-});
-console.log(result);
-listkeywords = result
-        for (let l = 0; l < listkeywords.length; l++) {
-          // console.log('http://127.0.0.1:5000/checkkeyword?name=' + name+'&&name_real=');
-          axios.get('http://127.0.0.1:5000/checkkeyword?name=' + name+'&&name_real=' + listkeywords[l]).then((res) => {
-            // console.log(res.data);
+      // console.log(name);
+    //   axios.get('http://localhost:8081/api/keyword_dicts?name=1').then((res) => {
+    //     console.log(res.data);
+    //     for (let r = 0; r < res.data.length; r++) {
+          axios.get('http://127.0.0.1:5000/checkkeyword?name=' + name).then((res) => {
+            console.log(res.data);
+            if (res.data.length > 0) {
         this.keyword.push(res.data)
+              
+            }
       });
+    //     }
+      
+    // });
+//       var listkeywords = []
+//       var namesplit = name.split(" ")
+//       // console.log(namesplit);
+//       axios.get('http://localhost:8081/api/keyword_dicts?name=1').then((res) => {
+//         console.log(res.data);
+//         var keylist = []
+//         for (let r = 0; r < res.data.length; r++) {
+//           res.data[r].name = res.data[r].name.replaceAll(".","")
+//           var kk = res.data[r].name.split(" ")
+//           for (let k = 0; k < kk.length; k++) {
+//             keylist.push(kk[k])
+//           }
+//         }
+//         for (let key = 0; key < keylist.length; key++) {
+//           for (let n = 0; n < namesplit.length; n++) {
+//             if (namesplit[n] == keylist[key] && keylist[key] != '' && isNaN(keylist[key])) {
+//               listkeywords.push(keylist[key])
+//             }
+            
+//           }
+//         }
+//         // console.log(keylist);
+//         // console.log(listkeywords);
+
+//       console.log(listkeywords.length);
+//         if (listkeywords.length == 0) {
           
-        }
-      });
+//           this.colorkey = "background-color:#a3e9a4"
+//         }
+//         var result = [];
+//         listkeywords.forEach(function(item) {
+//      if(result.indexOf(item) < 0) {
+//          result.push(item);
+//      }
+// });
+// console.log(result);
+// listkeywords = result
+//         for (let l = 0; l < listkeywords.length; l++) {
+//           // console.log('http://127.0.0.1:5000/checkkeyword?name=' + name+'&&name_real=');
+//           axios.get('http://127.0.0.1:5000/checkkeyword?name=' + name+'&&name_real=' + listkeywords[l]).then((res) => {
+//             // console.log(res.data);
+//         this.keyword.push(res.data)
+//       });
+          
+//         }
+//       });
       
     },
     updatestatusfda(){
