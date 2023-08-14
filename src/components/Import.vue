@@ -61,6 +61,7 @@
         </tr>
         <tr>
           <td :style="colorkey" style="width:40%"><span v-html="desc"></span></td>
+          <!-- <th :style="colorkey">ข้อความโฆษณา</th> -->
           <td :style="colorkey" v-if="keyword.length"><div v-for="(k, i) in keyword" :key="i"><span v-html="k"></span><br/></div></td>
           <td :style="colorkey" v-else>ไม่พบข้อความโฆษณา</td>
         </tr>
