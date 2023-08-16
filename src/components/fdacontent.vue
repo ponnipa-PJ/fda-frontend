@@ -43,9 +43,14 @@
       </thead>
       <tbody>
         <tr>
-          <td :style="colorkey">โฆษณาเกินจริง</td>
-          <td :style="colorkey" v-if="keyword.length"><div v-for="(k, i) in keyword" :key="i"><span v-html="k"></span></div><br/></td>
-          <td :style="colorkey" v-else>ไม่พบข้อความโฆษณาเกินจริง</td>
+          <th style="background-color:#ffb454">รายละเอียดสินค้า</th>
+          <th style="background-color:#ffb454">ข้อความโฆษณา</th>
+        </tr>
+        <tr>
+          <td :style="colorkey" style="width:40%"><span v-html="desc"></span></td>
+          <!-- <th :style="colorkey">ข้อความโฆษณา</th> -->
+          <td :style="colorkey" v-if="keyword.length"><div v-for="(k, i) in keyword" :key="i"><span v-html="k"></span><br/></div></td>
+          <td :style="colorkey" v-else>ไม่พบข้อความโฆษณา</td>
         </tr>
       </tbody>
       </table>
@@ -134,23 +139,64 @@ export default {
       id:'',
       keyword:[],
       colorkey:'background-color:#f9bdbb',
-
+      desc:''
     };
   },
   methods: {
+    finddescription(data){
+      // console.log(data);
+      var text = ['รายละเอียด']
+      var findfda = data
+      for (let t = 0; t < text.length; t++) {
+        if (findfda.indexOf(text[t]) != -1) {
+
+          findfda = findfda.substring(findfda.indexOf(text[t]));  
+        }
+
+      }
+      // if (findfda == 'อาหาร') {
+      //   findfda = findfda+ findfda+'เสริม'
+      // }
+      // console.log(findfda);
+      return findfda
+    },
     checkkeyword(name){
-      axios.get('http://127.0.0.1:5000/checkkeyword?name=' + name).then((res) => {
-            // console.log(res.data);
+      // console.log(name);
+    //   axios.get('http://localhost:8081/api/keyword_dicts?name=1').then((res) => {
+    //     console.log(res.data);
+        // for (let r = 0; r < res.data.length; r++) {
+          // name = name.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
+          //       name = name.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
+          //       name = name.replaceAll(/(\r\n|\n|\r)/gm, "");
+          //       name = name.replaceAll("_", "");
+          //       name = name.replaceAll("!", "");
+          //       name = name.replaceAll("*", "");
+                // name = name.replaceAll(`_/l\_`, "");// eslint-disable-line
+      // console.log('http://127.0.0.1:5000/checkkeyword?name=' + name);
+      var desc = this.finddescription(name)
+      // console.log('http://127.0.0.1:5000/worktokendesc?text='+desc);
+      axios.get('http://127.0.0.1:5000/worktokendesc?text='+desc).then((res) => {
+        // console.log(res.data);
+        this.desc  = res.data
+      });
+      // name = 'ข้อมูลจำเพาะของสินค้า หมวดหมู่ Shopee กลุ่มผลิตภัณฑ์เพื่อสุขภาพ อาหารเสริมเพื่อความงาม ผิว ยี่ห้อ Bluebird(บลูเบิร์ด) Storage Condition Normal ประเภทสารอาหาร สารต้านอนุมูลอิสระ, วิตามินซี ประเทศต้นกำเนิดสินค้า ไทย หน้าที่ของอาหารเสริมสำหรับความงาม ดูแลสิว, ป้องกันริ้วรอย ประเภทการห่อ ห่อรวมกัน เพศ ทั้งสองเพศ อายุการเก็บรักษา 12 เดือน ประเภทของผลิตภัณฑ์ยา แคปซูล หมายเลขใบอนุญาต/อย. 30-1-26764-5-0051 จำนวนสินค้า 17901 ส่งจาก จังหวัดนครราชสีมา รายละเอียดสินค้า วิตามินซี พลัส ตรา บลูเบิร์ด ตรา บลูเบิร์ด ขนาด 1000 มิลลิกรัม 60 แคปซูล เรทขายส่ง ช่วงราคาที่ 1 สั่งซื้อตั้งแต่ 5 กระปุกขึ้นไป ถึง 20 กระปุก ราคากระปุกละ 93 บาท ช่วงราคาที่ 2 สั่งซื้อตั้งแต่ 21 กระปุกขึ้นไป ถึง 50 กระปุก ราคากระปุกละ 90 บาท ช่วงราคาที่ 3 สั่งซื้อตั้งแต่ 51 กระปุกขึ้นไป ถึง 100 กระปุก ราคากระปุกละ 87 บาท ช่วงราคาที่ 4 สั่งซื้อตั้งแต่ 100 กระปุกขึ้นไป ..................... ราคากระปุกละ 85 บาท Vitamin C Plus Dietary Supplement Product Bluebird Brand ผลิตภัณฑ์เสริมอาหารวิตามินซี พลัส ตรา บลูเบิร์ด ส่วนประกอบทั้งหมดใน 1 แคปซูล ส่วนประกอบที่สำคัญ (Active Ingredient) VITAMIN C (100%) - 60 มิลลิกรัม CITRUS BIOFLAVONOID POWDER - 630 มิลลิกรัม BARBADOSCHERRY POWDER/ACEROLA CHERRY POWDER (ผงบาร์เบโดสเชอร์รี/ผงอะเซโรลาเชอร์รี) (MALPIGHIA GLABRA L.) ผล - 60 มิลลิกรัม ROSEHIP POWDER (ผงโรสฮิปส์) (ROSA CANINA L.) ผล - 60 มิลลิกรัม Rutin - 30 มิลลิกรัม INDIAN GOOSEBERRY POWDER (ผงมะขามป้อม) (PHYLLANTHUS EMBLICA L. ) ผล - 60 มิลลิกรัม ส่วนประกอบที่ไม่สำคัญ (Inactive Ingredient) EDIBLE GELATIN 428 - 98.5 มิลลิกรัม TITANIUM DIOXIDE 171 -1.95 มิลลิกรัม วิธีรับประทาน ครั้งละ 1-2 แคปซูล หลังอาหารเช้า เลขที่ อ.ย. 30-1-26764-5-0051 คำเตือน ควรเก็บให้พ้นแสงแดงและความชื้น เด็ก สตรีมีครรภ์ และสตรีให้นมบุตรไม่ควรรับประทาน ควรกินอาหารหลากหลายให้ครบ 5 หมู่ ในสัดส่วนที่เหมาะสมเป็นประจำ ไม่มีผลในการป้องกันหรือรักษาโรค สรรพคุณ ประโยชน์ของการกินวิตามินซี ️ทำให้หน้าไม่โทรม หน้าตาสดใส ️ช่วยฟื้นฟูผิวหน้า สิว ฝ้า กระ ริ้วรอย ดูจางลง ️ผิวพรรณนุ่มเรียบเนียบ ชุ่มชื่น ️หน้าตาดูเด็กและเด้งขึ้น ️ผิวหน้าขาวอมชมพู สินค้าตัดรอบทุกวันเวลา ตัดรอบเวลา 12.00 น ของทุกวัน แจ้งโอนเกินเวลา ส่งรอบวันถัดไปนะจ๊ะ ส่งพัสดุทุกวัน เว้นวันอาทิตย์ และวันหยุดนักขัตฤกษ์ ขอบพระคุณลูกค้าทุกท่าน ที่ไว้วางใจผลิตภัณฑ์ของเราเสมอมา_/l\_'
+      console.log('http://127.0.0.1:5000/checkkeyword?name=' + desc);    
+      axios.get('http://127.0.0.1:5000/checkkeyword?name=' + desc).then((res) => {
+            console.log(res.data);
             if (res.data.length > 0) {
         // this.keyword.push(res.data)
         this.keyword = res.data
               
             }
-          });
+      });
+    //     }
+      
+    // });
 //       var listkeywords = []
 //       var namesplit = name.split(" ")
 //       // console.log(namesplit);
-//       axios.get('http://localhost:8081/api/keywords?name=1').then((res) => {
+//       axios.get('http://localhost:8081/api/keyword_dicts?name=1').then((res) => {
+//         console.log(res.data);
 //         var keylist = []
 //         for (let r = 0; r < res.data.length; r++) {
 //           res.data[r].name = res.data[r].name.replaceAll(".","")
@@ -167,15 +213,14 @@ export default {
             
 //           }
 //         }
+//         // console.log(keylist);
+//         // console.log(listkeywords);
 
-//         console.log(listkeywords.length);
+//       console.log(listkeywords.length);
 //         if (listkeywords.length == 0) {
           
 //           this.colorkey = "background-color:#a3e9a4"
 //         }
-
-//         // console.log(keylist);
-//         // console.log(listkeywords);
 //         var result = [];
 //         listkeywords.forEach(function(item) {
 //      if(result.indexOf(item) < 0) {
@@ -185,6 +230,7 @@ export default {
 // console.log(result);
 // listkeywords = result
 //         for (let l = 0; l < listkeywords.length; l++) {
+//           // console.log('http://127.0.0.1:5000/checkkeyword?name=' + name+'&&name_real=');
 //           axios.get('http://127.0.0.1:5000/checkkeyword?name=' + name+'&&name_real=' + listkeywords[l]).then((res) => {
 //             // console.log(res.data);
 //         this.keyword.push(res.data)
