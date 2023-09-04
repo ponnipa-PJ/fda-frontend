@@ -62,7 +62,7 @@
             <form>
               <div class="card-body mt-3">
                 <div class="form-group mt-3">
-                  <label>หมวด</label>
+                  <label>คำศัพท์</label>
                   <input
                     v-model="data.name"
                     type="text"
@@ -126,6 +126,7 @@
 <script>
 
 import DictService from '../services/DictService'
+import RuleBasedService from '../services/RuleBasedService'
 
 export default {
   name: "App",
@@ -165,10 +166,13 @@ export default {
         };
         console.log(prodata);
         if (this.pro_id == 0) {
-          DictService.createdict(prodata).then(() => {
+          DictService.createdict(prodata).then((res) => {
+            // console.log(res.data );
+            RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
             document.getElementById("closedcategory").click();
             this.getcategory();
             alert('บันทึกสำเร็จ')
+          });
             //       setTimeout(function () {
             //   location.reload();
             // }, 500);
@@ -211,6 +215,13 @@ export default {
   },
   mounted() {
     this.getcategory()
+//     var corpus=
+//     {
+// dict1 : 1
+//     }
+//     RuleBasedService.createrule_based(corpus).then((res) => {
+//       console.log(res.data);
+//     });
   },
 };
 </script>
