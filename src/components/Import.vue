@@ -62,7 +62,13 @@
         <tr>
           <td :style="colorkey" style="width:40%"><span v-html="desc"></span></td>
           <!-- <th :style="colorkey">ข้อความโฆษณา</th> -->
-          <td :style="colorkey" v-if="keyword.length"><div v-for="(k, i) in keyword" :key="i"><span v-html="k"></span><br/></div></td>
+          <td :style="colorkey" v-if="keyword.length">
+        <tr v-for="(k, i) in keyword" :key="i">
+          <td ><span v-html="k"></span></td>
+          <td ><button @click="savetorulr_based()" type="submit" class="mb-3 btn btn-success">
+      บันทึก
+    </button></td>
+        </tr></td>
           <td :style="colorkey" v-else>ไม่พบข้อความโฆษณา</td>
         </tr>
       </tbody>
