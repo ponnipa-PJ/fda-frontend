@@ -193,7 +193,7 @@ export default {
       }
     },
     getcategory(){
-      DictService.getdicts(1).then((res)=>{
+      DictService.getdicts(1,'').then((res)=>{
         this.list = res.data
       })
     },

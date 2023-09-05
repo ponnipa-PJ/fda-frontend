@@ -4,7 +4,9 @@ class ProductsService {
   getproducts(status,statusdelete,statusfda) {
     return http.get('/products?status='+status+'&&statusdelete='+statusdelete+'&&statusfda='+statusfda);
   }
-  
+  getproductkeyword(status) {
+    return http.get('/products/getproductkeyword?status='+status);
+  }
   findGraphOne(status) {
     return http.get('/products/findGraphOne?status='+status);
   }
@@ -28,6 +30,9 @@ class ProductsService {
   } 
   updateproduct(id,data) {
     return http.put(`/products/${id}`, data);
+  }
+  map_rule_based(id,data) {
+    return http.put(`/products/map_rule_based/${id}`, data);
   }
   updatescraping(id,data) {
     return http.put(`/products/updatescraping/${id}`, data);

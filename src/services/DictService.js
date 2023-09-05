@@ -1,8 +1,8 @@
 import http from "../http-common";
 
 class DictService {
-  getdicts(status) {
-    return http.get('/dicts?status='+status);
+  getdicts(status,name) {
+    return http.get('/dicts?status='+status+"&&name="+name);
   }
   getdict(id) {
     return http.get('/dicts/'+id);

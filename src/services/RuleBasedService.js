@@ -10,6 +10,9 @@ class RuleBasedService {
   getrule_based(id) {
     return http.get('/rule_based/'+id);
   }
+  getbydict(id) {
+    return http.get('/rule_based/getbydict?name='+id);
+  }
   createrule_based(data) {
     return http.post('/rule_based', data);
   } 

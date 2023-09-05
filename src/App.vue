@@ -65,11 +65,21 @@ export default {
       path:'/Corpus',
       class:''
     },
-    // {
-    //   name:'keywords',
-    //   path:'/keywords',
-    //   class:''
-    // }
+    {
+      name:'keywords',
+      path:'/keywords',
+      class:''
+    },
+    {
+      name:'Advertising',
+      path:'/Advertising',
+      class:''
+    },
+    {
+      name:'rule based',
+      path:'/rulebased',
+      class:''
+    }
     )
     for (let m = 0; m < this.menu.length; m++) {
       if (this.menu[m].path == this.$route.path) {

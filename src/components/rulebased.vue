@@ -1,26 +1,26 @@
 <template>
   <div class="container mt-5">
-    <div style="text-align:right"> <button @click="getid(0)"
+    <!-- <div style="text-align:right"> <button @click="getid(0)"
           data-bs-toggle="modal"
           data-bs-target="#AddScopus"
            type="submit" class="mb-3 btn btn-success">
       <i class="fa fa-plus" aria-hidden="true"></i>
-    </button></div>
+    </button></div> -->
       <table class="table" v-if="list.length > 0" width="100%">
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col">ข้อความ</th>
-            <th scope="col">ตัดคำ</th>
-            <th scope="col"></th>
+            <th scope="col">ประโยค</th>
+            <th scope="col">สถานะ</th>
+            <!-- <th scope="col"></th> -->
           </tr>
         </thead>
         <tbody>
           <tr v-for="(l, i) in list" :key="i">
             <td :style="l.bg">{{ i + 1 }}</td>
-            <td :style="l.bg">{{ l.name }}</td>
-            <td :style="l.bg">{{ l.token }}</td>
-            <td>
+            <td :style="l.bg"><span v-for="a in l.data" :key="a">{{ a }}&nbsp;</span> </td>
+            <td :style="l.bg"><span v-if="l.answer == 1">เกินจริง</span><span v-else>ไม่เกินจริง</span></td>
+            <!-- <td>
             <a @click="getid(l.id)">
               <button
                 type="button"
@@ -39,7 +39,7 @@
               >
                 <i class="fa fa-trash"></i></button
             ></a>
-          </td>
+          </td> -->
           </tr>
         </tbody>
       </table>
@@ -140,7 +140,7 @@ import KeywordService from '../services/KeywordService'
 import axios from 'axios';
 import RuleBasedService from '../services/RuleBasedService'
 import DictService from '../services/DictService'
-
+import MapRuleBasedService from '../services/MapRuleBasedService'
 const customLabels = {
   first: "<<",
   last: ">>",
@@ -256,8 +256,9 @@ export default {
       });
     },
     getcategory(){
-      KeywordService.getkeywords(1).then((res)=>{
+      MapRuleBasedService.getmap_rule_baseds().then((res)=>{
         this.list = res.data
+        console.log(res.data);
         // for (let l = 0; l < this.list.length; l++) {
           // this.updatetoken(this.list[l])
           // for (let t = 0; t < this.list[l].token.length; t++) {
