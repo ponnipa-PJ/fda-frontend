@@ -13,8 +13,8 @@ class MapRuleBasedService {
   updatemap_rule_based(id,data) {
     return http.put(`/map_rule_based/${id}`, data);
   }
-  deletemap_rule_based(id) {
-    return http.delete(`/map_rule_based/${id}`);
+  deletemap_rule_based(id,data) {
+    return http.put(`/map_rule_based/updatestatus/${id}`, data);
   }
 }
 

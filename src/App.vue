@@ -72,7 +72,7 @@ export default {
     },
     {
       name:'Advertising',
-      path:'/Advertising',
+      path:'/Advertising?id=1',
       class:''
     },
     {

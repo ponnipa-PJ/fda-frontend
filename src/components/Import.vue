@@ -129,6 +129,7 @@ import readXlsxFile from "read-excel-file";
 import axios from "axios";
 import ProductsService from '../services/ProductsService.js'
 import FDATypesService from '../services/FDATypesService'
+import LinkService from '../services/LinkService'
 
 export default {
   name: "App",
@@ -174,13 +175,13 @@ export default {
       // console.log('http://127.0.0.1:5000/checkkeyword?name=' + name);
       var desc = this.finddescription(name)
       // console.log('http://127.0.0.1:5000/worktokendesc?text='+desc);
-      axios.get('http://127.0.0.1:5000/worktokendesc?text='+desc).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/worktokendesc?text='+desc).then((res) => {
         // console.log(res.data);
         this.desc  = res.data
       });
       // name = 'ข้อมูลจำเพาะของสินค้า หมวดหมู่ Shopee กลุ่มผลิตภัณฑ์เพื่อสุขภาพ อาหารเสริมเพื่อความงาม ผิว ยี่ห้อ Bluebird(บลูเบิร์ด) Storage Condition Normal ประเภทสารอาหาร สารต้านอนุมูลอิสระ, วิตามินซี ประเทศต้นกำเนิดสินค้า ไทย หน้าที่ของอาหารเสริมสำหรับความงาม ดูแลสิว, ป้องกันริ้วรอย ประเภทการห่อ ห่อรวมกัน เพศ ทั้งสองเพศ อายุการเก็บรักษา 12 เดือน ประเภทของผลิตภัณฑ์ยา แคปซูล หมายเลขใบอนุญาต/อย. 30-1-26764-5-0051 จำนวนสินค้า 17901 ส่งจาก จังหวัดนครราชสีมา รายละเอียดสินค้า วิตามินซี พลัส ตรา บลูเบิร์ด ตรา บลูเบิร์ด ขนาด 1000 มิลลิกรัม 60 แคปซูล เรทขายส่ง ช่วงราคาที่ 1 สั่งซื้อตั้งแต่ 5 กระปุกขึ้นไป ถึง 20 กระปุก ราคากระปุกละ 93 บาท ช่วงราคาที่ 2 สั่งซื้อตั้งแต่ 21 กระปุกขึ้นไป ถึง 50 กระปุก ราคากระปุกละ 90 บาท ช่วงราคาที่ 3 สั่งซื้อตั้งแต่ 51 กระปุกขึ้นไป ถึง 100 กระปุก ราคากระปุกละ 87 บาท ช่วงราคาที่ 4 สั่งซื้อตั้งแต่ 100 กระปุกขึ้นไป ..................... ราคากระปุกละ 85 บาท Vitamin C Plus Dietary Supplement Product Bluebird Brand ผลิตภัณฑ์เสริมอาหารวิตามินซี พลัส ตรา บลูเบิร์ด ส่วนประกอบทั้งหมดใน 1 แคปซูล ส่วนประกอบที่สำคัญ (Active Ingredient) VITAMIN C (100%) - 60 มิลลิกรัม CITRUS BIOFLAVONOID POWDER - 630 มิลลิกรัม BARBADOSCHERRY POWDER/ACEROLA CHERRY POWDER (ผงบาร์เบโดสเชอร์รี/ผงอะเซโรลาเชอร์รี) (MALPIGHIA GLABRA L.) ผล - 60 มิลลิกรัม ROSEHIP POWDER (ผงโรสฮิปส์) (ROSA CANINA L.) ผล - 60 มิลลิกรัม Rutin - 30 มิลลิกรัม INDIAN GOOSEBERRY POWDER (ผงมะขามป้อม) (PHYLLANTHUS EMBLICA L. ) ผล - 60 มิลลิกรัม ส่วนประกอบที่ไม่สำคัญ (Inactive Ingredient) EDIBLE GELATIN 428 - 98.5 มิลลิกรัม TITANIUM DIOXIDE 171 -1.95 มิลลิกรัม วิธีรับประทาน ครั้งละ 1-2 แคปซูล หลังอาหารเช้า เลขที่ อ.ย. 30-1-26764-5-0051 คำเตือน ควรเก็บให้พ้นแสงแดงและความชื้น เด็ก สตรีมีครรภ์ และสตรีให้นมบุตรไม่ควรรับประทาน ควรกินอาหารหลากหลายให้ครบ 5 หมู่ ในสัดส่วนที่เหมาะสมเป็นประจำ ไม่มีผลในการป้องกันหรือรักษาโรค สรรพคุณ ประโยชน์ของการกินวิตามินซี ️ทำให้หน้าไม่โทรม หน้าตาสดใส ️ช่วยฟื้นฟูผิวหน้า สิว ฝ้า กระ ริ้วรอย ดูจางลง ️ผิวพรรณนุ่มเรียบเนียบ ชุ่มชื่น ️หน้าตาดูเด็กและเด้งขึ้น ️ผิวหน้าขาวอมชมพู สินค้าตัดรอบทุกวันเวลา ตัดรอบเวลา 12.00 น ของทุกวัน แจ้งโอนเกินเวลา ส่งรอบวันถัดไปนะจ๊ะ ส่งพัสดุทุกวัน เว้นวันอาทิตย์ และวันหยุดนักขัตฤกษ์ ขอบพระคุณลูกค้าทุกท่าน ที่ไว้วางใจผลิตภัณฑ์ของเราเสมอมา_/l\_'
-      console.log('http://127.0.0.1:5000/checkkeyword?name=' + desc);    
-      axios.get('http://127.0.0.1:5000/checkkeyword?name=' + desc).then((res) => {
+      console.log(LinkService.getpythonlink()+'/checkkeyword?name=' + desc);    
+      axios.get(LinkService.getpythonlink()+'/checkkeyword?name=' + desc).then((res) => {
             console.log(res.data);
             if (res.data.length > 0) {
         // this.keyword.push(res.data)
@@ -279,7 +280,7 @@ export default {
           this.colorname = "background-color:#f9bdbb"
       //     console.log(name_real);
       //  console.log('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real);
-      axios.get('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
         // console.log(res.data);
         this.matchname = res.data
         this.matchnamesum = this.matchname.replaceAll('red','black')
@@ -300,7 +301,7 @@ export default {
           
           if (category_real) {
       //  console.log('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real);
-      axios.get('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
         // console.log(res.data);
         this.matchcategory = res.data
         // console.log(this.matchcategory.includes('red'));
@@ -323,14 +324,14 @@ export default {
         namereal_result = 'xxx'
       }
       // console.log('http://127.0.0.1:5000/worktoken?namereal_result=' + namereal_result+'&&text='+words);
-      axios.get('http://127.0.0.1:5000/worktoken?namereal_result=' + namereal_result+'&&text='+words).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/worktoken?namereal_result=' + namereal_result+'&&text='+words).then((res) => {
         // console.log(res.data);
         this.tokenize = res.data
       });
     },
     getimagefile(id) {
       this.imagelists = ''
-      axios.get('http://127.0.0.1:5000/base64?id=' + id).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/base64?id=' + id).then((res) => {
         // console.log(res.data);
         this.imagelists = 'data:image/jpeg;base64,'+res.data
       });

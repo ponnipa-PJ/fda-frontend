@@ -4,8 +4,8 @@ class ProductsService {
   getproducts(status,statusdelete,statusfda) {
     return http.get('/products?status='+status+'&&statusdelete='+statusdelete+'&&statusfda='+statusfda);
   }
-  getproductkeyword(status) {
-    return http.get('/products/getproductkeyword?status='+status);
+  getproductkeyword(start,end) {
+    return http.get('/products/getproductkeyword?start='+start+'&&end='+end);
   }
   findGraphOne(status) {
     return http.get('/products/findGraphOne?status='+status);

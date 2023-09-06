@@ -21,6 +21,7 @@ import axios from "axios";
 import ProductsService from '../services/ProductsService.js'
 import FDATypesService from '../services/FDATypesService'
 import fdacontent from '../components/fdacontent.vue'
+import LinkService from '../services/LinkService'
 
 export default {
   name: "App",
@@ -56,7 +57,7 @@ export default {
           this.colorname = "background-color:#f9bdbb"
       //     console.log(name_real);
       //  console.log('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real);
-      axios.get('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
         // console.log(res.data);
         this.matchname = res.data
         this.matchnamesum = this.matchname.replaceAll('red','black')
@@ -77,7 +78,7 @@ export default {
           
           if (category_real) {
       //  console.log('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real);
-      axios.get('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
         // console.log(res.data);
         this.matchcategory = res.data
         // console.log(this.matchcategory.includes('red'));
@@ -99,14 +100,14 @@ export default {
       if (!namereal_result) {
         namereal_result = 'xxx'
       }
-      axios.get('http://127.0.0.1:5000/worktoken?namereal_result=' + namereal_result+'&&text='+words).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/worktoken?namereal_result=' + namereal_result+'&&text='+words).then((res) => {
         // console.log(res.data);
         this.tokenize = res.data
       });
     },
     getimagefile(id) {
       this.imagelists = ''
-      axios.get('http://127.0.0.1:5000/base64?id=' + id).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/base64?id=' + id).then((res) => {
         // console.log(res.data);
         this.imagelists = 'data:image/jpeg;base64,'+res.data
       });
