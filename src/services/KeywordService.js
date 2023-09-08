@@ -7,6 +7,9 @@ class KeywordService {
   getkeyword(id) {
     return http.get('/keyword_dicts/'+id);
   }
+  getrulebasekeyword() {
+    return http.get('/rule_based_keyword/');
+  }
   createkeyword(data) {
     return http.post('/keyword_dicts', data);
   } 

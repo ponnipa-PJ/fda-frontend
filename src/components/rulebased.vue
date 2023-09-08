@@ -16,10 +16,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(l, i) in list" :key="i">
+          <tr v-for="(l, i) in list" :key="i+1">
             <td :style="l.bg">{{ i + 1 }}</td>
-            <td :style="l.bg"><span v-for="a in l.data" :key="a">{{ a }}&nbsp;</span> </td>
-            <td :style="l.bg"><span v-if="l.answer == 1">เกินจริง</span><span v-else>ไม่เกินจริง</span></td>
+            <td :style="l.bg"><span v-for="(a,i) in l.sen" :key="i">{{ a.name }}&nbsp;</span> </td>
+            <td :style="l.bg"><span v-if="l.answer == 1">เกินจริง</span><span v-if="l.answer == 9">ไม่เกินจริง</span><span v-if="!l.answer"></span></td>
             <td>
             <!-- <a @click="getid(l.id)">
               <button

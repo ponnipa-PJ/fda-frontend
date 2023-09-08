@@ -10,6 +10,9 @@ class MapRuleBasedService {
   createmap_rule_based(data) {
     return http.post('/map_rule_based', data);
   } 
+  updateadvertise(id,data) {
+    return http.put(`/advertise/${id}`, data);
+  }
   updatemap_rule_based(id,data) {
     return http.put(`/map_rule_based/${id}`, data);
   }

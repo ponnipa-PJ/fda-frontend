@@ -27,42 +27,65 @@ export default {
     if (this.$route.params.name == "map" || this.$route.name == "login" || this.$route.name == "register") {
       this.show = false;
     }
+    // this.menu.push(
+    // {
+    //   name:'แดชบอร์ด',
+    //   path:'/',
+    //   class:''
+    // },
+    //   {
+    //   name:'ค้นหาสินค้าจากลิงก์',
+    //   path:'/import',
+    //   class:''
+    // },
+    // {
+    //   name:'ค้นหาสินค้าจากเลขอย.',
+    //   path:'/searchbyfda',
+    //   class:''
+    // },
+    // {
+    //   name:'รายการสินค้าที่ตรวจสอบทั้งหมด',
+    //   path:'/scraping',
+    //   class:''
+    // },
+    
+    // // {
+    // //   name:'หมวด',
+    // //   path:'/category',
+    // //   class:''
+    // // },
+    // // {
+    // //   name:'รายการสินค้าที่ยกเลิกการตรวจสอบ',
+    // //   path:'/scrapingdelete',
+    // //   class:''
+    // // },
+    
+    // {
+    //   name:'Corpus',
+    //   path:'/Corpus',
+    //   class:''
+    // },
+    // {
+    //   name:'keywords',
+    //   path:'/keywords',
+    //   class:''
+    // },
+    // {
+    //   name:'Advertising',
+    //   path:'/Advertising?id=1',
+    //   class:''
+    // },
+    // {
+    //   name:'rule based',
+    //   path:'/rulebased',
+    //   class:''
+    // }
+    // )
+    
     this.menu.push(
     {
-      name:'แดชบอร์ด',
-      path:'/',
-      class:''
-    },
-      {
-      name:'ค้นหาสินค้าจากลิงก์',
-      path:'/import',
-      class:''
-    },
-    {
-      name:'ค้นหาสินค้าจากเลขอย.',
-      path:'/searchbyfda',
-      class:''
-    },
-    {
-      name:'รายการสินค้าที่ตรวจสอบทั้งหมด',
-      path:'/scraping',
-      class:''
-    },
-    
-    // {
-    //   name:'หมวด',
-    //   path:'/category',
-    //   class:''
-    // },
-    // {
-    //   name:'รายการสินค้าที่ยกเลิกการตรวจสอบ',
-    //   path:'/scrapingdelete',
-    //   class:''
-    // },
-    
-    {
       name:'Corpus',
-      path:'/Corpus',
+      path:'/',
       class:''
     },
     {
@@ -71,16 +94,22 @@ export default {
       class:''
     },
     {
-      name:'Advertising',
-      path:'/Advertising?id=1',
+      name:'Advertise',
+      path:'/Advertise',
       class:''
     },
     {
       name:'rule based',
       path:'/rulebased',
       class:''
+    },
+    {
+      name:'keyword rulebased',
+      path:'/keywordrulebased',
+      class:''
     }
     )
+    
     for (let m = 0; m < this.menu.length; m++) {
       if (this.menu[m].path == this.$route.path) {
         this.menu[m].class = 'active'

@@ -11,7 +11,7 @@
           <tr>
             <th scope="col">#</th>
             <th scope="col">ข้อความ</th>
-            <th scope="col">ตัดคำ</th>
+            <!-- <th scope="col">ตัดคำ</th> -->
             <th scope="col"></th>
           </tr>
         </thead>
@@ -19,7 +19,7 @@
           <tr v-for="(l, i) in list" :key="i">
             <td :style="l.bg">{{ i + 1 }}</td>
             <td :style="l.bg">{{ l.name }}</td>
-            <td :style="l.bg">{{ l.token }}</td>
+            <!-- <td :style="l.bg">{{ l.token }}</td> -->
             <td>
             <a @click="getid(l.id)">
               <button

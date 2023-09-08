@@ -346,7 +346,11 @@ export default {
           axios.get(LinkService.getpythonlink()+'/worktokendesc?text=' + res.data[l].desc).then((desc) => {
             // console.log(res.data);
             res.data[l].desctext = desc.data
-            axios.get(LinkService.getpythonlink()+'checkkeyword?name=' + res.data[l].desc).then((keys) => {
+            var des = {
+              sentent_keyword:desc.data
+            }
+            ProductsService.sentent_keyword(this.$route.query.id,des).then(async () => {
+            axios.get(LinkService.getpythonlink()+'checkkeyword?name=' + res.data[l].desc+'&&id='+this.$route.query.id).then((keys) => {
               console.log(keys.data);
               if (keys.data.length > 0) {
                 res.data[l].keyword = keys.data
@@ -357,7 +361,7 @@ export default {
                 this.list = res.data
               }
             });
-
+          });
           });
           //   }
         }

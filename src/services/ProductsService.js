@@ -7,6 +7,9 @@ class ProductsService {
   getproductkeyword(start,end) {
     return http.get('/products/getproductkeyword?start='+start+'&&end='+end);
   }
+  getdecision() {
+    return http.get('/products/getdecision');
+  }
   findGraphOne(status) {
     return http.get('/products/findGraphOne?status='+status);
   }
@@ -31,8 +34,8 @@ class ProductsService {
   updateproduct(id,data) {
     return http.put(`/products/${id}`, data);
   }
-  map_rule_based(id,data) {
-    return http.put(`/products/map_rule_based/${id}`, data);
+  sentent_keyword(id,data) {
+    return http.put(`/products/sentent_keyword/${id}`, data);
   }
   updatescraping(id,data) {
     return http.put(`/products/updatescraping/${id}`, data);

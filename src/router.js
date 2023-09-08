@@ -12,6 +12,8 @@ import DetailTypeTwoGraph from './components/DetailTypeTwoGraph.vue';
 import keywords from './components/keywords.vue';
 import Advertising from './components/Advertising.vue';
 import rulebased from './components/rulebased.vue';
+import Advertise from './components/Advertise.vue';
+import keywordrulebased from './components/keywordrulebased.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -36,7 +38,7 @@ const router = new Router({
       component: category
     },
     {
-      path: "/Corpus",
+      path: "/",
       alias: "/Corpus",
       name: "Corpus",
       component: scopus
@@ -54,7 +56,7 @@ const router = new Router({
       component: searchbyfda
     },
     {
-      path: "/",
+      path: "/Dashboard",
       alias: "/Dashboard",
       name: "Dashboard",
       component: Dashboard
@@ -88,6 +90,19 @@ const router = new Router({
       alias: "/rulebased",
       name: "rulebased",
       component: rulebased
+    },
+    
+    {
+      path: "/Advertise",
+      alias: "/Advertise",
+      name: "Advertise",
+      component: Advertise
+    },
+    {
+      path: "/keywordrulebased",
+      alias: "/keywordrulebased",
+      name: "keywordrulebased",
+      component: keywordrulebased
     },
   ]
 });
