@@ -18,8 +18,21 @@
         <tbody>
           <tr v-for="(l, i) in list" :key="i+1">
             <td :style="l.bg">{{ i + 1 }}</td>
-            <td :style="l.bg"><span v-for="(a,i) in l.sen" :key="i">{{ a.name }}&nbsp;</span> </td>
-            <td :style="l.bg"><span v-if="l.answer == 1">เกินจริง</span><span v-if="l.answer == 9">ไม่เกินจริง</span><span v-if="!l.answer"></span></td>
+            <td style="width:90%">
+              <!-- <tr style="border: none;">
+            <td style="border: none;padding: 0px;" v-for="(a,i) in l.sen" :key="i">{{ a.name }}&nbsp;
+            </td> 
+        </tr> -->
+        <tr style="border: none;">
+            <td style="border: none;padding: 0px" v-for="(d) in l.dict_id_new" :key="d.id">
+              <span>{{ d.name }}</span>&nbsp;<br/>
+              <span v-if="d.id" style="color:blue">{{ d.id }}</span>
+            </td>
+        </tr>
+            </td>
+             <!-- <td :style="l.bg+';width:80%'"><span v-for="(a,i) in l.sen" :key="i">{{ a.name }}&nbsp;</span><br/>
+              <span v-for="(d) in l.dict_id" :key="d">{{ d }}&nbsp;</span> </td> -->
+            <td :style="l.bg+';width:10%'"><span v-if="l.answer == 1">เกินจริง</span><span v-if="l.answer == 9">ไม่เกินจริง</span><span v-if="!l.answer"></span></td>
             <td>
             <!-- <a @click="getid(l.id)">
               <button
@@ -30,7 +43,7 @@
               >
                 <i class="fa fa-edit"></i></button
             ></a>&nbsp; -->
-            <a @click="getid(l.id)">
+            <!-- <a @click="getid(l.id)">
               <button
                 type="button"
                 class="btn btn-danger"
@@ -38,7 +51,7 @@
                 data-bs-target="#DeleteScopus"
               >
                 <i class="fa fa-trash"></i></button
-            ></a>
+            ></a> -->
           </td>
           </tr>
         </tbody>

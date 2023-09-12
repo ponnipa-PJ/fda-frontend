@@ -99,12 +99,12 @@ export default {
       class:''
     },
     {
-      name:'rule based',
+      name:'rule-based',
       path:'/rulebased',
       class:''
     },
     {
-      name:'keyword rulebased',
+      name:'keyword rule-based',
       path:'/keywordrulebased',
       class:''
     }

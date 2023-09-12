@@ -10,22 +10,37 @@
       <tbody>
         <tr>
           <th style="background-color:#ffb454">รายละเอียดสินค้า</th>
-          <th style="background-color:#ffb454">ข้อความโฆษณา</th>
+          <th style="background-color:#ffb454">
+            <div class="row">
+              <div class="col-md-6">
+                ข้อความโฆษณา
+              </div>
+              <div class="col-md-6">
+                
+           <div style="text-align: right;"> <button @click="getid(0)"
+             style="text-align: right;"
+          data-bs-toggle="modal" 
+          data-bs-target="#AddScopus"
+           type="submit" class="mb-3 btn btn-success">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    เพิ่ม keyword</button></div>
+              </div>
+            </div>  </th>
         </tr>
         <tr>
           <td :style="colorkey" style="width:40%"><span v-html="l.sentent_keyword"></span></td>
           <!-- <th :style="colorkey">ข้อความโฆษณา</th> -->
           <td :style="colorkey" v-if="l.data != 0">
         <tr v-for="(k, i) in l.data" :key="i">
-          <td><span v-html="k.sentent"></span></td>
-          <td><span v-if="k.answer == 1">เกินจริง</span><span v-if="k.answer == 9">ไม่เกินจริง</span><span
+          <td style="width:70%"><span v-html="k.sentent"></span></td>
+          <td style="width:20%"><span v-if="k.answer == 1">เกินจริง</span><span v-if="k.answer == 9">ไม่เกินจริง</span><span
               v-if="k.answer == 0"></span></td>
-          <td><button @click="savetorule_based(k.dict_id, k.sen, 1,k.id)" type="submit" class="mb-3 btn btn-success">
+          <td style="width:10%"><button @click="savetorule_based(k.dict_id, k.sen, 1,k.id)" type="submit" class="mb-3 btn btn-success">
               <i class="fa fa-check"></i>
-            </button>&nbsp;
+           เกินจริง </button>&nbsp;
            <button @click="savetorule_based(k.dict_id, k.sen, 9,k.id)" type="submit" class="mb-3 btn btn-danger">
               <i class="fa fa-times"></i>
-            </button></td>
+            ไม่เกินจริง</button></td>
         </tr>
         </td>
         <td :style="colorkey" v-else>
@@ -47,6 +62,51 @@
               <i class="fa fa-arrow-right" aria-hidden="true"></i>
             </button></a></div>
     </div>
+      <!-- Modal -->
+  <div
+      class="modal fade"
+      id="AddScopus"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{ title }}</h5>
+            
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="card-body mt-3">
+                <div class="form-group mt-3">
+                  <label>ข้อความโฆษณา</label>
+                  <input
+                    v-model="data.name"
+                    type="text"
+                    min="1"
+                    class="form-control form-control-sm"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer mt-3">
+            <button type="button" class="btn btn-success" @click="save()">
+              บันทึก
+            </button>
+            <button
+            id="closedcategory"
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              ปิด
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -57,6 +117,7 @@ import DictService from '../services/DictService'
 import RuleBasedService from '../services/RuleBasedService'
 import MapRuleBasedService from '../services/MapRuleBasedService'
 import LinkService from '../services/LinkService'
+import KeywordService from '../services/KeywordService'
 
 export default {
   name: "App",
@@ -87,10 +148,59 @@ export default {
       arrList: [],
       alldata:0,
       back:0,
-      next:0
+      next:0,
+      title:'',
+      data:{},
+      pro_id:0,
     };
   },
   methods: {
+    getid(id) {
+      // console.log(id);
+      this.pro_id = id;
+      if (this.pro_id != 0) {
+        this.title = "แก้ไขข้อมูลข้อความ";
+        // console.log(this.user_id);
+        KeywordService.getkeyword(this.pro_id).then((res) => {
+          // console.log(res.data);
+          this.data = res.data;
+        });
+      } else {
+        this.title = "เพิ่มข้อมูลข้อความ";
+        this.data = [];
+      }
+    },
+    save() {
+      console.log(this.data);
+      if (this.data.name == null || this.data.cat_id == "") {
+        alert("กรุณากรอกข้อความ");
+      } else {
+        var prodata = {
+          id:this.data.id,
+          name: this.data.name,
+          status:1,
+        };
+        console.log(prodata); 
+        if (this.pro_id == 0) {
+          KeywordService.createkeyword(prodata).then(() => {
+          DictService.createdict(prodata).then(() => {
+            // console.log(res.data );
+            // RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
+            document.getElementById("closedcategory").click();
+            // this.getcategory();
+            alert('บันทึกสำเร็จ')
+          // });
+        });
+      });
+        } else {
+          KeywordService.updatekeyword(this.pro_id,prodata).then(() => {
+            document.getElementById("closedcategory").click();
+            // this.getcategory();
+            alert('บันทึกสำเร็จ')
+          });
+            }
+      }
+    },
     savetorule(sen, answer,ad_id) {
       console.log(sen);
       var iddata = []
@@ -106,56 +216,75 @@ export default {
           // console.log(d+1 , sen.length);
           console.log(iddata);
           if (d + 1 == sen.length) {
-            var sql = `SELECT r.* FROM map_rule_based m join rule_based r on m.rule_based_id = r.id WHERE m.status = 1 and dict_id = '[${iddata}]'`
+            var sql = `SELECT m.* FROM map_rule_based m WHERE m.status = 1 and m.dict_id = '[${iddata}]'`
             console.log(sql);
             
-            await RuleBasedService.getbydict(sql).then((res) => {
+             RuleBasedService.getbydict(sql).then((res) => {
+              console.log(res.data);
               if (res.data.length == 0) {
-                let text = ''
-                text += '{'
-                for (let i = 0; i < iddata.length; i++) {
-                  // console.log(iddata[i]);
-                  text += '"dict' + iddata[i] + '"' + ':' + 1 + ','
-
-                }
-                text += '"answer' + '"' + ':' + answer + ','
-                text = text.slice(0, -1);
-                text += '}'
-                // console.log(text);
-                let jsonData = JSON.parse(text);
-                // console.log(jsonData);
-                RuleBasedService.createrule_based(jsonData).then((res) => {
-                  var maprule = {
+                var maprule = {
                     rule_based_id: res.data.id,
                     dict_id: iddata,
-                    status:1
+                    status:1,
+                    answer:answer
                   }
-                  MapRuleBasedService.createmap_rule_based(maprule).then(() => {
+                  MapRuleBasedService.createmap_rule_based(maprule).then((res) => {
+                    console.log(res.data);
+                    var map_id = res.data.id
                     var updateadvertise = {
                     dict_id: iddata,
                   }
                   MapRuleBasedService.updateadvertise(ad_id,updateadvertise).then(() => {
+                    for (let i = 0; i < iddata.length; i++) {
+                var rule = {
+                  map_rule_based_id	:map_id,
+	dict_id	:iddata[i],
+	no:i+1
+                }
+                RuleBasedService.createrule_based(rule).then(() => {
+
+               if (i+1 == iddata.length) {
+                
+                alert('บันทึกสำเร็จ')
+              
+              this.getdata()
+                             }     
+                });
+              }
                     // console.log(res.data);
                     // var pro = {
                     //   map_rule_based:res.data.id
                     // }
                     // ProductsService.map_rule_based(id,pro).then(() => {
-                    alert('บันทึกสำเร็จ')
-
-                    this.getdata()
+                    
                     //               setTimeout(function () {
                     //   location.reload();
                     // }, 500);
                     // });
                   });
                   });
-                });
+                // let text = ''
+                // text += '{'
+                // for (let i = 0; i < iddata.length; i++) {
+                //   // console.log(iddata[i]);
+                //   text += '"dict' + iddata[i] + '"' + ':' + 1 + ','
+
+                // }
+                // text += '"answer' + '"' + ':' + answer + ','
+                // text = text.slice(0, -1);
+                // text += '}'
+                // // console.log(text);
+                // let jsonData = JSON.parse(text);
+                // // console.log(jsonData);
+                // RuleBasedService.createrule_based(jsonData).then((res) => {
+                  
+                // });
               } else {
                 // console.log(res.data);
                 var updatemaprule = {
                   answer: answer,
                 }
-                RuleBasedService.updaterule_based(res.data[0].id, updatemaprule).then(() => {
+                MapRuleBasedService.updateanswer(res.data[0].id, updatemaprule).then(() => {
                   alert('บันทึกสำเร็จ')
 
                   this.getdata()

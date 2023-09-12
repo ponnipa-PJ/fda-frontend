@@ -1,8 +1,8 @@
 import http from "../http-common";
 
 class RuleBasedService {
-  getrule_baseds(status) {
-    return http.get('/rule_based?status='+status);
+  getrule_baseds() {
+    return http.get('/rule_based');
   }
   createdcolumnrule_based(id) {
     return http.get('/rule_based/createcolumn?name='+id);

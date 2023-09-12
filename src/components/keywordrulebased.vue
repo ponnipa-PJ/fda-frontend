@@ -16,7 +16,18 @@
         <tbody>
           <tr v-for="(l, i) in list" :key="i+1">
             <td :style="l.bg">{{ i + 1 }}</td>
-            <td :style="l.bg"><span v-for="(a,i) in l.data" :key="i">{{ a }}&nbsp;</span> </td>
+            <td :style="l.bg">
+        <tr style="border: none;">
+            <td style="border: none;padding: 0px;" v-for="(a,i) in l.data" :key="i">{{ a }}&nbsp;
+            </td> 
+        </tr>
+        <tr style="border: none;">
+            <td style="border: none;padding: 0px;color:blue;" v-for="(k) in l.keyword_id" :key="k">{{ k }}
+            </td>
+        </tr>
+              <!-- <span v-for="(a,i) in l.data" :key="i">{{ a }}&nbsp;</span><br/>
+              <span v-for="(k) in l.keyword_id" :key="k">{{ k }}&nbsp;</span>  -->
+            </td>
             
           </tr>
         </tbody>

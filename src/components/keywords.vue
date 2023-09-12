@@ -195,22 +195,29 @@ export default {
         };
         console.log(prodata); 
         if (this.pro_id == 0) {
-          KeywordService.createkeyword(prodata).then(() => {
+          KeywordService.createkeyword(prodata).then((res) => {
+            console.log(res.data);
+            if (res.data.err == 1062) {
+              alert('มีคำนี้ในระบบแล้ว')
+            }else{
           DictService.createdict(prodata).then((res) => {
-            // console.log(res.data );
+            console.log(res.data );
             RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
+              
             document.getElementById("closedcategory").click();
             this.getcategory();
             alert('บันทึกสำเร็จ')
-          });
-        });
-      });
+          })
+        })
+      }
+      })
         } else {
           KeywordService.updatekeyword(this.pro_id,prodata).then(() => {
             document.getElementById("closedcategory").click();
             this.getcategory();
             alert('บันทึกสำเร็จ')
-          });
+            
+          })
             }
       }
     },
