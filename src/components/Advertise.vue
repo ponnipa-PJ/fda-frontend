@@ -35,10 +35,10 @@
           <td style="width:70%"><span v-html="k.sentent"></span></td>
           <td style="width:20%"><span v-if="k.answer == 1">เกินจริง</span><span v-if="k.answer == 9">ไม่เกินจริง</span><span
               v-if="k.answer == 0"></span></td>
-          <td style="width:10%"><button @click="savetorule_based(k.dict_id, k.sen, 1,k.id)" type="submit" class="mb-3 btn btn-success">
+          <td style="width:10%" v-if="!k.answer"><button @click="savetorule_based(k.dict_id, k.dict_name, 1,k.id)" type="submit" class="mb-3 btn btn-success">
               <i class="fa fa-check"></i>
            เกินจริง </button>&nbsp;
-           <button @click="savetorule_based(k.dict_id, k.sen, 9,k.id)" type="submit" class="mb-3 btn btn-danger">
+           <button @click="savetorule_based(k.dict_id,k.dict_name, 9,k.id)" type="submit" class="mb-3 btn btn-danger">
               <i class="fa fa-times"></i>
             ไม่เกินจริง</button></td>
         </tr>
@@ -204,7 +204,7 @@ export default {
     savetorule(sen, answer,ad_id) {
       console.log(sen);
       var iddata = []
-
+var dicts =[]
       for (let d = 0; d < sen.length; d++) {
         // console.log(datasplit[d]);
         DictService.getdicts('', sen[d].name).then(async (res) => {
@@ -212,6 +212,8 @@ export default {
           if (res.data.length > 0) {
             // console.log(res.data[0].id);
             iddata.push(res.data[0].id)
+            dicts.push({id:res.data[0].id,
+            name:sen[d].name})
           }
           // console.log(d+1 , sen.length);
           console.log(iddata);
@@ -224,7 +226,7 @@ export default {
               if (res.data.length == 0) {
                 var maprule = {
                     rule_based_id: res.data.id,
-                    dict_id: iddata,
+                    advertise_id: ad_id,
                     status:1,
                     answer:answer
                   }
@@ -235,10 +237,11 @@ export default {
                     dict_id: iddata,
                   }
                   MapRuleBasedService.updateadvertise(ad_id,updateadvertise).then(() => {
-                    for (let i = 0; i < iddata.length; i++) {
+                    for (let i = 0; i < dicts.length; i++) {
                 var rule = {
                   map_rule_based_id	:map_id,
-	dict_id	:iddata[i],
+	dict_id	:dicts[i].id,
+  dict_name:dicts[i].name,
 	no:i+1
                 }
                 RuleBasedService.createrule_based(rule).then(() => {
@@ -298,44 +301,86 @@ export default {
       }
 
     },
-    savetorule_based(id, sen, answer,ad_id) {
-      sen = JSON.parse(sen)
-      id = JSON.parse(id)
-      console.log(id);
-      console.log(id.length);
-      // console.log(ad_id);
-      console.log(sen.length);
-      console.log('answer',answer);
-      if (id.length != sen.length) {
-        for (let a = 0; a < sen.length; a++) {
-          // console.log(sen[a].name);
-          DictService.getdicts('', sen[a].name).then((res) => {
-            console.log(res.data);
-            if (res.data.length == 0) {
-              var prodata = {
-                name: sen[a].name,
-                status: 1,
-              };
-              console.log(prodata);
-              DictService.createdict(prodata).then(() => {
-                //   RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
+    savetorule_based(id, name, answer,ad_id) {
+      var dicts = JSON.parse(id)
+      var dictname = JSON.parse(name)
+      MapRuleBasedService.findadanduser(ad_id,this.currentUser.id).then(async (res) => {
+console.log(res.data);
 
-                // });
+if (res.data.length == 0) {
+  var maprule = {
+                    advertise_id: ad_id,
+                    answer:answer,
+                    user:this.currentUser.id,
+                    status:1
+
+                  }
+                  MapRuleBasedService.createmap_rule_based(maprule).then((res) => {
+                    var map_id = res.data.id
+                    for (let i = 0; i < dicts.length; i++) {
+                var rule = {
+                  map_rule_based_id	:map_id,
+	dict_id	:dicts[i],
+  dict_name:dictname[i],
+	no:i+1
+                }
+                RuleBasedService.createrule_based(rule).then(() => {
+
+               if (i+1 == dicts.length) {
                 
-              });
-            }
-            
-            console.log(a + 1,sen.length);
-                if (a + 1 == sen.length) {
-                  console.log(1);
-              this.savetorule(sen, answer,ad_id)
-            }
-          })
+                alert('บันทึกสำเร็จ')
+              
+              this.getdata()
+                             }     
+                });
+              }
+                });
+}
+      });
+      // sen = JSON.parse(sen)
+      // id = JSON.parse(id)
+      // console.log(id);
+      // console.log(id.length);
+      // // console.log(ad_id);
+      // console.log(sen.length);
+      // console.log('answer',answer);
+      // if (id.length != sen.length) {
+      //   for (let a = 0; a < sen.length; a++) {
+      //     // console.log(sen[a].name);
+      //     DictService.getdicts('', sen[a].name).then(async (res) => {
+      //       console.log(res.data);
+      //       if (res.data.length == 0) {
+      //         var prodata = {
+      //           name: sen[a].name,
+      //           status: 1,
+      //         };
+      //         console.log(prodata);
+      //         DictService.createdict(prodata).then(() => {
 
-        }
-      } else {
-        this.savetorule(sen, answer,ad_id)
-      }
+      //           //   RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
+
+      //           // });
+      //           // console.log(a + 1,sen.length);
+      //         //   if (a + 1 == sen.length) {
+      //         //     // console.log(1);
+      //         // this.savetorule(sen, answer, ad_id)
+      //       // }
+      //         });
+      //       }else{
+      //         // console.log(a + 1,sen.length);
+      //           if (a + 1 == sen.length) {
+      //             // console.log(1);
+      //        this.savetorule(sen, answer, ad_id)
+      //       }
+      //       }
+            
+            
+      //     })
+
+      //   }
+      // } else {
+      //   this.savetorule(sen, answer,ad_id)
+      // }
     },
     checkkeyword(name) {
       // console.log(name);
@@ -439,10 +484,10 @@ export default {
       // // var start = end-4
       // var start = this.$route.query.id
       // console.log(start);
-      ProductsService.getdecision().then(async (res) => {
+      ProductsService.getdecision(this.currentUser.id).then(async (res) => {
       
         this.list = res.data
-        console.log(this.list);
+        // console.log(this.list);
       })
 
 
@@ -457,6 +502,11 @@ export default {
       // console.log(res.data);
     this.getdata()
     // });
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },    
   },
 };
 </script>

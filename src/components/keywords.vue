@@ -16,7 +16,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(l, i) in list" :key="i">
+          <tr v-for="(l, i) in pageOfItems" :key="i">
             <td :style="l.bg">{{ i + 1 }}</td>
             <td :style="l.bg">{{ l.name }}</td>
             <!-- <td :style="l.bg">{{ l.token }}</td> -->
@@ -43,15 +43,16 @@
           </tr>
         </tbody>
       </table>
-      <!-- <div class="row" align="right">
-        <div class="col-md-12">
+      <div class="row" align="right">
+        <div class="col-md-12 mb-5 mt-3">
           <jw-pagination
             :items="list"
             @changePage="onChangePage"
             :labels="customLabels"
+            :pageSize="20"
           ></jw-pagination>
         </div>
-      </div> -->
+      </div>
       <div v-if="list.length == 0" class="mt-5">
 <h3 style="text-align:center">ไม่พบข้อมูล</h3>
       </div>

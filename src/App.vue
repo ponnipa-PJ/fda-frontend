@@ -1,13 +1,17 @@
 <template>
   <div>
     <div class="topnav">
-  <a v-for="m in menu" :key="m.id" :class="m.class" :href="m.path">{{m.name}}</a>
-</div>
-<router-view />
+      <a v-for="m in menu" :key="m.id" :class="m.class" :href="m.url">{{ m.name }}</a>
+      <a v-if="currentUser" class="" style="color: white;cursor: pointer;" @click="logOut()">ออกจากระบบ</a>
+    </div>
+    <router-view />
   </div>
 </template>
 
+
 <script>
+import UserService from './services/UserService'
+
 export default {
   name: "app",
   components: {
@@ -15,15 +19,25 @@ export default {
   data() {
     return {
       show: true,
-      menu:[]
+      menu: []
     };
   },
-  computed: {},
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
+  },
   methods: {
-    
+    logOut() {
+      this.$store.dispatch("auth/logout");
+      setTimeout(function () {
+        location.reload();
+      }, 500);
+      this.$router.push("/");
+    },
   },
   mounted() {
-    // console.log(this.$route.path);
+    console.log(this.currentUser);
     if (this.$route.params.name == "map" || this.$route.name == "login" || this.$route.name == "register") {
       this.show = false;
     }
@@ -48,7 +62,7 @@ export default {
     //   path:'/scraping',
     //   class:''
     // },
-    
+
     // // {
     // //   name:'หมวด',
     // //   path:'/category',
@@ -59,7 +73,7 @@ export default {
     // //   path:'/scrapingdelete',
     // //   class:''
     // // },
-    
+
     // {
     //   name:'Corpus',
     //   path:'/Corpus',
@@ -81,40 +95,22 @@ export default {
     //   class:''
     // }
     // )
-    
-    this.menu.push(
-    {
-      name:'Corpus',
-      path:'/',
-      class:''
-    },
-    {
-      name:'keywords',
-      path:'/keywords',
-      class:''
-    },
-    {
-      name:'Advertise',
-      path:'/Advertise',
-      class:''
-    },
-    {
-      name:'rule-based',
-      path:'/rulebased',
-      class:''
-    },
-    {
-      name:'keyword rule-based',
-      path:'/keywordrulebased',
-      class:''
+
+    if (this.currentUser) {
+      UserService.getMenubyRoleID(this.currentUser.role_id).then((res) => {
+        this.menu = res.data
+        console.log(this.menu);
+        for (let m = 0; m < this.menu.length; m++) {
+          this.menu[m].class = ''
+          if (this.menu[m].url == this.$route.path) {
+            this.menu[m].class = 'active'
+          }
+        }
+      })
     }
-    )
-    
-    for (let m = 0; m < this.menu.length; m++) {
-      if (this.menu[m].path == this.$route.path) {
-        this.menu[m].class = 'active'
-      }
-    }
+
+
+
   },
 };
 </script>

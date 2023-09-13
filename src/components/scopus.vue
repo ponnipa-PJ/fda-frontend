@@ -15,7 +15,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(l, i) in list" :key="i">
+          <tr v-for="(l, i) in pageOfItems" :key="i">
             <td :style="l.bg">{{ i + 1 }}</td>
             <td :style="l.bg">{{ l.name }}</td>
             <td>
@@ -41,6 +41,16 @@
           </tr>
         </tbody>
       </table>
+      <div class="row" align="right">
+        <div class="col-md-12 mb-5 mt-3">
+          <jw-pagination
+            :items="list"
+            @changePage="onChangePage"
+            :labels="customLabels"
+            :pageSize="20"
+          ></jw-pagination>
+        </div>
+      </div>
       <div v-if="list.length == 0" class="mt-5">
 <h3 style="text-align:center">ไม่พบข้อมูล</h3>
       </div>
@@ -126,7 +136,13 @@
 <script>
 
 import DictService from '../services/DictService'
-import RuleBasedService from '../services/RuleBasedService'
+
+const customLabels = {
+  first: "<<",
+  last: ">>",
+  previous: "<",
+  next: ">",
+};
 
 export default {
   name: "App",
@@ -142,10 +158,17 @@ export default {
       title:'',
       data:{},
       pro_id:0,
-      category:[]
+      category:[],
+      pageOfItems: [],
+      customLabels,
     };
   },
   methods: {
+    onChangePage(pageOfItems) {
+      // update page of items
+      this.pageOfItems = pageOfItems;
+      window.scrollTo(0,0);
+    },
     deleteScopus(){
       console.log(this.pro_id);
       DictService.deletedict(this.pro_id).then((res)=>{
@@ -167,12 +190,17 @@ export default {
         console.log(prodata);
         if (this.pro_id == 0) {
           DictService.createdict(prodata).then((res) => {
-            // console.log(res.data );
-            RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
+            console.log(res.data );
+            if (res.data.err == 1062) {
+              alert('มีคำนี้ในระบบแล้ว')
+            }else{
+            // RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
             document.getElementById("closedcategory").click();
             this.getcategory();
             alert('บันทึกสำเร็จ')
-          });
+            
+          // });
+        }
             //       setTimeout(function () {
             //   location.reload();
             // }, 500);

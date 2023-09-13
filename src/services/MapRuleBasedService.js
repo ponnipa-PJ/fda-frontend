@@ -7,6 +7,9 @@ class MapRuleBasedService {
   getmap_rule_based(id) {
     return http.get('/map_rule_based/'+id);
   }
+  findadanduser(ad_id,user) {
+    return http.get('/map_rule_based/findadanduser?ad_id='+ad_id+'&&user='+user);
+  }
   createmap_rule_based(data) {
     return http.post('/map_rule_based', data);
   } 

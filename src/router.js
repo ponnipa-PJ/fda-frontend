@@ -14,6 +14,10 @@ import Advertising from './components/Advertising.vue';
 import rulebased from './components/rulebased.vue';
 import Advertise from './components/Advertise.vue';
 import keywordrulebased from './components/keywordrulebased.vue';
+import Login from './components/Login.vue';
+import Users from './components/Users.vue';
+import Menu from './components/Menu.vue';
+import Menumanage from './components/Menumanage.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -38,7 +42,7 @@ const router = new Router({
       component: category
     },
     {
-      path: "/",
+      path: "/Corpus",
       alias: "/Corpus",
       name: "Corpus",
       component: scopus
@@ -104,24 +108,49 @@ const router = new Router({
       name: "keywordrulebased",
       component: keywordrulebased
     },
+    {
+      path: "/",
+      alias: "/Login",
+      name: "Login",
+      component: Login
+    },
+    {
+      path: "/Users",
+      alias: "/Users",
+      name: "Users",
+      component: Users
+    },
+    {
+      path: "/menu",
+      alias: "/menu",
+      name: "menu",
+      component: Menu
+    },
+    {
+      path: "/menumanage",
+      alias: "/menumanage",
+      name: "menumanage",
+      component: Menumanage
+    },
+    
   ]
 });
 
 
-// router.beforeEach((to, from, next) => {
-//   const publicPages = ['/login','/register'];
-//   const authRequired = !publicPages.includes(to.path);
-//   const loggedIn = localStorage.getItem('users');
-//   // trying to access a restricted page + not logged in
-//   // redirect to login page
-//   // console.log(loggedIn);
-//   if (authRequired && !loggedIn) {
-//     next('/login');
-//     // next();
-//   } else {
-//     next();
-//   }
+router.beforeEach((to, from, next) => {
+  const publicPages = ['/login','/register'];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem('fda');
+  // trying to access a restricted page + not logged in
+  // redirect to login page
+  // console.log(loggedIn);
+  if (authRequired && !loggedIn) {
+    next('/login');
+    // next();
+  } else {
+    next();
+  }
 
-// });
+});
 
 export default router;

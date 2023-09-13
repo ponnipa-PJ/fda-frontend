@@ -7,8 +7,8 @@ class ProductsService {
   getproductkeyword(start,end) {
     return http.get('/products/getproductkeyword?start='+start+'&&end='+end);
   }
-  getdecision() {
-    return http.get('/products/getdecision');
+  getdecision(user) {
+    return http.get('/products/getdecision?user='+user);
   }
   findGraphOne(status) {
     return http.get('/products/findGraphOne?status='+status);

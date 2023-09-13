@@ -6,6 +6,7 @@
            type="submit" class="mb-3 btn btn-success">
       <i class="fa fa-plus" aria-hidden="true"></i>
     </button></div> -->
+    <div class="mb-5">
       <table class="table" v-if="list.length > 0" width="100%">
         <thead>
           <tr>
@@ -24,10 +25,12 @@
             </td> 
         </tr> -->
         <tr style="border: none;">
-            <td style="border: none;padding: 0px" v-for="(d) in l.dict_id_new" :key="d.id">
-              <span>{{ d.name }}</span>&nbsp;<br/>
-              <span v-if="d.id" style="color:blue">{{ d.id }}</span>
-            </td>
+            <td style="border: none;padding: 0px;" v-for="(a,ai) in l.dict_name" :key="ai">{{ a }} &nbsp;&nbsp;&nbsp;
+            </td> 
+        </tr>
+        <tr style="border: none;">
+            <td style="border: none;padding: 0px;color:blue;" v-for="(k,ki) in l.dict_id" :key="ki">{{ k }}&nbsp;&nbsp;
+            </td>&nbsp;
         </tr>
             </td>
              <!-- <td :style="l.bg+';width:80%'"><span v-for="(a,i) in l.sen" :key="i">{{ a.name }}&nbsp;</span><br/>
@@ -68,6 +71,7 @@
       <div v-if="list.length == 0" class="mt-5">
 <h3 style="text-align:center">ไม่พบข้อมูล</h3>
       </div>
+    </div>
   <!-- Modal -->
   <div
       class="modal fade"
@@ -276,7 +280,7 @@ export default {
     getcategory(){
       MapRuleBasedService.getmap_rule_baseds().then((res)=>{
         this.list = res.data
-        console.log(res.data);
+        // console.log(res.data);
         // for (let l = 0; l < this.list.length; l++) {
           // this.updatetoken(this.list[l])
           // for (let t = 0; t < this.list[l].token.length; t++) {

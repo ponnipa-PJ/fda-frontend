@@ -18,7 +18,7 @@
             <td :style="l.bg">{{ i + 1 }}</td>
             <td :style="l.bg">
         <tr style="border: none;">
-            <td style="border: none;padding: 0px;" v-for="(a,i) in l.data" :key="i">{{ a }}&nbsp;
+            <td style="border: none;padding: 0px;" v-for="(a,ai) in l.data" :key="ai">{{ a }}&nbsp;
             </td> 
         </tr>
         <tr style="border: none;">
@@ -252,7 +252,7 @@ export default {
     getcategory(){
       KeywordService.getrulebasekeyword().then((res)=>{
         this.list = res.data
-        console.log(res.data);
+        // console.log(res.data);
         // for (let l = 0; l < this.list.length; l++) {
           // this.updatetoken(this.list[l])
           // for (let t = 0; t < this.list[l].token.length; t++) {
