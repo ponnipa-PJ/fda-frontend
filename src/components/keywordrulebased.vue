@@ -11,12 +11,13 @@
           <tr>
             <th scope="col">#</th>
             <th scope="col">keywords</th>
+            <th scope="col">หมวดหมู่</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(l, i) in list" :key="i+1">
-            <td :style="l.bg">{{ i + 1 }}</td>
-            <td :style="l.bg">
+            <td >{{ i + 1 }}</td>
+            <td style="width:70%">
         <tr style="border: none;">
             <td style="border: none;padding: 0px;" v-for="(a,ai) in l.data" :key="ai">{{ a }}&nbsp;
             </td> 
@@ -28,6 +29,7 @@
               <!-- <span v-for="(a,i) in l.data" :key="i">{{ a }}&nbsp;</span><br/>
               <span v-for="(k) in l.keyword_id" :key="k">{{ k }}&nbsp;</span>  -->
             </td>
+            <td style="width:20%">{{ l.category }}</td>
             
           </tr>
         </tbody>

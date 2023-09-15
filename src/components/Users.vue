@@ -18,7 +18,7 @@
       <thead>
         <tr class="table-active">
           <th scope="col">ลำดับที่</th>
-          <th scope="col">Username</th>
+          <th scope="col">ชื่อผู้ใช้งาน</th>
           <th scope="col">สิทธิ์การใช้งาน</th>
           <th scope="col"></th>
         </tr>
@@ -92,7 +92,7 @@
                   />
                 </div> -->
                 <div class="form-group mt-3">
-                  <label for="username">username</label>
+                  <label for="username">ชื่อผู้ใช้งาน</label>
                   <input
                     v-model="user.email"
                     type="text"
@@ -212,7 +212,7 @@ export default {
       //   alert("กรุณากรอกนามสกุล");
       // }else 
       if (this.user.email == "") {
-        alert("กรุณากรอก username");
+        alert("กรุณากรอกชื่อผู้ใช้งาน");
       // } else if (this.user.role_id == "") {
       //   alert("กรุณาเลือกสิทธิ์");
       }else if (this.user.password == "") {

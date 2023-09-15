@@ -1,12 +1,12 @@
 <template>
 <div >
-    <div class="card mt-5" style="width: 40%">
+    <div class="card mt-5" style="width: 80%">
     <div class="card-body login-card-body mt-3">
       <h3 class="login-box-msg" style="text-align:center">เข้าสู่ระบบ</h3>
       <form>
         <div class="card-body mt-3">
           <div class="form-group">
-            <label for="email">Username<span style="color: red">*</span> </label>
+            <label for="email">ชื่อผู้ใช้งาน<span style="color: red">*</span> </label>
             <input
               v-model="user.email"
               v-on:keyup.enter="signIn()"
@@ -14,7 +14,7 @@
               min="1"
               class="form-control form-control-sm"
               id="email"
-              placeholder="กรุณากรอกอีเมล"
+              placeholder="กรุณากรอกชื่อผู้ใช้งาน"
             />
           </div>
           <div class="form-group mt-3" style="margin-bottom:0px">

@@ -16,7 +16,7 @@
         </thead>
         <tbody>
           <tr v-for="(l, i) in pageOfItems" :key="i">
-            <td :style="l.bg">{{ i + 1 }}</td>
+            <td :style="l.bg">{{ l.id }}</td>
             <td :style="l.bg">{{ l.name }}</td>
             <td>
             <a @click="getid(l.id)">
