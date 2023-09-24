@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="height: 600px">
-    <div class="form-group mt-5">
+    <div class="form-group mt-5 mb-3">
 
       <label for="exampleFormControlTextarea1">URL</label>
       <textarea v-model="url" class="form-control" id="exampleFormControlTextarea1" rows="7"></textarea>
@@ -28,22 +28,22 @@
           <td :style="colorfda"><span v-if="list[0].status">{{ list[0].fda }}</span></td>
           <td :style="colorfda">{{ list[0].fda }} </td>
           <td :style="colorfda">{{ list[0].list.cncnm || '' }}</td>
-          <td v-if="list[0].is_fda && list[0].is_cat && list[0].is_name" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
-          <span>ผ่าน</span></td>
+          <td v-if="statusfda && statuscat && statusname" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
+          <span>ผ่าน</span>{{ updatestatusfda() }}</td>
           <td v-else rowspan="3" style="text-align: center;vertical-align: middle;background-color:#f9bdbb">
-          <span>ไม่ผ่าน</span></td>
+          <span>ไม่ผ่าน</span>{{ updatestatusfda() }}</td>
         </tr>
         <tr>
           <td :style="colorcat">ประเภทผลิตภัณฑ์</td>
           <td :style="colorcat">{{ type}}</td>
-          <td :style="colorcat"><span v-html="type"></span></td>
-          <td :style="colorcat"><span v-if="list[0].is_cat">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
+          <td :style="colorcat"><span v-html="matchcategory"></span></td>
+          <td :style="colorcat"><span v-if="statuscat">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
         </tr>
         <tr>
           <td :style="colorname">ชื่อผลิตภัณฑ์</td>
           <td :style="colorname">{{ list[0].list.productha }}<br/>{{ list[0].list.produceng }}</td>
           <td :style="colorname"><span v-html="matchname"></span></td>
-          <td :style="colorname"><span v-if="list[0].is_name">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
+          <td :style="colorname"><span v-if="statusname">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
         </tr>
       </tbody>
       </table>
@@ -72,7 +72,7 @@
         </tr>
       </tbody>
       </table> -->
-    <table class="table mt-3" v-if="list.length > 0 && url">
+    <table class="table mt-3 mb-3" v-if="list.length > 0 && url">
       <thead>
         <tr>
           <th scope="col">สินค้า</th>
@@ -239,12 +239,48 @@ export default {
 //       });
       
     },
+    updatestatusfda(){
+      // console.log(this.statusfda,this.statuscat,this.statusname)
+      // var cat = this.matchcategory.replaceAll('<span style="color:red">','')
+      // cat = cat.replaceAll('</span>','')
+      // console.log(cat);
+      // console.log(this.list[0].status);
+      if (this.list[0].status ==1) {
+        var fda = {
+        }
+      if (this.statusfda && this.statuscat && this.statusname) {
+         fda = {
+          statusfda:true,
+          cat_fda:this.type,
+          is_fda:this.statusfda,
+          is_cat:this.statuscat,
+          is_name:this.statusname
+        }
+      }else{
+         fda = {
+          statusfda:false,
+          cat_fda:this.type,
+          is_fda:this.statusfda,
+          is_cat:this.statuscat,
+          is_name:this.statusname
+        }
+      }
+      // console.log(this.list[0].id);
+      ProductsService.updatefdastatus(this.list[0].id,fda).then(()=>{
+        // console.log(res.data);
+      })
+      }
+      
+      return ''
+    },
     checkfdamatch(name,name_real) {
+      console.log(name);
+       console.log(name_real);
       this.matchname = ''
       this.statusname = 0
           this.colorname = "background-color:#f9bdbb"
       //     console.log(name_real);
-      //  console.log('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real);
+       console.log('http://127.0.0.1:5000/matchname?name=' + name+'&&name_real=' + name_real);
       axios.get(LinkService.getpythonlink()+'/matchname?name=' + name+'&&name_real=' + name_real).then((res) => {
         // console.log(res.data);
         this.matchname = res.data
@@ -266,18 +302,16 @@ export default {
           
           if (category_real) {
       //  console.log('http://127.0.0.1:5000/matchcategory?category=' + category+'&&category_real=' + category_real);
-      axios.get(LinkService.getpythonlink()+'/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
+      // axios.get(LinkService.getpythonlink()+'/matchcategory?category=' + category+'&&category_real=' + category_real).then((res) => {
         // console.log(res.data);
-        this.matchcategory = res.data
-        // console.log(this.matchcategory.includes('red'));
-        if(this.list[0].is_cat){
+        // console.log(category.includes(category_real));
+        if(category.includes(category_real)){
           this.statuscat = 1
           this.colorcat = "background-color:#a3e9a4"
+        this.matchcategory = category_real
         }
-      if(this.list[0].is_fda){
-          this.colorfda = "background-color:#a3e9a4"
-        }
-      });
+      
+      // });
     }
     },
     cut(word) {
@@ -435,10 +469,7 @@ export default {
             name: res.data[0].name,
             detail: detail,
             fda: fda,
-            cat_name:res.data[0].cat_name,
-            is_name:res.data[0].is_name,
-             is_cat:res.data[0].is_cat,
-              is_fda:res.data[0].is_fda
+            cat_name:res.data[0].cat_name
           })
           for (let f = 0; f < fdalist.length; f++) {
             if (!fdalist[f].fda || isNaN(fda) || fda ==0) {
@@ -476,18 +507,19 @@ export default {
                   data.typepro = ''
                 }
                 if (data.length > 1) {
+                  console.log(data.cncnm);
                   fdalist[f].status = 0
                   fdalist[f].list = {}
                   // console.log(fdalist[f]);
                   fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
                   fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
                   this.gettokenize(fdalist[f].detail,'')
-                  this.checkkeyword(fdalist[f].detail)
+                  // this.checkkeyword(fdalist[f].detail)
                   this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
                 // var namefull =fdalist[f].name+" " +this.finddescription(fdalist[f].detail)
-                var namefull =fdalist[f].name
+                var namefull =fdalist[f].name + ' '+fdalist[f].detail
                 namefull = namefull.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
                 namefull = namefull.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
                 namefull = namefull.replaceAll(/(\r\n|\n|\r)/gm, "");
@@ -495,7 +527,9 @@ export default {
                 namefull = namefull.replaceAll("!", "");
                 namefull = namefull.replaceAll("*", "");
                 namefull = namefull.replaceAll("#", "");
-                  this.checkfdamatch(namefull,data.productha+data.produceng)
+                namefull = namefull.replaceAll("&", " ");
+                console.log(namefull);
+                  this.checkfdamatch(namefull,data.productha+' '+data.produceng)
 
                 // console.log(fdalist[f].detail);
                 // var cat = this.findcategory(fdalist[f].detail)
@@ -530,7 +564,7 @@ export default {
               fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
               fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
                 this.gettokenize(fdalist[f].detail,fdatype+name+data.produceng)
-                this.checkkeyword(fdalist[f].detail)
+                // this.checkkeyword(fdalist[f].detail)
                 if (!data.lcnno) {
                   fdalist[f].status = 0
                   fdalist[f].list = []
@@ -540,6 +574,7 @@ export default {
                   fdalist[f].status = 1
                   fdalist[f].bg = 'background-color:#a3e9a4'
                   // console.log(data.STATUS_ID.includes(7))
+                  
                   if (data.cncnm == "คงอยู่") {
                     this.statusfda = 1
                     this.colorfda = "background-color:#a3e9a4"
@@ -578,6 +613,7 @@ export default {
       this.colorcat='background-color:#f9bdbb',
       this.list = []
       ProductsService.getproduct(this.id).then(async (res) => {
+        
         // console.log(res.data);
         if (res.data.content == '' || res.data.length == 0) {
           alert('ไม่พบข้อมูลในระบบ')
@@ -608,10 +644,7 @@ export default {
             name: res.data.name,
             detail: detail,
             fda: fda,
-            cat_name:res.data.cat_name,
-            is_name:res.data.is_name,
-             is_cat:res.data.is_cat,
-              is_fda:res.data.is_fda
+            cat_name:res.data.cat_name
           })
           // console.log(fdalist);
           for (let f = 0; f < fdalist.length; f++) {
@@ -626,7 +659,7 @@ export default {
               fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
               console.log(fdalist[f].detail);
               this.gettokenize(fdalist[f].detail,'')
-              this.checkkeyword(fdalist[f].detail)
+              // this.checkkeyword(fdalist[f].detail)
               this.list = fdalist
               alert('เลขอย.ของผลิตภัณฑ์นี้ไม่ถูกต้อง')
             }else{
@@ -661,12 +694,12 @@ export default {
               fdalist[f].detail = fdalist[f].detail.replaceAll("&", "");
               fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
                   this.gettokenize(fdalist[f].detail,'')
-                  this.checkkeyword(fdalist[f].detail)
+                  // this.checkkeyword(fdalist[f].detail)
                   this.list = fdalist
                   alert('ไม่พบเลขอย.ในเว็บไซต์ของผลิตภัณฑ์นี้')
                 }
                 // var namefull =fdalist[f].name+" " +this.finddescription(fdalist[f].detail)
-                var namefull =fdalist[f].name
+                var namefull =fdalist[f].name + ' '+fdalist[f].detail
                 namefull = namefull.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
                 namefull = namefull.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
                 namefull = namefull.replaceAll(/(\r\n|\n|\r)/gm, "");
@@ -674,10 +707,13 @@ export default {
                 namefull = namefull.replaceAll("!", "");
                 namefull = namefull.replaceAll("*", "");
                 namefull = namefull.replaceAll("#", "");
-                  this.checkfdamatch(namefull,data.productha+data.produceng)
+                 namefull = namefull.replaceAll("&", " ");
+                console.log(namefull);
+                  this.checkfdamatch(namefull,data.productha+' '+data.produceng)
 
                 // console.log(fdalist[f].detail);
-                var cat = this.findcategory(fdalist[f].detail)
+                // var cat = this.findcategory(fdalist[f].detail)
+                var cat = fdalist[f].name+fdalist[f].detail
                 // console.log(cat);
                 var fdatype = this.fdatype(data.typepro)
                 fdatype = fdatype.replaceAll(' ','')
@@ -710,7 +746,7 @@ export default {
               fdalist[f].detail = fdalist[f].detail.replaceAll("#", "");
               // console.log(fdalist[f].detail);
                 this.gettokenize(fdalist[f].detail,fdatype+name+data.produceng)
-                this.checkkeyword(fdalist[f].detail)
+                // this.checkkeyword(fdalist[f].detail)
                 if (!data.lcnno) {
                   fdalist[f].status = 0
                   fdalist[f].list = []
@@ -720,7 +756,9 @@ export default {
                   fdalist[f].status = 1
                   fdalist[f].bg = 'background-color:#a3e9a4'
                   // console.log(data.STATUS_ID.includes(7))
-                  if (data.cncnm == "คงอยู่") {
+                  // console.log(data.cncnm);
+                  if (data.cncnm.includes("คงอยู่")) {
+                    this.statusfda = 1
                     this.colorfda = "background-color:#a3e9a4"
                     fdalist[f].icon = 'color: green'
 

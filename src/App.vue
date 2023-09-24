@@ -106,6 +106,11 @@ export default {
             this.menu[m].class = 'active'
           }
         }
+        this.menu.push({
+          name:'รายการสินค้าที่ตรวจสอบทั้งหมด',
+      url:'/scraping',
+      class:''
+        })
       })
     }
 

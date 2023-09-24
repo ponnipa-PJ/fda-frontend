@@ -18,6 +18,7 @@ import Login from './components/Login.vue';
 import Users from './components/Users.vue';
 import Menu from './components/Menu.vue';
 import Menumanage from './components/Menumanage.vue';
+import check from './components/check.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -28,6 +29,12 @@ const router = new Router({
       alias: "/import",
       name: "import",
       component: Import
+    },
+    {
+      path: "/check",
+      alias: "/check",
+      name: "check",
+      component: check
     },
     {
       path: "/scraping",

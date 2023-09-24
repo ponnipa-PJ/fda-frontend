@@ -12,10 +12,10 @@
       <div class="card-body">
 
 <div class="form-group">
-                  <!-- <label for="password">หมวด</label>
-                  <select class="form-control" v-model="data.cat_id">
+                  <label for="password">หมวด</label>
+                  <select class="form-control form-control-sm" v-model="data.cat_id">
   <option v-for="(i,r) in category" :key="r" :value="i.id">{{i.name}}</option>
-</select> -->
+</select>
                 </div>
                 <div class="form-group">
                   <label>ชื่อไฟล์</label>
@@ -135,12 +135,12 @@
             <form>
               <div class="card-body mt-3">
 
-<!-- <div class="form-group mt-3">
+<div class="form-group mt-3">
                   <label for="password">หมวด</label>
                   <select class="form-control" v-model="data.cat_id">
   <option v-for="(i,r) in category" :key="r" :value="i.id">{{i.name}}</option>
 </select>
-                </div> -->
+                </div>
                 <div class="form-group mt-3">
                   <label>Name File</label>
                   <input
@@ -240,7 +240,7 @@ export default {
       data:{},
       pro_id:0,
       category:[],
-      status:1,
+      status:0,
       imagelists:[],
       pageOfItems: [],
       customLabels,
@@ -358,7 +358,7 @@ export default {
    getproduct(){
     // console.log(this.status);
     ProductsService.getproducts(this.status,'','').then(async (res)=>{
-      console.log(res.data);
+      // console.log(res.data);
       this.imagelists = []
       this.list = res.data
     })
@@ -443,12 +443,12 @@ return result
         // console.log(pro);
         ProductsService.updatescraping(data.id,pro).then(()=>{
           // console.log(res.data);
-          alert('บันทึกเรียบร้อย')
+          // alert('บันทึกเรียบร้อย')
           this.data = {}
           // let route = this.$router.resolve({ path: "/"+ data.id});
           // window.open(route.href);
           // window.location = '/';
-          this.gotosearch(data.id)
+          this.gotocheckstatus(data.id)
 //           const router = useRouter();
 // const routeData = router.resolve({name: '/', query: {id: data.id}});
 // window.open(routeData.href, '_blank');
@@ -467,6 +467,9 @@ return result
    },
    gotosearch(id){
     window.open('/import?id='+id, '_blank');
+   },
+   gotocheckstatus(id){
+    window.open('/check?id='+id, '_blank');
    },
    gotofile(url){
     window.open(this.filepath+url, '_blank');
