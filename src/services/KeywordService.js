@@ -1,6 +1,15 @@
 import http from "../http-common";
 
 class KeywordService {
+  getkeywordsall(status) {
+    return http.get('/keywords?name='+status);
+  }
+  updatekeywordall(id,data) {
+    return http.put(`/keywords/${id}`, data);
+  }
+  updatedictid(id,data) {
+    return http.put(`/keywords/updatedictid/${id}`, data);
+  }
   getkeywords(status) {
     return http.get('/keyword_dicts?name='+status);
   }
