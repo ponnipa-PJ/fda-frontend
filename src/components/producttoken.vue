@@ -1,23 +1,33 @@
 <template>
   <div class="container">
+<div class="row">
+    <div>
+      <div class="form-group mt-5">
 
-    <table class="table table-bordered mt-3" v-for="l in list" :key="l.id">
-      <thead>
-        <tr>
-          <th scope="col" style="text-align:center;background-color:#ffb454" colspan="2">{{ l.file }}</th>
-        </tr>
-      </thead>
+<label for="exampleFormControlTextarea1">URL</label>
+<textarea v-model="data.url" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+</div>
+<div class="form-group ">
+
+<label for="exampleFormControlTextarea1">Content</label>
+<textarea v-model="data.content" class="form-control" id="exampleFormControlTextarea1" rows="7"></textarea>
+</div>
+<button @click="search()" type="submit" class="mb-3 btn btn-success">
+ค้นหา
+</button>
+    </div>
+    <table class="table table-bordered mt-3 mb-5" v-if="status">
       <tbody>
         <tr>
           <th style="background-color:#ffb454">รายละเอียดสินค้า</th>
           <th style="background-color:#ffb454">ข้อความโฆษณา</th>
         </tr>
         <tr>
-          <td :style="colorkey" style="width:40%"><span v-html="l.desctext"></span></td>
+          <td :style="colorkey" style="width:40%"><span v-html="list.sentence_keyword"></span></td>
           <!-- <th :style="colorkey">ข้อความโฆษณา</th> -->
-          <td :style="colorkey" v-if="l.keyword != 0">
-        <tr v-for="(k, i) in l.keyword" :key="i">
-          <td><span v-html="k.sentent"></span></td>
+          <td :style="colorkey" v-if="list.keyword != 0">
+        <tr v-for="(k, i) in list.keyword" :key="i">
+          <td><span v-html="k.sentent"></span> {{k.percentage}}</td>
           <td><span v-if="k.status == 1">เกินจริง</span><span v-if="k.status == 9">ไม่เกินจริง</span><span
               v-if="k.status == 0"></span></td>
 
@@ -37,27 +47,18 @@
         </tr>
       </tbody>
     </table>
-    <div class="row" v-if="list.length">
-      <div class="col-md-6">
-        <a :href="'Advertising?id='+back"> <button type="submit" class="mb-3 btn btn-info" v-if="$route.query.id !=1">
-          <i class="fa fa-arrow-left" aria-hidden="true"></i>
-            </button></a>
-      </div>
-      <div class="col-md-6" style="text-align: right;" v-if="$route.query.id < alldata">
-        <a :href="'Advertising?id='+next"><button type="submit" class="mb-3 btn btn-info" >
-              <i class="fa fa-arrow-right" aria-hidden="true"></i>
-            </button></a></div>
     </div>
-  </div>
+</div>
 </template>
 
 <script>
 import axios from "axios";
-import ProductsService from '../services/ProductsService.js'
+// import ProductsService from '../services/ProductsService.js'
 import DictService from '../services/DictService'
 import RuleBasedService from '../services/RuleBasedService'
 import MapRuleBasedService from '../services/MapRuleBasedService'
 import LinkService from '../services/LinkService'
+import AdvertiseService from '../services/AdvertiseService'
 
 export default {
   name: "App",
@@ -88,7 +89,8 @@ export default {
       arrList: [],
       alldata:0,
       back:0,
-      next:0
+      next:0,
+      data:{}
     };
   },
   methods: {
@@ -331,56 +333,210 @@ export default {
       // console.log(findfda);
       return findfda
     },
-    getdata() {
-      var end = this.$route.query.id*5
-      // var start = end-4
-      var start = this.$route.query.id
-      console.log(start);
-      ProductsService.getproductkeyword(start,end).then(async (res) => {
-        // this.list = res.data
-        // console.log(res.data);
-        for (let l = 0; l < res.data.length; l++) {
-          // var desc = this.finddescription(res.data[l].content)
-          // res.data[l].desc =  desc
-          // // console.log('http://127.0.0.1:5000/checkkeyword?name=' + desc);   
-          axios.get(LinkService.getpythonlink()+'/worktokendesc?text=' + res.data[l].desc).then((desc) => {
+    search() { 
+        this.status = false
+      if (this.data.url == null || this.data.url == "") {
+       alert('กรุณากรอก URL') 
+      }else if(this.data.content == null || this.data.content == ""){
+        alert('กรุณากรอกข้อความโฆษณา') 
+      }else{
+      var content = ''
+      content = this.data.content.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
+            content = content.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
+            content = content.replaceAll(/(\r\n|\n|\r)/gm, "");
+            content = content.replaceAll("_", "");
+            content = content.replaceAll("!", "");
+            content = content.replaceAll("*", "");
+            content = content.replaceAll("&", "");
+              content = content.replaceAll("#", "");
+      content = content.replaceAll(`_/l\_`, "");// eslint-disable-line
+     var url = this.data.url.split('-i.')
+    //  console.log(url);
+     var selectpro = {
+      url:url[0]
+     }
+     MapRuleBasedService.getproduct_token(selectpro).then(async (res)=>{
+      // console.log(res.data);
+      // console.log(content);
+      if (res.data.length == 0) {
+        // console.log(LinkService.getpythonlink()+'/worktokendesc?text=' + content);
+         await axios.get(LinkService.getpythonlink()+'/worktokendesc?text=' + content).then(async (res) => {
             // console.log(res.data);
-            res.data[l].desctext = desc.data
+            var sentence = res.data.replaceAll('<spanstyle','<span style')
             var des = {
-              sentent_keyword:desc.data
+              url:url[0],
+              sentence:this.data.content,
+              sentence_keyword:sentence,
+              status:1
             }
-            ProductsService.sentent_keyword(this.$route.query.id,des).then(async () => {
-            axios.get(LinkService.getpythonlink()+'checkkeyword?name=' + res.data[l].desc+'&&id='+this.$route.query.id).then((keys) => {
-              console.log(keys.data);
-              if (keys.data.length > 0) {
-                res.data[l].keyword = keys.data
-              } else {
-                res.data[l].keyword = 0
+            console.log(des);
+            await MapRuleBasedService.createproduct_token(des).then(async (res) => {
+              // console.log(res.data.id);
+             var product_token = res.data.id
+            await axios.get(LinkService.getpythonlink()+'checkkeyword?name=' + this.data.content).then(async (res) => {
+              // console.log(res.data);
+              for (let r = 0; r < res.data.length; r++) {
+                var sentencetoken = res.data[r].sentent.replaceAll('\"','') // eslint-disable-line
+                sentencetoken = sentencetoken.replaceAll('<spanstyle','<span style')
+
+                // sentencetoken = sentencetoken.replaceAll('"color:red\"','"color:red"')
+              var advertise = {
+                product_token_id:product_token,
+                keyword_dict_id:res.data[r].keyword_dict_id,
+                dict_id:res.data[r].dict_id,
+                dict_name:res.data[r].dict_name,
+                sen:res.data[r].sen,
+                sentent:sentencetoken,
               }
-              if (l + 1 == res.data.length) {
-                this.list = res.data
-              }
+              AdvertiseService.createadvertise(advertise).then(()=>{
+                if (r+1 == res.data.length) { MapRuleBasedService.getproduct_token(selectpro).then((pro)=>{
+      // this.list = res.data
+      this.tokendata(pro.data)
+        this.status = true
+        
+     })
+                }
+              })
+            }
+              // if (keys.data.length > 0) {
+              //   res.data[l].keyword = keys.data
+              // } else {
+              //   res.data[l].keyword = 0
+              // }
+              // if (l + 1 == res.data.length) {
+              //   this.list = res.data
+              // }
             });
           });
-          });
-          //   }
-        }
+          
+        });
+      }else{
+        this.tokendata(res.data)
+        this.status = true
         // console.log(this.list);
-      })
+      }
+     })
+         
+    }
 
-
+    },
+    tokendata(list){
+      console.log(list);
+for (let l = 0; l < list.keyword.length; l++) {
+  console.log(list.keyword[l].map);
+    if (list.keyword[l].map) {
+      var map = {
+    url:JSON.stringify(list.keyword[l].map)
+     }
+     console.log(map);
+     MapRuleBasedService.getmapproduct(map).then((res)=>{
+      list.keyword[l].rulebase = res.data
+      if (l+1 == list.keyword.length) {
+        this.compare(list)
+      }
+     });
+    }
+    
+  // }
+  
+  
+}
+    },
+    compare(list){
+      for (let k = 0; k < list.keyword.length; k++) {
+    // console.log(list.keyword[k]);
+        var dict_id = JSON.parse(list.keyword[k].dict_id)
+        // var rulebased = JSON.parse(list.keyword[k].rulebase)
+        // console.log(list.keyword[k].rulebased);
+        if (list.keyword[k].rulebase) {
+        let uniqueCharsrule = list.keyword[k].rulebase.filter((c, index) => {
+                                return list.keyword[k].rulebase.indexOf(c) === index;
+                            });
+                            var filteredArray = dict_id.filter(function(n) {
+    return uniqueCharsrule.indexOf(n) !== -1;
+});
+// console.log(filteredArray);
+                            // console.log('filteredArray',filteredArray);
+                            // console.log('dict_id',dict_id.length);
+                            // console.log(sumdictId.length);
+                            var percentage = (100 * parseInt(filteredArray.length)/parseInt(dict_id.length))
+                            // console.log(percentage);
+                            list.keyword[k].percentage = percentage
+                          }else{
+                            list.keyword[k].percentage = 0
+                          }
+                          if (k+1 == list.keyword.length) {
+                            this.list = list
+                          }
+          
+        }
     }
   },
   mounted() {
-    console.log(this.$route.query.id);
-    this.back = parseInt(this.$route.query.id)-1
-    this.next = parseInt(this.$route.query.id)+1
-    // ProductsService.getproducts(1,'','').then((res)=>{
-      this.alldata = 75
-      // console.log(res.data);
-    this.getdata()
-    // });
-  },
+    this.data.url ='https://shopee.co.th/%E2%99%A6%EF%B8%8F%E0%B9%82%E0%B8%89%E0%B8%A1%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88-%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%81%E0%B8%97%E0%B9%89%E2%99%A6%EF%B8%8F-%E0%B8%82%E0%B8%B2%E0%B8%A2%E0%B8%94%E0%B8%B5%E0%B8%A1%E0%B8%B2%E0%B8%81-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F-%E0%B8%A5%E0%B8%B4%E0%B9%82%E0%B8%8B%E0%B9%88-%E0%B8%9E%E0%B8%A5%E0%B8%B1%E0%B8%AA-%E2%80%8B-coffee-lishou-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%84%E0%B8%A7%E0%B8%9A%E0%B8%84%E0%B8%B8%E0%B8%A1%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%84%E0%B8%B8%E0%B8%A1%E0%B8%AB%E0%B8%B4%E0%B8%A7-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%A5%E0%B8%94%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%A5%E0%B8%94%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%AD%E0%B9%89%E0%B8%A7%E0%B8%99'
+    this.data.content = '️ถ้าเป็นลูกค้าพิมแล้ว ดูแลจนน้ำหนักลดเลยค่ะ สั่งซื้อสินค้าแล้ว ทักแชทมาคุยกันได้เลยค่ะ'
+    var url = this.data.url.split('-i.')
+    // var content = this.data.content.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
+    //         content = content.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
+    //         content = content.replaceAll(/(\r\n|\n|\r)/gm, "");
+    //         content = content.replaceAll("_", "");
+    //         content = content.replaceAll("!", "");
+    //         content = content.replaceAll("*", "");
+    //         content = content.replaceAll("&", "");
+    //           content = content.replaceAll("#", "");
+    //   content = content.replaceAll(`_/l\_`, "");// eslint-disable-line
+    //   axios.get(LinkService.getpythonlink()+'/worktokendesc?text=' + content).then(async (res) => {
+    //     console.log(res.data);
+    //   })
+      // axios.get(LinkService.getpythonlink()+'/checkkeyword?name=' + content).then(async (res) => {
+      //       console.log(res.data);
+      //       for (let r = 0; r < res.data.length; r++) {
+      //         var advertise = {
+      //           product_token_id:1,
+      //           keyword_dict_id:res.data[r].keyword_dict_id,
+      //           dict_id:res.data[r].dict_id,
+      //           dict_name:res.data[r].dict_name,
+      //           sen:res.data[r].sen,
+      //           sentent:res.data[r].sentent,
+      //         }
+      //         AdvertiseService.createadvertise(advertise).then((res)=>{
+      //           console.log(res.data);
+      //         })
+      //       }
+      // });
+    //  console.log(url);
+    var selectpro = {
+      url:url[0]
+     }
+     MapRuleBasedService.getproduct_token(selectpro).then((res)=>{
+      console.log(res.data);
+var list = res.data
+this.tokendata(list)
+// for (let l = 0; l < list.keyword.length; l++) {
+//   // console.log(this.list.keyword[l].map);
+//   // for (let m = 0; m < this.list.keyword[l].length; m++) {
+//     if (list.keyword[l].map) {
+//       var map = {
+//     url:JSON.stringify(list.keyword[l].map)
+//      }
+//     //  console.log(map);
+//      MapRuleBasedService.getmapproduct(map).then((res)=>{
+//       list.keyword[l].rulebase = res.data
+//       if (l+1 == list.keyword.length) {
+//         this.compare(list)
+//       }
+//      });
+//     }
+    
+//   }
+  
+  
+// }
+// console.log(this.list);
+this.status =true
+     })
+
+    },
 };
 </script>
 

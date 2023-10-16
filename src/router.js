@@ -19,6 +19,8 @@ import Users from './components/Users.vue';
 import Menu from './components/Menu.vue';
 import Menumanage from './components/Menumanage.vue';
 import check from './components/check.vue';
+import token from './components/token.vue';
+import producttoken from './components/producttoken.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -139,7 +141,18 @@ const router = new Router({
       name: "menumanage",
       component: Menumanage
     },
-    
+    {
+      path: "/token",
+      alias: "/token",
+      name: "token",
+      component: token
+    },
+    {
+      path: "/producttoken",
+      alias: "/producttoken",
+      name: "producttoken",
+      component: producttoken
+    },
   ]
 });
 

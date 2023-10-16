@@ -11,7 +11,7 @@
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col" style="width:10%">หมวดหมู่</th>
+            <!-- <th scope="col" style="width:10%">หมวดหมู่</th> -->
             <th scope="col">ประโยค</th>
             <th scope="col"></th>
           </tr>
@@ -19,22 +19,22 @@
         <tbody>
           <tr v-for="(l, i) in list" :key="i+1">
             <td style="width:5%">{{ i + 1 }}</td>
-            <td style="width:15%">{{ l.category }}</td>
+            <!-- <td style="width:15%">{{ l.category }}</td> -->
              <td>
         <tr style="border: none;">
-            <td style="border: none;padding: 0px;" v-for="(a,ai) in l.dict_name" :key="ai">{{ a }} &nbsp;&nbsp;&nbsp;
+            <td style="border: none;padding: 0px;" v-for="(a,ai) in l.dict" :key="ai">{{ a.dict_name }} &nbsp;&nbsp;&nbsp;
             </td> 
         </tr>
         <tr style="border: none;">
-            <td style="border: none;padding: 0px;color:blue;" v-for="(k,ki) in l.dict_id" :key="ki">{{ k }}&nbsp;&nbsp;
+            <td style="border: none;padding: 0px;color:blue;" v-for="(k,ki) in l.dict" :key="ki">{{ k.dict_id }}&nbsp;&nbsp;
             </td>&nbsp;
         </tr>
             </td>
            
              <!-- <td :style="l.bg+';width:80%'"><span v-for="(a,i) in l.sen" :key="i">{{ a.name }}&nbsp;</span><br/>
               <span v-for="(d) in l.dict_id" :key="d">{{ d }}&nbsp;</span> </td> -->
-            <!-- <td :style="l.bg+';width:10%'"><span v-if="l.answer == 1">เกินจริง</span><span v-if="l.answer == 9">ไม่เกินจริง</span><span v-if="!l.answer"></span></td> -->
-            <td>
+            <td :style="l.bg+';width:10%'"><span v-if="l.answer == 1">เกินจริง</span><span v-if="l.answer == 9">ไม่เกินจริง</span><span v-if="!l.answer"></span></td>
+            <!-- <td> -->
             <!-- <a @click="getid(l.id)">
               <button
                 type="button"
@@ -53,7 +53,7 @@
               >
                 <i class="fa fa-trash"></i></button
             ></a> -->
-          </td>
+          <!-- </td> -->
           </tr>
         </tbody>
       </table>
@@ -276,7 +276,7 @@ export default {
       });
     },
     getcategory(){
-      MapRuleBasedService.getmap_rule_baseds().then((res)=>{
+      MapRuleBasedService.getallrulebased().then((res)=>{
         this.list = res.data
         console.log(res.data);
         // for (let l = 0; l < this.list.length; l++) {
