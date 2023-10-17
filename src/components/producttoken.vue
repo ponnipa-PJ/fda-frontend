@@ -407,7 +407,11 @@ export default {
           /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g,
           ""
         );
-        content = content.replaceAll(/(\r\n|\n|\r)/gm, "");
+        
+        content = content.replaceAll(
+          /\ud83d[\ude00-\ude4f]/g,""
+        );
+        content = content.replaceAll(/(\r\n|\n|\r)/gm, " ");
         content = content.replaceAll("_", "");
         content = content.replaceAll("!", "");
         content = content.replaceAll("*", "");
@@ -422,7 +426,7 @@ export default {
           url: url[0],
         };
         MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-          // console.log(res.data);
+          console.log(res.data);
           // console.log(content);
           if (res.data.length == 0) {
             // console.log(LinkService.getpythonlink()+'/worktokendesc?text=' + content);
@@ -499,7 +503,6 @@ export default {
           } else {
             this.tokendata(res.data);
             this.product_token = res.data.id
-            this.status = true;
             // console.log(this.list);
           }
         });
@@ -508,10 +511,11 @@ export default {
     tokendata(list) {
       console.log(list);
       for (let l = 0; l < list.keyword.length; l++) {
-        console.log(list.keyword[l].map);
-        if (list.keyword[l].map) {
+        console.log(list.keyword[l].keyword_dict_id);
+        if (list.keyword[l].keyword_dict_id) {
           var map = {
-            url: JSON.stringify(list.keyword[l].map),
+            url: list.keyword[l].keyword_dict_id,
+            keyword_id:list.keyword[l].dict_id,
           };
           console.log(map);
           MapRuleBasedService.getmapproduct(map).then((res) => {
