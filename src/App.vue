@@ -37,7 +37,7 @@ export default {
     },
   },
   mounted() {
-    console.log(this.currentUser);
+    // console.log(this.currentUser);
     if (this.$route.params.name == "map" || this.$route.name == "login" || this.$route.name == "register") {
       this.show = false;
     }
@@ -99,18 +99,18 @@ export default {
     if (this.currentUser) {
       UserService.getMenubyRoleID(this.currentUser.role_id).then((res) => {
         this.menu = res.data
-        console.log(this.menu);
+        // console.log(this.menu);
         for (let m = 0; m < this.menu.length; m++) {
           this.menu[m].class = ''
           if (this.menu[m].url == this.$route.path) {
             this.menu[m].class = 'active'
           }
         }
-        this.menu.push({
-          name:'รายการสินค้าที่ตรวจสอบทั้งหมด',
-      url:'/scraping',
-      class:''
-        })
+      //   this.menu.push({
+      //     name:'รายการสินค้าที่ตรวจสอบทั้งหมด',
+      // url:'/scraping',
+      // class:''
+      //   })
       })
     }
 

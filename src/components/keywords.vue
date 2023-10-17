@@ -1,54 +1,17 @@
 <template>
   <div class="container mt-5">
-    <!-- <div style="text-align:right"> <button @click="createrulebased()"
+    <div style="text-align:right"> <button @click="getid(0)"
+          data-bs-toggle="modal"
+          data-bs-target="#AddScopus"
            type="submit" class="mb-3 btn btn-success">
       <i class="fa fa-plus" aria-hidden="true"></i>
-    </button></div> -->
-     <table class="table" v-if="list.length > 0" width="100%">
+    </button></div>
+      <table class="table" v-if="list.length > 0" width="100%">
         <thead>
           <tr>
             <th scope="col">#</th>
             <th scope="col">ข้อความ</th>
-            <th scope="col">ตัดคำ</th>
-            <!-- <th scope="col"></th> -->
-            <th scope="col">index</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(l, i) in list" :key="i">
-            <td :style="l.bg">{{ i + 1 }}</td>
-            <td :style="l.bg">{{ l.name }}</td>
-            <td :style="l.bg">{{ l.token }}</td>
-            <!-- <td :style="l.bg">{{l.dict_name}}</td> -->
-            <td :style="l.bg">{{l.dict_id}}</td>
-            <!-- <td> -->
-            <!-- <a @click="getid(l.id)">
-              <button
-                type="button"
-                class="btn btn-warning"
-                data-bs-toggle="modal"
-                data-bs-target="#AddScopus"
-              >
-                <i class="fa fa-edit"></i></button
-            ></a>&nbsp;
-            <a @click="getid(l.id)">
-              <button
-                type="button"
-                class="btn btn-danger"
-                data-bs-toggle="modal"
-                data-bs-target="#DeleteScopus"
-              >
-                <i class="fa fa-trash"></i></button
-            ></a> -->
-          <!-- </td> -->
-          </tr>
-        </tbody>
-      </table>
-      <!-- <table class="table" v-if="list.length > 0" width="100%">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">ข้อความ</th>
+
             <th scope="col"></th>
           </tr>
         </thead>
@@ -56,6 +19,7 @@
           <tr v-for="(l, i) in pageOfItems" :key="i">
             <td :style="l.bg">{{ i + 1 }}</td>
             <td :style="l.bg">{{ l.name }}</td>
+            <!-- <td :style="l.bg">{{ l.token }}</td> -->
             <td>
             <a @click="getid(l.id)">
               <button
@@ -91,7 +55,7 @@
       </div>
       <div v-if="list.length == 0" class="mt-5">
 <h3 style="text-align:center">ไม่พบข้อมูล</h3>
-      </div> -->
+      </div>
   <!-- Modal -->
   <div
       class="modal fade"
@@ -178,7 +142,6 @@ import axios from 'axios';
 import RuleBasedService from '../services/RuleBasedService'
 import DictService from '../services/DictService'
 import LinkService from '../services/LinkService'
-import MapRuleBasedService from '../services/MapRuleBasedService'
 
 const customLabels = {
   first: "<<",
@@ -207,52 +170,6 @@ export default {
     };
   },
   methods: {
-    updatekeyword(){
- for (let l = 0; l < this.list.length; l++) {
-          this.updatetoken(this.list[l])
-          for (let t = 0; t < this.list[l].token.length; t++) {
-            console.log(this.list[l].token[t]);
-            
-          }
-          
-        }
-    },
-    createrulebased(){
-
-      for (let l = 0; l < this.list.length; l++) {
-          
-          var maprule = {
-            keyword_id:this.list[l].id,
-                      advertise_id: null,
-                      status:1,
-                      answer:1,
-                      user:1
-                    }
-                    MapRuleBasedService.createmap_rule_based(maprule).then(async (res) => {
-                      // console.log(res.data);
-                      var map_id = res.data.id
-                      var dictlist = JSON.parse(this.list[l].dict_name)
-                      for (let d = 0; d < dictlist.length; d++) {
-                        await DictService.getdicts('',dictlist[d]).then((res)=>{
-                          var rule = {
-                    map_rule_based_id	:map_id,
-    dict_id	:res.data[0].id,
-    dict_name:res.data[0].name,
-    no:d+1
-                  }
-                    RuleBasedService.createrule_based(rule).then(() => {
-                      if (l+1 == this.list.length) {
-    alert('บันทึกสำเร็จ')
-  }
-   });
-  });
-  }
-                    });
-  
-                    
-                        
-                      }  
-    },
      onChangePage(pageOfItems) {
       // update page of items
       this.pageOfItems = pageOfItems;
@@ -314,7 +231,7 @@ export default {
       });
       return tokenize
     },
-    updatetoken(data){
+    updatetoken(data,type){
       // console.log(data);
       var tokenize= ''
       // data.name = data.name.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
@@ -337,78 +254,28 @@ export default {
         };
         // console.log(tokendata);
         // console.log(data.id);
-        KeywordService.updatekeywordall(data.id, tokendata).then(() => {
+        KeywordService.updatekeyword(data.id, tokendata).then(() => {
           // console.log(res.data);
-          // if (type == 'update') {
-          //   document.getElementById("closedcategory").click();
-          //   this.getcategory();
-          //   alert('บันทึกสำเร็จ')
-          // }
-          if (this.list.length == data.id) {
+          if (type == 'update') {
+            document.getElementById("closedcategory").click();
+            this.getcategory();
             alert('บันทึกสำเร็จ')
-            
           }
         });
       });
     },
     getcategory(){
-      // axios.get(LinkService.getpythonlink()+'/tokenkeyword?text=เพิ่มพลังรัก').then((res) => {
-      //   // this.tokenize = res.data
-      //   console.log(res.data);
-      //   // tokenize = res.data
-      // });
-      KeywordService.getkeywordsall(1).then(async (res)=>{
+      KeywordService.getkeywords(1).then((res)=>{
         this.list = res.data
-        
-//         for (let l = 0; l < this.list.length; l++) {
-//           var sentence = this.list[l].token.split('|')
-//           // console.log(sentence.length);
-//           var dictlist =[]
-//           var dictname=[]
-//           for (let s = 0; s < sentence.length; s++) {
-//             // console.log(sentence[s]);
-//             var sen = sentence[s].replaceAll(' ','')
-//             // console.log(sen);
-//              await DictService.getdicts('',sen).then((res)=>{
-//             console.log(sen);
-//     // console.log(res.data);
-//     if (res.data.length == 0) {
-// var prodata = {
-//           name: sen,
-//           status:1,
-//         };
-//         DictService.createdict(prodata).then((res) => {
+        // for (let l = 0; l < this.list.length; l++) {
+          // this.updatetoken(this.list[l])
+          // for (let t = 0; t < this.list[l].token.length; t++) {
+          //   console.log(this.list[l].token[t]);
             
-//       dictlist.push(res.data.id)
-//       dictname.push(sen)
-//         })
-//       // console.log(sentence[s].replaceAll(' ',''))
-//     }else{
-//       dictlist.push(res.data[0].id)
-//       dictname.push(res.data[0].name)
-//       // console.log(s+1, sentence.length);
-//       if (s+1 == sentence.length) {
-//       var dictid = {
-//         dict_id:dictlist,
-//         dict_name:dictname
-//         };
-
-//       console.log(dictlist);
-//       KeywordService.updatedictid(this.list[l].id,dictid).then(()=>{
-// // console.log(res.data);
-//       })
-        
-//       }
-//     }
-//   })
-//           }
- 
-  
-// }
-       
-                  });
-        
-    
+          // }
+          
+        // }
+      })
     },
     getid(id) {
       // console.log(id);
@@ -428,18 +295,6 @@ export default {
   },
   mounted() {
     this.getcategory()
-   
-
-//  for (let t = 0; t < this.list.length; t++) {
-//   console.log(this.list[t].name);
-//   axios.get(LinkService.getpythonlink()+'/tokenkeyword?text=' + this.list[t].name).then((res) => {
-//         console.log(res.data);
-//         this.list[t].token = res.data
-
-//   });
-            // this.list[t].token = this.token(this.list[t].name)
-            // console.log(this.list[t].token);
-          // }
   },
 };
 </script>
