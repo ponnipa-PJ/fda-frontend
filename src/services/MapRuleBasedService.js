@@ -22,11 +22,20 @@ class MapRuleBasedService {
   getproduct_token(data) {
     return http.post('/product_token/getproduct', data);
   } 
+  getproductkeyword(data) {
+    return http.post('/product_token/getproductkeyword', data);
+  }
   getmapproduct(data) {
     return http.post('/product_token/getmapproduct', data);
   } 
+  getbestrulebased(data) {
+    return http.post('/product_token/getbestrulebased', data);
+  }
   updateadvertise(id,data) {
     return http.put(`/advertise/${id}`, data);
+  }
+  updaterulebased(id,data) {
+    return http.put(`/advertise/updaterulebased/${id}`, data);
   }
   updateanswer(id,data) {
     return http.put(`/map_rule_based/updateanswer/${id}`, data);

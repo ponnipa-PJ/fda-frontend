@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+   
     <div class="row">
       <div>
         <div class="form-group mt-5">
@@ -38,16 +39,24 @@
             <td :style="colorkey" v-if="list.keyword != 0">
               <tr v-for="(k, i) in list.keyword" :key="i">
                 <td>
-                  <span v-html="k.sentent"></span><br />
-                  {{ k.percentage.toFixed(2) }}%
+                  <span v-html="k.sentence_rulebase"></span><br><br>
+                  <span v-for="(s,idx) in k.rule_based_name" :key="idx">{{s}}</span>
+                  <br><br>
+<span v-if="k.count_rulebased">{{(getpercentage(k)).toFixed(2)}}%</span><br><br>
+<div style="text-align:left"> <button
+          data-bs-toggle="modal"
+          data-bs-target="#AddScopusToken"
+           type="submit" class="mb-3 btn btn-success">
+      <i class="fa fa-plus" aria-hidden="true"> เพิ่ม keyword</i>
+    </button></div>
                 </td>
-                <!-- <td>
-                  <span v-if="k.status == 1">เกินจริง</span
-                  ><span v-if="k.status == 9">ไม่เกินจริง</span
-                  ><span v-if="k.status == 0"></span>
-                </td> -->
+                <td>
+                  <span v-if="k.answer == 1">เกินจริง</span
+                  ><span v-if="k.answer == 9">ไม่เกินจริง</span
+                  ><span v-if="k.answer == 0"></span>
+                </td>
 
-                <!-- <td>
+                <td>
                   <button
                     @click="savetorule_based(k, 1)"
                     type="submit"
@@ -62,7 +71,7 @@
                   >
                     <i class="fa fa-times"></i>
                   </button>
-                </td> -->
+                </td>
               </tr>
             </td>
             <td :style="colorkey" v-else>
@@ -73,6 +82,51 @@
           </tr>
         </tbody>
       </table>
+        <!-- Modal -->
+  <div
+      class="modal fade"
+      id="AddScopusToken"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{ title }}</h5>
+            
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="card-body mt-3">
+                <div class="form-group mt-3">
+                  <label>ข้อความ</label>
+                  <input
+                    v-model="key.name"
+                    type="text"
+                    min="1"
+                    class="form-control form-control-sm"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer mt-3">
+            <button type="button" class="btn btn-success" @click="save()">
+              บันทึก
+            </button>
+            <button
+            id="closedcategory"
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              ปิด
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 </template>
@@ -85,6 +139,7 @@ import RuleBasedService from "../services/RuleBasedService";
 import MapRuleBasedService from "../services/MapRuleBasedService";
 import LinkService from "../services/LinkService";
 import AdvertiseService from "../services/AdvertiseService";
+import KeywordService from "../services/KeywordService";
 
 export default {
   name: "App",
@@ -117,10 +172,51 @@ export default {
       back: 0,
       next: 0,
       data: {},
-      product_token:0
+      product_token:0,
+      title:'เพิ่ม keyword',
+      key:{}
     };
   },
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
+  },
   methods: {
+
+    save() {
+      console.log(this.key);
+      if (this.key.name == null || this.key.name == "") {
+        alert("กรุณากรอกข้อความ");
+      } else {
+        var prodata = {
+          name: this.key.name,
+          status:1,
+        };
+        console.log(prodata); 
+          KeywordService.createkeyword(prodata).then((res) => {
+            console.log(res.data);
+            if (res.data.err == 1062) {
+              alert('มีคำนี้ในระบบแล้ว')
+            }else{
+          DictService.createdict(prodata).then((res) => {
+            console.log(res.data );
+            // RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
+              
+            document.getElementById("closedcategory").click();
+            alert('บันทึกสำเร็จ')
+          // })
+        })
+      }
+      })
+      }
+    },
+    getpercentage(data){
+// var dict = JSON.parse(data.dict_id)
+var rule_based_id = JSON.parse(data.rule_based_id)
+var re = (100 * data.count_rulebased)/ (rule_based_id.length)
+return re
+    },
     savetorule(sen, answer) {
       // console.log(answer);
       var iddata = [];
@@ -195,15 +291,17 @@ export default {
     savetorule_based(data, answer) {
       // console.log(sen.length);
       // console.log('answer',answer);
-      // console.log(data);
+      console.log(data);
 
       var maprule = {
         keyword_id: 1,
-        advertise_id: null,
+        advertise_id: data.id,
         status: 1,
         answer: answer,
-        user: 1,
+        user: this.currentUser.id,
       };
+      if (!data.mapId) {
+        
       MapRuleBasedService.createmap_rule_based(maprule).then(async (res) => {
         // console.log(res.data);
         var map_id = res.data.id;
@@ -217,75 +315,22 @@ export default {
             no: d + 1,
           };
           RuleBasedService.createrule_based(rule).then(() => {
-            if (d + 1 == sendata.length) {
+            if (d + 1 == sendata.length) {      
+               this.getdetail()
+
               alert("บันทึกสำเร็จ");
             }
           });
         }
       });
 
-      // if (id.length != sen.length) {
-      //   for (let a = 0; a < sen.length; a++) {
-      //     DictService.getdicts("", sen[a]).then((res) => {
-      //       // console.log(res.data);
-      //       if (res.data.length == 0) {
-      //         var prodata = {
-      //           name: sen[a],
-      //           status: 1,
-      //         };
-      //         // console.log(prodata);
-      //         DictService.createdict(prodata).then(() => {
-      //           //   RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
-
-      //           // });
-      //           if (a + 1 == sen.length) {
-      //             this.savetorule(sen, answer);
-      //           }
-      //         });
-      //       }
-      //     });
-      //   }
-      // } else {
-      // this.savetorule(sendata, answer);
-      // }
-      //       this.arrList = []
-      //       console.log(answer);
-      // keyword= keyword.toString();
-      // var data = keyword.replaceAll('<span style="color:red">','')
-      //   data = data.replaceAll('</span>','')
-      //   data = data.replaceAll('  ',' ')
-      //   // console.log(data);
-      //   var datasplit = data.split(" ")
-      //   // console.log(datasplit);
-      //   for (let d = 0; d < datasplit.length; d++) {
-      //     if (datasplit[d] != '') {
-      //       this.arrList.push(datasplit[d])
-      //       // console.log(datasplit[d]);
-
-      //     }
-      //   }
-
-      //   console.log(this.arrList);
-      //     for (let a = 0; a < this.arrList.length; a++) {
-      //     DictService.getdicts('',this.arrList[a]).then((res)=>{
-      //         // console.log(res.data);
-      //         if (res.data.length == 0) {
-      //           var prodata = {
-      //           name: this.arrList[a],
-      //           status:1,
-      //         };
-      //         // console.log(prodata);
-      //           DictService.createdict(prodata).then((res) => {
-      //             RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
-      //           });
-      //         });
-      //         }
-      //       })
-      //         if (a+1== this.arrList.length) {
-      //       this.savetorule(answer)
-      //       // console.log(1);
-      //     }
-      //     }
+      }else{
+      MapRuleBasedService.deletemap_rule_based(data.mapId,maprule).then(async () => {
+        // console.log(res.data);
+       this.getdetail()
+        alert("บันทึกสำเร็จ");
+      });
+    }
     },
     checkkeyword(name) {
       // console.log(name);
@@ -390,6 +435,21 @@ export default {
     loaddict() {
       axios.get(LinkService.getpythonlink() + "/loaddict").then(async () => {});
     },
+    getdetail(){
+      // var url = this.data.url.split("-i.");
+      var selectpro = {
+          url: this.data.url,
+          id:this.currentUser.id
+        };
+        MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
+          console.log(res.data);
+          var best = this.getMax(res.data.keyword,'count_rulebased')
+          console.log(best);
+          this.list = res.data
+          this.list.keyword = [best]
+          this.status = true
+        })
+    },
     async search() {
       await this.loaddict();
       this.status = false;
@@ -401,11 +461,11 @@ export default {
         var content = "";
         content = this.data.content.replaceAll(
           /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g,
-          ""
+          " "
         );
         content = content.replaceAll(
           /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g,
-          ""
+          " "
         );
         
         content = content.replaceAll(
@@ -420,10 +480,13 @@ export default {
         content = content.replaceAll("•", "");
         content = content.replaceAll("+", "");
         content = content.replaceAll(`_/l\_`, ""); // eslint-disable-line
-        var url = this.data.url.split("-i.");
+        content = content.replaceAll(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, ' ');
+
+        // var url = this.data.url.split("-i.");
         //  console.log(url);
         var selectpro = {
-          url: url[0],
+          url: this.data.url,
+          id:this.currentUser.id
         };
         MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
           console.log(res.data);
@@ -439,22 +502,23 @@ export default {
                 console.log(res.data);
                 // var sentence = res.data.sentent.replaceAll("<spanstyle", "<span style");
                 var des = {
-                  url: url[0],
-                  sentence: this.data.content,
+                  url: this.data.url,
+                  sentence: content,
                   sentence_keyword: res.data.sentent,
                   keyword_id:res.data.keywordId,
                   status: 1,
                 };
                 console.log(des);
                 await MapRuleBasedService.createproduct_token(des).then(
-                  async (res) => {
-                    // console.log(res.data.id);
-                    var product_token = res.data.id;
+                   (producttoken) => {
+                    console.log(producttoken);
+                    this.product_token = producttoken.data.id;
 
-                    await axios
+                     axios
                       .post(LinkService.getpythonlink() + "/checkkeyword", con)
                       .then(async (res) => {
                         console.log(res.data);
+                        if (res.data.length > 0) {
                         for (let r = 0; r < res.data.length; r++) {
                           var sentencetoken = res.data[r].sentent.replaceAll(
                             '"',
@@ -467,17 +531,18 @@ export default {
 
                           // sentencetoken = sentencetoken.replaceAll('"color:red\"','"color:red"')
                           var advertise = {
-                            product_token_id: product_token,
+                            product_token_id: this.product_token,
                             keyword_dict_id: res.data[r].keyword_dict_id,
                             dict_id: res.data[r].dict_id,
                             dict_name: res.data[r].dict_name,
                             sentent: sentencetoken,
                             sen: res.data[r].sen,
                           };
+                          console.log(this.product_token);
                           AdvertiseService.createadvertise(advertise).then(
                             () => {
                               if (r + 1 == res.data.length) {
-                                MapRuleBasedService.getproduct_token(
+                                MapRuleBasedService.getproductkeyword(
                                   selectpro
                                 ).then((pro) => {
                                   this.product_token = pro.data.id
@@ -487,6 +552,10 @@ export default {
                               }
                             }
                           );
+                        }
+                          
+                        }else{
+                        this.getdetail()
                         }
                         // if (keys.data.length > 0) {
                         //   res.data[l].keyword = keys.data
@@ -501,32 +570,71 @@ export default {
                 );
               });
           } else {
-            this.tokendata(res.data);
-            this.product_token = res.data.id
-            // console.log(this.list);
+            // this.getdetail()
+            this.tokendata(res.data)
+            // this.list = res.data
+            // this.product_token = res.data.id
+            // // console.log(this.list);
+            // this.status = true
           }
         });
       }
     },
+    getMax(arr, prop) {
+    var max;
+    for (var i=0 ; i< arr.length ; i++) {
+        if (max == null || parseInt(arr[i][prop]) > parseInt(max[prop]))
+            max = arr[i];
+    }
+    return max;
+},
     tokendata(list) {
       console.log(list);
+      if (list.keyword.length > 0) {
       for (let l = 0; l < list.keyword.length; l++) {
         console.log(list.keyword[l].keyword_dict_id);
         if (list.keyword[l].keyword_dict_id) {
           var map = {
+            id: list.keyword[l].id,
             url: list.keyword[l].keyword_dict_id,
             keyword_id:list.keyword[l].dict_id,
           };
-          console.log(map);
+          // console.log(map);
           MapRuleBasedService.getmapproduct(map).then((res) => {
-            list.keyword[l].rulebase = res.data;
-            if (l + 1 == list.keyword.length) {
-              this.compare(list);
-            }
+            console.log(res.data);
+            var bestdata = this.getMax(res.data,'allcount')
+            console.log(bestdata);
+            var best = {
+            id: list.keyword[l].id,
+            sentence: bestdata,
+          };
+            MapRuleBasedService.getbestrulebased(best).then((res) => {
+              console.log(res.data);
+              var rulebased = {
+            count_rulebased: res.data.count,
+            sentence_rulebase: res.data.sentence,
+            rule_based_id:res.data.rule_based_id,
+            rule_based_name:res.data.rule_based_name
+          };
+          // console.log(list.keyword[l].id);
+              MapRuleBasedService.updaterulebased(list.keyword[l].id,rulebased).then(() => {
+              if (l+1 == list.keyword.length) {
+                this.getdetail()
+              }
+              })
+            })
+            // list.keyword[l].rulebase = res.data;
+            // if (l + 1 == list.keyword.length) {
+            //   this.compare(list);
+            // }
           });
         }
 
         // }
+      }
+        
+      }else{
+        this.getdetail()
       }
     },
     compare(list) {
@@ -558,7 +666,7 @@ export default {
           this.status = true;
         }
       }
-    },
+    }
   },
   mounted() {
     // this.data.url =

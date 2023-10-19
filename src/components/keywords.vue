@@ -139,7 +139,7 @@
 
 import KeywordService from '../services/KeywordService'
 import axios from 'axios';
-import RuleBasedService from '../services/RuleBasedService'
+// import RuleBasedService from '../services/RuleBasedService'
 import DictService from '../services/DictService'
 import LinkService from '../services/LinkService'
 
@@ -186,7 +186,7 @@ export default {
     },
     save() {
       console.log(this.data);
-      if (this.data.name == null || this.data.cat_id == "") {
+      if (this.data.name == null || this.data.name == "") {
         alert("กรุณากรอกข้อความ");
       } else {
         var prodata = {
@@ -203,12 +203,12 @@ export default {
             }else{
           DictService.createdict(prodata).then((res) => {
             console.log(res.data );
-            RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
+            // RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
               
             document.getElementById("closedcategory").click();
             this.getcategory();
             alert('บันทึกสำเร็จ')
-          })
+          // })
         })
       }
       })
