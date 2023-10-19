@@ -1,9 +1,19 @@
 <template>
   <div class="container mt-5">
-    <!-- <div style="text-align:right"> <button @click="createrulebased()"
+    <div style="text-align:right"> <button @click="updatekeyword()"
            type="submit" class="mb-3 btn btn-success">
-      <i class="fa fa-plus" aria-hidden="true"></i>
-    </button></div> -->
+           updatekeyword
+    </button></div>
+   
+    <div style="text-align:right"> <button @click="createdictdata()"
+           type="submit" class="mb-3 btn btn-success">
+           createdictdata
+    </button></div>
+
+    <div style="text-align:right"> <button @click="createrulebased()"
+           type="submit" class="mb-3 btn btn-success">
+           createrulebased
+    </button></div>
      <table class="table" v-if="list.length > 0" width="100%">
         <thead>
           <tr>
@@ -207,13 +217,60 @@ export default {
     };
   },
   methods: {
+    async createdictdata(){
+     
+        
+        for (let l = 0; l < this.list.length; l++) {
+          var sentence = JSON.parse(this.list[l].token)
+          // console.log(sentence.length);
+          var dictlist =[]
+          var dictname=[]
+          for (let s = 0; s < sentence.length; s++) {
+            // console.log(sentence[s]);
+            var sen = sentence[s]
+            console.log(sen);
+            await DictService.getdicts('',sen).then(async (res)=>{
+    // console.log(res.data);
+    if (res.data.length == 0) {
+var prodata = {
+          name: sen,
+          status:1,
+        };
+        DictService.createdict(prodata).then((res) => {
+            
+      dictlist.push(res.data.id)
+      dictname.push(sen)
+        })
+      // console.log(sentence[s].replaceAll(' ',''))
+    }else{
+      dictlist.push(res.data[0].id)
+      dictname.push(res.data[0].name)
+      // console.log(s+1, sentence.length);
+      if (s+1 == sentence.length) {
+      var dictid = {
+        dict_id:dictlist,
+        dict_name:dictname
+        };
+
+      console.log(dictlist);
+      await KeywordService.updatedictid(this.list[l].id,dictid).then(()=>{
+// console.log(res.data);
+      })
+        
+      }
+    }
+  })
+          }
+ 
+  
+}
+       
+        
+    },
     updatekeyword(){
  for (let l = 0; l < this.list.length; l++) {
+  // this.list.length
           this.updatetoken(this.list[l])
-          for (let t = 0; t < this.list[l].token.length; t++) {
-            console.log(this.list[l].token[t]);
-            
-          }
           
         }
     },
@@ -231,8 +288,9 @@ export default {
                     MapRuleBasedService.createmap_rule_based(maprule).then(async (res) => {
                       // console.log(res.data);
                       var map_id = res.data.id
-                      var dictlist = JSON.parse(this.list[l].dict_name)
+                      var dictlist = JSON.parse(this.list[l].token)
                       for (let d = 0; d < dictlist.length; d++) {
+                      console.log(dictlist[d]);
                         await DictService.getdicts('',dictlist[d]).then((res)=>{
                           var rule = {
                     map_rule_based_id	:map_id,
@@ -316,28 +374,28 @@ export default {
     },
     updatetoken(data){
       // console.log(data);
-      var tokenize= ''
+      // var tokenize= ''
       // data.name = data.name.replaceAll(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '')
       // data.name = data.name.replaceAll(/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g, '');
 
-      axios.get(LinkService.getpythonlink()+'/tokenkeyword?text=' + data.name).then((res) => {
+      axios.get(LinkService.getpythonlink()+'/token?text=' + data.name).then(async (res) => {
         this.tokenize = res.data
-        // console.log(res.data);
-        tokenize = res.data.replaceAll(" ",'')
-        tokenize = tokenize.replaceAll(".",'')
-        tokenize = tokenize.replaceAll("''",'')
-        tokenize = tokenize.replaceAll(",,",',')
-        tokenize = tokenize.replaceAll('[','')
-        tokenize = tokenize.replaceAll(']','')
-        tokenize = tokenize.replaceAll("'",'')
-        tokenize = tokenize.replaceAll(",",' | ')
+        console.log(this.tokenize);
+        // tokenize = this.tokenize.replaceAll(" ",'')
+        // tokenize = tokenize.replaceAll(".",'')
+        // tokenize = tokenize.replaceAll("''",'')
+        // tokenize = tokenize.replaceAll(",,",',')
+        // tokenize = tokenize.replaceAll('[','')
+        // tokenize = tokenize.replaceAll(']','')
+        // tokenize = tokenize.replaceAll("'",'')
+        // tokenize = tokenize.replaceAll(",",' | ')
       var tokendata = {
         name:data.name,
-        token: tokenize,
+        token: this.tokenize,
         };
         // console.log(tokendata);
         // console.log(data.id);
-        KeywordService.updatekeywordall(data.id, tokendata).then(() => {
+        await KeywordService.updatekeywordall(data.id, tokendata).then(() => {
           // console.log(res.data);
           // if (type == 'update') {
           //   document.getElementById("closedcategory").click();
@@ -352,62 +410,10 @@ export default {
       });
     },
     getcategory(){
-      // axios.get(LinkService.getpythonlink()+'/tokenkeyword?text=เพิ่มพลังรัก').then((res) => {
-      //   // this.tokenize = res.data
-      //   console.log(res.data);
-      //   // tokenize = res.data
-      // });
       KeywordService.getkeywordsall(1).then(async (res)=>{
         this.list = res.data
-        
-//         for (let l = 0; l < this.list.length; l++) {
-//           var sentence = this.list[l].token.split('|')
-//           // console.log(sentence.length);
-//           var dictlist =[]
-//           var dictname=[]
-//           for (let s = 0; s < sentence.length; s++) {
-//             // console.log(sentence[s]);
-//             var sen = sentence[s].replaceAll(' ','')
-//             // console.log(sen);
-//              await DictService.getdicts('',sen).then((res)=>{
-//             console.log(sen);
-//     // console.log(res.data);
-//     if (res.data.length == 0) {
-// var prodata = {
-//           name: sen,
-//           status:1,
-//         };
-//         DictService.createdict(prodata).then((res) => {
-            
-//       dictlist.push(res.data.id)
-//       dictname.push(sen)
-//         })
-//       // console.log(sentence[s].replaceAll(' ',''))
-//     }else{
-//       dictlist.push(res.data[0].id)
-//       dictname.push(res.data[0].name)
-//       // console.log(s+1, sentence.length);
-//       if (s+1 == sentence.length) {
-//       var dictid = {
-//         dict_id:dictlist,
-//         dict_name:dictname
-//         };
-
-//       console.log(dictlist);
-//       KeywordService.updatedictid(this.list[l].id,dictid).then(()=>{
-// // console.log(res.data);
-//       })
-        
-//       }
-//     }
-//   })
-//           }
- 
-  
-// }
-       
-                  });
-        
+      });
+      
     
     },
     getid(id) {
