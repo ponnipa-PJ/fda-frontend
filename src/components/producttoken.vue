@@ -185,7 +185,7 @@ export default {
   methods: {
 
     save() {
-      console.log(this.key);
+      //console.log(this.key);
       if (this.key.name == null || this.key.name == "") {
         alert("กรุณากรอกข้อความ");
       } else {
@@ -193,14 +193,14 @@ export default {
           name: this.key.name,
           status:1,
         };
-        console.log(prodata); 
+        //console.log(prodata); 
           KeywordService.createkeyword(prodata).then((res) => {
-            console.log(res.data);
+            //console.log(res.data);
             if (res.data.err == 1062) {
               alert('มีคำนี้ในระบบแล้ว')
             }else{
-          DictService.createdict(prodata).then((res) => {
-            console.log(res.data );
+          DictService.createdict(prodata).then(() => {
+            //console.log(res.data );
             // RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
               
             document.getElementById("closedcategory").click();
@@ -291,7 +291,7 @@ return data.count_rulebased
     savetorule_based(data, answer) {
       // console.log(sen.length);
       // console.log('answer',answer);
-      console.log(data);
+      //console.log(data);
 
       var maprule = {
         keyword_id: 1,
@@ -442,9 +442,9 @@ return data.count_rulebased
           id:this.currentUser.id
         };
         MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-          console.log(res.data);
+          //console.log(res.data);
           var best = this.getMax(res.data.keyword,'count_rulebased')
-          console.log(best);
+          //console.log(best);
           this.list = res.data
           this.list.keyword = [best]
           this.status = true
@@ -464,14 +464,14 @@ return data.count_rulebased
           /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g,
           ""
         );
-        // content = content.replaceAll(
-        //   /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g,
-        //   " "
-        // );
+        content = content.replaceAll(
+          /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g,
+          " "
+        );
         
-        // content = content.replaceAll(
-        //   /\ud83d[\ude00-\ude4f]/g," "
-        // );
+        content = content.replaceAll(
+          /\ud83d[\ude00-\ude4f]/g," "
+        );
         content = content.replaceAll(/(\r\n|\n|\r)/gm, ' ');
         content = content.replaceAll("_", "");
         content = content.replaceAll("!", "");
@@ -481,7 +481,7 @@ return data.count_rulebased
         content = content.replaceAll("•", "");
         content = content.replaceAll("+", "");
         content = content.replaceAll(`_/l\_`, ""); // eslint-disable-line
-        // content = content.replaceAll(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, ' ');
+        content = content.replaceAll(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, ' ');
 
         // var url = this.data.url.split("-i.");
         //  console.log(url);
@@ -490,7 +490,7 @@ return data.count_rulebased
           id:this.currentUser.id
         };
         MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-          console.log(res.data);
+          //console.log(res.data);
           // console.log(content);
           if (res.data.length == 0) {
             // console.log(LinkService.getpythonlink()+'/worktokendesc?text=' + content);
@@ -500,7 +500,7 @@ return data.count_rulebased
             await axios
               .post(LinkService.getpythonlink() + "/wordtokendesc", con)
               .then(async (res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 // var sentence = res.data.sentent.replaceAll("<spanstyle", "<span style");
                 var des = {
                   url: this.data.url,
@@ -509,7 +509,7 @@ return data.count_rulebased
                   keyword_id:res.data.keywordId,
                   status: 1,
                 };
-                console.log(des);
+                //console.log(des);
                 await MapRuleBasedService.createproduct_token(des).then(
                    (producttoken) => {
                     // console.log(producttoken);
@@ -517,11 +517,11 @@ return data.count_rulebased
                      con = {
               content: content,
             };
-            console.log(con);
+            //console.log(con);
                      axios
                       .post(LinkService.getpythonlink() + "/checkkeyword", con)
                       .then(async (res) => {
-                        console.log(res.data);
+                        //console.log(res.data);
                         if (res.data.length > 0) {
                         for (let r = 0; r < res.data.length; r++) {
                           var sentencetoken = res.data[r].sentent.replaceAll(
@@ -542,7 +542,7 @@ return data.count_rulebased
                             sentent: sentencetoken,
                             sen: res.data[r].sen,
                           };
-                          console.log(this.product_token);
+                          //console.log(this.product_token);
                           AdvertiseService.createadvertise(advertise).then(
                             () => {
                               if (r + 1 == res.data.length) {
@@ -593,10 +593,10 @@ return data.count_rulebased
     return max;
 },
     tokendata(list) {
-      console.log(list);
+      //console.log(list);
       if (list.keyword.length > 0) {
       for (let l = 0; l < list.keyword.length; l++) {
-        console.log(list.keyword[l].keyword_dict_id);
+        //console.log(list.keyword[l].keyword_dict_id);
         if (list.keyword[l].keyword_dict_id) {
           var map = {
             id: list.keyword[l].id,
@@ -605,15 +605,15 @@ return data.count_rulebased
           };
           // console.log(map);
           MapRuleBasedService.getmapproduct(map).then((res) => {
-            console.log(res.data);
+            //console.log(res.data);
             var bestdata = this.getMax(res.data,'allcount')
-            console.log(bestdata);
+            //console.log(bestdata);
             var best = {
             id: list.keyword[l].id,
             sentence: bestdata,
           };
             MapRuleBasedService.getbestrulebased(best).then((res) => {
-              console.log(res.data);
+              //console.log(res.data);
               var rulebased = {
             count_rulebased: res.data.count,
             sentence_rulebase: res.data.sentence,
