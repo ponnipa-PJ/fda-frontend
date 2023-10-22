@@ -34,6 +34,9 @@ class MapRuleBasedService {
   updateadvertise(id,data) {
     return http.put(`/advertise/${id}`, data);
   }
+  updatemap(id,data) {
+    return http.put(`/product_token/updatemap/${id}`, data);
+  }
   updaterulebased(id,data) {
     return http.put(`/advertise/updaterulebased/${id}`, data);
   }

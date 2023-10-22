@@ -25,6 +25,41 @@
           ค้นหา
         </button>
       </div>
+      <table class="table table-bordered" v-if="status">
+      <thead>
+        <tr>
+          <th scope="col" style="text-align:center;background-color:#ffb454">เงื่อนไขการตรวจสอบข้อที่ 1</th>
+          <th scope="col" style="text-align:center;background-color:#ffb454">ข้อมูลจากฐานข้อมูลอย.</th>
+          <th scope="col" style="text-align:center;background-color:#ffb454">ข้อมูลจากเว็บไซต์</th>
+          <th scope="col" style="text-align:center;background-color:#ffb454">ผลการตรวจสอบ</th>
+          <th scope="col" style="text-align:center;background-color:#ffb454">ข้อสรุป</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td :style="colorfda">เลขที่อนุญาต</td>
+          <td :style="colorfda">{{procheck.fda}}</td>
+          <td :style="colorfda">{{procheck.mapfda}}</td>
+          <td :style="colorfda"><span v-if="procheck.fda_status">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
+          <td v-if="procheck.cat_status && procheck.name_status && procheck.fda_status" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
+          <span>ผ่าน</span></td>
+          <td v-else rowspan="3" style="text-align: center;vertical-align: middle;background-color:#f9bdbb">
+          <span>ไม่ผ่าน</span></td>
+        </tr>
+        <tr>
+          <td :style="colorcat">ประเภทผลิตภัณฑ์</td>
+          <td :style="colorcat">{{ procheck.typepro}}</td>
+          <td :style="colorcat"><span v-if="procheck.typepro">{{procheck.type}}</span><span v-else>-</span> </td>
+          <td :style="colorcat"><span v-if="procheck.cat_status">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
+        </tr>
+        <tr>
+          <td :style="colorname">ชื่อผลิตภัณฑ์</td>
+          <td :style="colorname">{{ procheck.productha }}<br/>{{ procheck.produceng }}</td>
+          <td :style="colorname"><span v-html="procheck.name"></span></td>
+          <td :style="colorname"><span v-if="procheck.name_status">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
+        </tr>
+      </tbody>
+      </table>
       <table class="table table-bordered mt-3 mb-5" v-if="status">
         <tbody>
           <tr>
@@ -76,12 +111,56 @@
             </td>
             <td :style="colorkey" v-else>
               <tr>
-                ไม่พบข้อความโฆษณา
+                ไม่พบข้อความโฆษณาเกินจริง
               </tr>
             </td>
           </tr>
         </tbody>
       </table>
+      <table class="table mt-3" v-if="status">
+      <thead>
+        <tr>
+          <th scope="col">สินค้า</th>
+          <th scope="col">ข้อมูล</th>
+          <th scope="col">FDA</th>
+          <th scope="col">ตัดคำ</th>
+          <th scope="col">ข้อมูลจากฐานข้อมูลอย.</th>
+          <!-- <th scope="col"></th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(l, i) in product" :key="i">
+          <td :style="l.bg">{{ l.name }}</td>
+          <td :style="l.bg">{{ l.detail }}</td>
+          <!-- <td :style="l.bg">
+              <div class="row">
+          <div class="col-md-2" v-for="(im ,i) in imagelists" :key="i">
+            <img :src="im" width="100%"/>
+          </div>
+        </div>
+            </td> -->
+          <td :style="l.bg" style="width:300px"><div >เลขที่อนุญาต : {{ l.fda }}<br/>
+            <!-- ชื่อผลิตภัณฑ์: <span v-html="matchname"></span> -->
+            ชื่อผลิตภัณฑ์: {{l.productha}}
+           </div></td>
+          <td :style="l.bg">{{cut(l.token)}}</td>
+          <td style="background-color:#BDEDFF" v-if="l.status == 1">
+            <p class="card-text">สถานะ : {{ l.cncnm || '' }}</p>
+            <p class="card-text">ประเภทผลิตภัณฑ์ :<span> {{ l.typepro }}</span></p>
+            <p class="card-text">ใบสำคัญ/เลขที่อนุญาต : <span> {{ l.lcnno }}</span></p>
+            <p class="card-text">ชื่อผลิตภัณฑ์ (TH) : <span> {{ l.productha }}</span></p>
+            <p class="card-text">ชื่อผลิตภัณฑ์ (EN) : <span> {{ l.produceng }}</span></p>
+            <p class="card-text">ชื่อผู้รับอนุญาต : {{ l.licen }}</p>
+            <p class="card-text">สถานที่ผลิต : {{ l.Addr }}</p>
+            <p class="card-text">Newcode : {{ l.Newcode }}</p>
+          </td>
+          <td :style="l.bg" v-else> ไม่พบข้อมูล</td>
+          <!-- <td :style="l.bg">
+            <i class="fa fa-circle" :style="l.icon" aria-hidden="true"></i>
+          </td> -->
+        </tr>
+      </tbody>
+    </table>
         <!-- Modal -->
   <div
       class="modal fade"
@@ -174,7 +253,10 @@ export default {
       data: {},
       product_token:0,
       title:'เพิ่ม keyword',
-      key:{}
+      key:{},
+      fda:'',
+      product:[],
+      procheck:[]
     };
   },
   computed: {
@@ -183,7 +265,13 @@ export default {
     },
   },
   methods: {
+cut(data){
+  data = data.filter((letter) => letter !== " ");
+  var mapname = data.toString()
 
+  mapname = mapname.replaceAll(',', ' | ')
+  return mapname
+},
     save() {
       //console.log(this.key);
       if (this.key.name == null || this.key.name == "") {
@@ -483,6 +571,8 @@ return data.count_rulebased
         content = content.replaceAll(`_/l\_`, ""); // eslint-disable-line
         content = content.replaceAll(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, ' ');
 
+        this.fda = await this.findfda(content)
+                console.log(this.fda);
         // var url = this.data.url.split("-i.");
         //  console.log(url);
         var selectpro = {
@@ -500,7 +590,6 @@ return data.count_rulebased
             await axios
               .post(LinkService.getpythonlink() + "/wordtokendesc", con)
               .then(async (res) => {
-                //console.log(res.data);
                 // var sentence = res.data.sentent.replaceAll("<spanstyle", "<span style");
                 var des = {
                   url: this.data.url,
@@ -511,7 +600,9 @@ return data.count_rulebased
                 };
                 //console.log(des);
                 await MapRuleBasedService.createproduct_token(des).then(
-                   (producttoken) => {
+                   async (producttoken) => {
+
+                await this.checkfda(content,producttoken.data.id)
                     // console.log(producttoken);
                     this.product_token = producttoken.data.id;
                      con = {
@@ -575,7 +666,9 @@ return data.count_rulebased
               });
           } else {
             // this.getdetail()
+            this.checkfda(content,res.data.id)
             this.tokendata(res.data)
+            this.fda = res.data.fda
             // this.list = res.data
             // this.product_token = res.data.id
             // // console.log(this.list);
@@ -670,10 +763,131 @@ return data.count_rulebased
           this.status = true;
         }
       }
+    },
+    getAllIndexes(arr, val) {
+  var indexes = [], i = -1;
+  while ((i = arr.indexOf(val, i + 1)) != -1) {
+      indexes.push(i);
+  }
+  return indexes;
+},
+    findfda(data) {
+      var text = ['หมายเลขใบอนุญาต/อย.']
+      // var end = ['']
+      var findfda = data
+      for (let t = 0; t < text.length; t++) {
+        findfda = findfda.substring(findfda.indexOf(text[t]),data.length); 
+        var endindex = this.getAllIndexes(findfda,' ')        
+        findfda = findfda.substring(findfda.indexOf(text[t]),endindex[1]);       
+      }
+      console.log(findfda);
+
+      findfda = findfda.replaceAll("หมายเลขใบอนุญาต/อย.", "");
+      findfda = findfda.replaceAll("-", "");
+      findfda = findfda.replaceAll("–", "");
+      findfda = findfda.replaceAll(" ", "");
+      // console.log(findfda);
+      // var regex = /\d+/g;
+      // var matches = findfda.match(regex);  // creates array from matches
+      // console.log(matches[0]);
+      return findfda
+    },
+    checkfda(content,id){
+    console.log(this.fda);
+    var fda = this.fda
+    var product_status = 0
+    const url = "https://tawaiforhealth.org/api/oryor/check-product";
+            const data = { "number_src": fda };
+// console.log(data);
+            const options = {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+              },
+              body: JSON.stringify(data),
+            };
+
+            fetch(url, options)
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.message) {
+                  console.log(1);
+                }else{
+                  console.log(data);
+                  console.log(data.cncnm.includes("คงอยู่"))
+                  if (data.cncnm.includes("คงอยู่")) {
+                    product_status = 1
+                    this.colorfda="background-color:#a3e9a4"
+                  }
+                  console.log(product_status);
+                  var con = {
+      fda: fda,
+      productha:data.productha,
+      produceng:data.produceng,
+      typepro:data.typepro,
+      content: content
+      
+    };
+    axios
+      .post(LinkService.getpythonlink() + "/checkfda", con)
+      .then(async (res) => {
+        console.log(res.data);
+        var pro = {
+          name:res.data.name,
+          fda:fda,
+          product_status:product_status,
+          cat_status:res.data.mapcatstatus,
+          fda_status:product_status,
+          name_status:res.data.mapnamestatus
+        }
+        console.log(pro);
+        MapRuleBasedService.updatemap(id,pro).then(()=>{
+          // console.log(res.data); 
+          this.product.push({name:data.productha+' '+data.produceng,
+          detail:content,
+          fda:this.fda,
+          cncnm:data.cncnm,
+          typepro:data.typepro,
+          lcnno:data.lcnno,
+          productha:data.productha,
+          produceng:data.produceng,
+          licen:data.licen,
+          Addr:data.Addr,
+          Newcode:data.Newcode,
+          status:product_status,
+          token:res.data.token,
+        })
+        this.procheck ={
+          fda:this.fda,
+          mapfda:data.lcnno,
+          cncnm:data.cncnm,
+          productha:data.productha,
+          produceng:data.produceng,
+          name:res.data.name,
+          product_status:product_status,
+          cat_status:res.data.mapcatstatus,
+          fda_status:product_status,
+          name_status:res.data.mapnamestatus,
+          typepro:data.typepro,
+          type:res.data.category,
+        }
+        this.colorcat =res.data.colorcat
+        this.colorname=res.data.colorname
+        console.log(this.product);
+        console.log(this.procheck);
+        })
+    })
+                }
+  })
+   
     }
   },
   mounted() {
-    // this.data.url =
+    // var text = 'หมายเลขใบอนุญาต/อย. 13-1-13465-5-0052 จำนวนสินค้า 415 ส่งจาก'
+    // console.log(this.findfda(text));
+
+  // this.data.url =
     //   "https://shopee.co.th/%E2%99%A6%EF%B8%8F%E0%B9%82%E0%B8%89%E0%B8%A1%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88-%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%81%E0%B8%97%E0%B9%89%E2%99%A6%EF%B8%8F-%E0%B8%82%E0%B8%B2%E0%B8%A2%E0%B8%94%E0%B8%B5%E0%B8%A1%E0%B8%B2%E0%B8%81-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F-%E0%B8%A5%E0%B8%B4%E0%B9%82%E0%B8%8B%E0%B9%88-%E0%B8%9E%E0%B8%A5%E0%B8%B1%E0%B8%AA-%E2%80%8B-coffee-lishou-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%84%E0%B8%A7%E0%B8%9A%E0%B8%84%E0%B8%B8%E0%B8%A1%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%84%E0%B8%B8%E0%B8%A1%E0%B8%AB%E0%B8%B4%E0%B8%A7-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%A5%E0%B8%94%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%A5%E0%B8%94%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%AD%E0%B9%89%E0%B8%A7%E0%B8%99";
     // this.data.content =
     //   "️ถ้าเป็นลูกค้าพิมแล้ว ดูแลจนน้ำหนักลดเลยค่ะ สั่งซื้อสินค้าแล้ว ทักแชทมาคุยกันได้เลยค่ะ";
