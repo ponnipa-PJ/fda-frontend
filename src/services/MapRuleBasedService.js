@@ -4,6 +4,9 @@ class MapRuleBasedService {
   getmap_rule_baseds() {
     return http.get('/map_rule_based');
   }
+  checkintb(name) {
+    return http.get('/map_rule_based/checkintb?name='+name);
+  }
   getmap_rule_based(id) {
     return http.get('/map_rule_based/'+id);
   }
@@ -36,6 +39,9 @@ class MapRuleBasedService {
   }
   updatemap(id,data) {
     return http.put(`/product_token/updatemap/${id}`, data);
+  }
+  updatproduct_token(id,data) {
+    return http.put(`/product_token/${id}`, data);
   }
   updaterulebased(id,data) {
     return http.put(`/advertise/updaterulebased/${id}`, data);

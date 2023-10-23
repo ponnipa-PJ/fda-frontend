@@ -23,25 +23,28 @@
         </div>
         <button @click="search()" type="submit" class="mb-3 btn btn-success">
           ค้นหา
+        </button>&nbsp;
+        <button @click="clear()" type="submit" class="mb-3 btn btn-danger">
+          ล้างข้อมูล
         </button>
       </div>
       <table class="table table-bordered" v-if="status">
       <thead>
         <tr>
-          <th scope="col" style="text-align:center;background-color:#ffb454">เงื่อนไขการตรวจสอบข้อที่ 1</th>
-          <th scope="col" style="text-align:center;background-color:#ffb454">ข้อมูลจากฐานข้อมูลอย.</th>
-          <th scope="col" style="text-align:center;background-color:#ffb454">ข้อมูลจากเว็บไซต์</th>
-          <th scope="col" style="text-align:center;background-color:#ffb454">ผลการตรวจสอบ</th>
-          <th scope="col" style="text-align:center;background-color:#ffb454">ข้อสรุป</th>
+          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">เงื่อนไขการตรวจสอบข้อที่ 1</th>
+          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">ข้อมูลจากฐานข้อมูลอย.</th>
+          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">ข้อมูลจากเว็บไซต์</th>
+          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">ผลการตรวจสอบ</th>
+          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">ข้อสรุป</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td :style="colorfda">เลขที่อนุญาต</td>
-          <td :style="colorfda">{{procheck.fda}}</td>
           <td :style="colorfda">{{procheck.mapfda}}</td>
-          <td :style="colorfda"><span v-if="procheck.fda_status">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
-          <td v-if="procheck.cat_status && procheck.name_status && procheck.fda_status" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
+          <td :style="colorfda">{{procheck.fda}}</td>
+          <td :style="colorfda">{{procheck.cncnm}}</td>
+          <td v-if="procheck.cat_status && procheck.name_status && procheck.fda_status == 1" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
           <span>ผ่าน</span></td>
           <td v-else rowspan="3" style="text-align: center;vertical-align: middle;background-color:#f9bdbb">
           <span>ไม่ผ่าน</span></td>
@@ -63,10 +66,12 @@
       <table class="table table-bordered mt-3 mb-5" v-if="status">
         <tbody>
           <tr>
-            <th style="background-color: #ffb454">รายละเอียดสินค้า</th>
-            <th style="background-color: #ffb454">ข้อความโฆษณา</th>
+            <th style="background-color: #ffb454;vertical-align: middle;">เงื่อนไขการตรวจสอบข้อที่ 2</th>
+            <th style="background-color: #ffb454;vertical-align: middle;">ข้อความโฆษณา</th>
+            <th style="background-color: #ffb454;vertical-align: middle;">ข้อความโฆษณาเกินจริง</th>
           </tr>
           <tr>
+            <td :style="colorkey">รายละเอียดสินค้า</td>
             <td :style="colorkey" style="width: 40%">
               <span v-html="list.sentence_keyword"></span>
             </td>
@@ -141,10 +146,10 @@
             </td> -->
           <td :style="l.bg" style="width:300px"><div >เลขที่อนุญาต : {{ l.fda }}<br/>
             <!-- ชื่อผลิตภัณฑ์: <span v-html="matchname"></span> -->
-            ชื่อผลิตภัณฑ์: {{l.productha}}
+            <!-- ชื่อผลิตภัณฑ์: {{l.productha}} -->
            </div></td>
           <td :style="l.bg">{{cut(l.token)}}</td>
-          <td style="background-color:#BDEDFF" v-if="l.status == 1">
+          <td style="background-color:#BDEDFF" v-if="l.status == 1 || l.status == 3">
             <p class="card-text">สถานะ : {{ l.cncnm || '' }}</p>
             <p class="card-text">ประเภทผลิตภัณฑ์ :<span> {{ l.typepro }}</span></p>
             <p class="card-text">ใบสำคัญ/เลขที่อนุญาต : <span> {{ l.lcnno }}</span></p>
@@ -265,7 +270,13 @@ export default {
     },
   },
   methods: {
-cut(data){
+    clear(){
+      this.data = {}
+        this.product = []
+this.procheck = {}
+this.status = false
+    },
+    cut(data){
   data = data.filter((letter) => letter !== " ");
   var mapname = data.toString()
 
@@ -379,39 +390,50 @@ return data.count_rulebased
     savetorule_based(data, answer) {
       // console.log(sen.length);
       // console.log('answer',answer);
-      //console.log(data);
+      console.log(data);
 
       var maprule = {
         keyword_id: 1,
-        advertise_id: data.id,
+        advertise_id: this.product_token,
         status: 1,
         answer: answer,
         user: this.currentUser.id,
       };
       if (!data.mapId) {
-        
+        MapRuleBasedService.checkintb(data.dict_id).then((check)=>{
+          if (check.count == 1) {
+            alert('มีรูปประโยคนี้อยู่ใน rule based แล้ว')
+          }else{
       MapRuleBasedService.createmap_rule_based(maprule).then(async (res) => {
         // console.log(res.data);
         var map_id = res.data.id;
         var sendata = JSON.parse(data.dict_id);
-        var dict_name = JSON.parse(data.dict_name);
+        // console.log(sendata);
+        // console.log(dict_name);
         for (let d = 0; d < sendata.length; d++) {
+          // console.log(sendata[d]);
+          await DictService.getdict(sendata[d]).then(async (sen) => {
+            // console.log(sen.data);
           var rule = {
             map_rule_based_id: map_id,
             dict_id: sendata[d],
-            dict_name: dict_name[d],
+            dict_name: sen.data.name,
             no: d + 1,
           };
-          RuleBasedService.createrule_based(rule).then(() => {
+          // console.log(rule);
+          await RuleBasedService.createrule_based(rule).then(() => {
             if (d + 1 == sendata.length) {      
                this.getdetail()
 
               alert("บันทึกสำเร็จ");
             }
           });
+        });
         }
       });
+    }
 
+    })
       }else{
       MapRuleBasedService.deletemap_rule_based(data.mapId,maprule).then(async () => {
         // console.log(res.data);
@@ -530,15 +552,18 @@ return data.count_rulebased
           id:this.currentUser.id
         };
         MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-          //console.log(res.data);
-          var best = this.getMax(res.data.keyword,'count_rulebased')
+          // console.log(res.data);
+          // var best = this.getMax(res.data.keyword,'count_rulebased')
           //console.log(best);
           this.list = res.data
-          this.list.keyword = [best]
-          this.status = true
+          // this.list.keyword = [best]
+          // this.status = true
         })
     },
     async search() {
+      this.procheck = {}
+      this.product = []
+      this.product_token = 0
       var con ={}
       await this.loaddict();
       this.status = false;
@@ -580,9 +605,12 @@ return data.count_rulebased
           id:this.currentUser.id
         };
         MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-          //console.log(res.data);
+          // console.log(res.data);
           // console.log(content);
-          if (res.data.length == 0) {
+          if (res.data.id) {
+            this.product_token =res.data.id
+          }
+          // console.log(this.product_token);
             // console.log(LinkService.getpythonlink()+'/worktokendesc?text=' + content);
              con = {
               content: content,
@@ -598,11 +626,11 @@ return data.count_rulebased
                   keyword_id:res.data.keywordId,
                   status: 1,
                 };
-                //console.log(des);
-                await MapRuleBasedService.createproduct_token(des).then(
+                if (this.product_token == 0) {
+                  await MapRuleBasedService.createproduct_token(des).then(
                    async (producttoken) => {
-
-                await this.checkfda(content,producttoken.data.id)
+this.product_token = producttoken.data.id
+                await this.checkfda(content,this.product_token)
                     // console.log(producttoken);
                     this.product_token = producttoken.data.id;
                      con = {
@@ -633,15 +661,17 @@ return data.count_rulebased
                             sentent: sentencetoken,
                             sen: res.data[r].sen,
                           };
-                          //console.log(this.product_token);
+                          // console.log(this.product_token);
                           AdvertiseService.createadvertise(advertise).then(
                             () => {
                               if (r + 1 == res.data.length) {
+                                var getprotoken = {
+                                  url:this.product_token
+                                }
                                 MapRuleBasedService.getproductkeyword(
-                                  selectpro
+                                  getprotoken
                                 ).then((pro) => {
-                                  this.product_token = pro.data.id
-                                  // this.list = res.data
+                                  // console.log(pro.data);
                                   this.tokendata(pro.data);
                                 });
                               }
@@ -652,32 +682,86 @@ return data.count_rulebased
                         }else{
                         this.getdetail()
                         }
-                        // if (keys.data.length > 0) {
-                        //   res.data[l].keyword = keys.data
-                        // } else {
-                        //   res.data[l].keyword = 0
-                        // }
-                        // if (l + 1 == res.data.length) {
-                        //   this.list = res.data
-                        // }
                       });
                   }
                 );
+              
+                }else{
+                  await MapRuleBasedService.updatproduct_token(this.product_token,des).then(
+                   async () => {
+
+                    await AdvertiseService.deleteadvertise(this.product_token).then(async ()=>{
+                      // console.log(del);
+                await this.checkfda(content,this.product_token)
+                     con = {
+              content: content,
+            };
+            //console.log(con);
+                     axios
+                      .post(LinkService.getpythonlink() + "/checkkeyword", con)
+                      .then(async (res) => {
+                        //console.log(res.data);
+                        if (res.data.length > 0) {
+                        for (let r = 0; r < res.data.length; r++) {
+                          var sentencetoken = res.data[r].sentent.replaceAll(
+                            '"',
+                            ""
+                          ); // eslint-disable-line
+                          sentencetoken = sentencetoken.replaceAll(
+                            "<spanstyle",
+                            "<span style"
+                          );
+
+                          // sentencetoken = sentencetoken.replaceAll('"color:red\"','"color:red"')
+                          var advertise = {
+                            product_token_id: this.product_token,
+                            keyword_dict_id: res.data[r].keyword_dict_id,
+                            dict_id: res.data[r].dict_id,
+                            dict_name: res.data[r].dict_name,
+                            sentent: sentencetoken,
+                            sen: res.data[r].sen,
+                            status:1
+                          };
+                          // console.log(this.product_token);
+                          AdvertiseService.createadvertise(advertise).then(
+                            () => {
+                              if (r + 1 == res.data.length) {
+                                var getprotoken = {
+                                  url:this.product_token
+                                }
+                                MapRuleBasedService.getproductkeyword(
+                                  getprotoken
+                                ).then((pro) => {
+                                  // console.log(pro.data);
+                                  this.tokendata(pro.data);
+                                });
+                              }
+                            }
+                          );
+                        }
+                          
+                        }else{
+                        this.getdetail()
+                        }
+                      });
+                  }
+                );
+              })
+                }
+                
               });
-          } else {
-            // this.getdetail()
-            this.checkfda(content,res.data.id)
-            this.tokendata(res.data)
-            this.fda = res.data.fda
-            // this.list = res.data
-            // this.product_token = res.data.id
-            // // console.log(this.list);
-            // this.status = true
-          }
         });
       }
     },
     getMax(arr, prop) {
+    var max;
+    for (var i=0 ; i< arr.length ; i++) {
+        if (max == null || parseInt(arr[i][prop]) > parseInt(max[prop]))
+            max = arr[i];
+    }
+    return max;
+},
+getMaxlength(arr, prop) {
     var max;
     for (var i=0 ; i< arr.length ; i++) {
         if (max == null || parseInt(arr[i][prop]) > parseInt(max[prop]))
@@ -698,22 +782,22 @@ return data.count_rulebased
           };
           // console.log(map);
           MapRuleBasedService.getmapproduct(map).then((res) => {
-            //console.log(res.data);
+            // console.log(res.data);
             var bestdata = this.getMax(res.data,'allcount')
-            //console.log(bestdata);
+            // console.log(bestdata);
             var best = {
             id: list.keyword[l].id,
             sentence: bestdata,
           };
             MapRuleBasedService.getbestrulebased(best).then((res) => {
-              //console.log(res.data);
+              // console.log(res.data);
               var rulebased = {
             count_rulebased: res.data.count,
             sentence_rulebase: res.data.sentence,
             rule_based_id:res.data.rule_based_id,
             rule_based_name:res.data.rule_based_name
           };
-          // console.log(list.keyword[l].id);
+          // console.log(rulebased);
               MapRuleBasedService.updaterulebased(list.keyword[l].id,rulebased).then(() => {
               if (l+1 == list.keyword.length) {
                 this.getdetail()
@@ -760,7 +844,7 @@ return data.count_rulebased
         }
         if (k + 1 == list.keyword.length) {
           this.list = list;
-          this.status = true;
+          // this.status = true;
         }
       }
     },
@@ -780,7 +864,7 @@ return data.count_rulebased
         var endindex = this.getAllIndexes(findfda,' ')        
         findfda = findfda.substring(findfda.indexOf(text[t]),endindex[1]);       
       }
-      console.log(findfda);
+      // console.log(findfda);
 
       findfda = findfda.replaceAll("หมายเลขใบอนุญาต/อย.", "");
       findfda = findfda.replaceAll("-", "");
@@ -794,7 +878,8 @@ return data.count_rulebased
     },
     checkfda(content,id){
     console.log(this.fda);
-    var fda = this.fda
+    if (this.fda) {
+      var fda = this.fda
     var product_status = 0
     const url = "https://tawaiforhealth.org/api/oryor/check-product";
             const data = { "number_src": fda };
@@ -812,15 +897,46 @@ return data.count_rulebased
               .then((response) => response.json())
               .then((data) => {
                 if (data.message) {
-                  console.log(1);
+                  this.product.push({name:'-',
+          detail:content,
+          fda:this.fda,
+          cncnm:'-',
+          typepro:'-',
+          lcnno:'-',
+          productha:'-',
+          produceng:'-',
+          licen:'-',
+          Addr:'-',
+          Newcode:'-',
+          status:'-',
+          token:'',
+        })
+        this.procheck ={
+          fda:this.fda,
+          mapfda:'-',
+          cncnm:'-',
+          productha:'-',
+          produceng:'-',
+          name:'-',
+          product_status:0,
+          cat_status:0,
+          fda_status:0,
+          name_status:0,
+          typepro:'-',
+          type:'-',
+        }
+
+        this.status = true
                 }else{
-                  console.log(data);
-                  console.log(data.cncnm.includes("คงอยู่"))
+                  // console.log(data);
+                  // console.log(data.cncnm.includes("คงอยู่"))
                   if (data.cncnm.includes("คงอยู่")) {
                     product_status = 1
                     this.colorfda="background-color:#a3e9a4"
+                  }else{
+                  product_status = 3
                   }
-                  console.log(product_status);
+                  // console.log(product_status);
                   var con = {
       fda: fda,
       productha:data.productha,
@@ -832,7 +948,7 @@ return data.count_rulebased
     axios
       .post(LinkService.getpythonlink() + "/checkfda", con)
       .then(async (res) => {
-        console.log(res.data);
+        // console.log(res.data);
         var pro = {
           name:res.data.name,
           fda:fda,
@@ -841,12 +957,12 @@ return data.count_rulebased
           fda_status:product_status,
           name_status:res.data.mapnamestatus
         }
-        console.log(pro);
+        // console.log(pro);
         MapRuleBasedService.updatemap(id,pro).then(()=>{
           // console.log(res.data); 
           this.product.push({name:data.productha+' '+data.produceng,
           detail:content,
-          fda:this.fda,
+          fda:fda,
           cncnm:data.cncnm,
           typepro:data.typepro,
           lcnno:data.lcnno,
@@ -859,7 +975,7 @@ return data.count_rulebased
           token:res.data.token,
         })
         this.procheck ={
-          fda:this.fda,
+          fda:fda,
           mapfda:data.lcnno,
           cncnm:data.cncnm,
           productha:data.productha,
@@ -874,12 +990,48 @@ return data.count_rulebased
         }
         this.colorcat =res.data.colorcat
         this.colorname=res.data.colorname
-        console.log(this.product);
-        console.log(this.procheck);
+        // console.log(this.product);
+        // console.log(this.procheck);
+        // console.log(this.fda);
         })
     })
+
+    this.status = true
                 }
   })
+    }else{
+      this.product.push({name:'-',
+          detail:content,
+          fda:this.fda,
+          cncnm:'-',
+          typepro:'-',
+          lcnno:'-',
+          productha:'-',
+          produceng:'-',
+          licen:'-',
+          Addr:'-',
+          Newcode:'-',
+          status:'-',
+          token:'',
+        })
+        this.procheck ={
+          fda:this.fda,
+          mapfda:'-',
+          cncnm:'-',
+          productha:'-',
+          produceng:'-',
+          name:'-',
+          product_status:0,
+          cat_status:0,
+          fda_status:0,
+          name_status:0,
+          typepro:'-',
+          type:'-',
+        }
+
+        this.status = true
+    }
+    
    
     }
   },
