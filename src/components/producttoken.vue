@@ -552,10 +552,15 @@ return data.count_rulebased
           id:this.currentUser.id
         };
         MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-          // console.log(res.data);
+          console.log(res.data);
           // var best = this.getMax(res.data.keyword,'count_rulebased')
           //console.log(best);
           this.list = res.data
+          var data = {
+            advertise_id:res.data.keyword[0].product_token_id
+          }
+          MapRuleBasedService.updateweight(res.data.keyword[0].map_rule_based_id,data).then( () => {
+          })
           // this.list.keyword = [best]
           // this.status = true
         })
@@ -769,7 +774,7 @@ getMaxlength(arr, prop) {
     }
     return max;
 },
-    tokendata(list) {
+    async tokendata(list) {
       //console.log(list);
       if (list.keyword.length > 0) {
       for (let l = 0; l < list.keyword.length; l++) {
@@ -781,29 +786,38 @@ getMaxlength(arr, prop) {
             keyword_id:list.keyword[l].dict_id,
           };
           // console.log(map);
-          MapRuleBasedService.getmapproduct(map).then((res) => {
+           await MapRuleBasedService.getmapproduct(map).then(async (res) => {
             // console.log(res.data);
             var bestdata = this.getMax(res.data,'allcount')
-            // console.log(bestdata);
+            console.log(bestdata);
             var best = {
             id: list.keyword[l].id,
             sentence: bestdata,
           };
-            MapRuleBasedService.getbestrulebased(best).then((res) => {
+          var rule_based_name =bestdata.name.toString()
+                rule_based_name = rule_based_name.replaceAll(',', '')
+
+          await axios.get(LinkService.getpythonlink() + '/loaddict?word='+rule_based_name).then(async () => {
+
+            await MapRuleBasedService.getbestrulebased(best).then(async (res) => {
               // console.log(res.data);
+
               var rulebased = {
             count_rulebased: res.data.count,
             sentence_rulebase: res.data.sentence,
             rule_based_id:res.data.rule_based_id,
-            rule_based_name:res.data.rule_based_name
+            rule_based_name:res.data.rule_based_name,
+            map_rule_based_id:res.data.map_id
           };
           // console.log(rulebased);
-              MapRuleBasedService.updaterulebased(list.keyword[l].id,rulebased).then(() => {
+          // console.log(list.keyword[l].id);
+             await MapRuleBasedService.updaterulebased(list.keyword[l].id,rulebased).then(() => {
               if (l+1 == list.keyword.length) {
                 this.getdetail()
               }
               })
             })
+          });
             // list.keyword[l].rulebase = res.data;
             // if (l + 1 == list.keyword.length) {
             //   this.compare(list);

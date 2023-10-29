@@ -52,6 +52,9 @@ class MapRuleBasedService {
   updatemap_rule_based(id,data) {
     return http.put(`/map_rule_based/${id}`, data);
   }
+  updateweight(id,data) {
+    return http.put(`/map_rule_based/updateweight/${id}`, data);
+  }
   deletemap_rule_based(id,data) {
     return http.put(`/map_rule_based/updatestatus/${id}`, data);
   }

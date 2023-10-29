@@ -708,7 +708,7 @@ return data.count_rulebased
             sentence: bestdata,
           };
             MapRuleBasedService.getbestrulebased(best).then((res) => {
-              //console.log(res.data);
+              console.log(res.data);
               var rulebased = {
             count_rulebased: res.data.count,
             sentence_rulebase: res.data.sentence,
@@ -717,6 +717,7 @@ return data.count_rulebased
           };
           // console.log(list.keyword[l].id);
               MapRuleBasedService.updaterulebased(list.keyword[l].id,rulebased).then(() => {
+
               if (l+1 == list.keyword.length) {
                 this.getdetail()
               }
@@ -795,7 +796,7 @@ return data.count_rulebased
       return findfda
     },
     checkfda(content,id){
-    console.log(this.fda);
+    // console.log(this.fda);
     if (this.fda) {
       var fda = this.fda
     var product_status = 0
@@ -855,7 +856,7 @@ return data.count_rulebased
                   product_status = 3
 
                   }
-                  console.log(product_status);
+                  // console.log(product_status);
                   var con = {
       fda: fda,
       productha:data.productha,
@@ -867,7 +868,7 @@ return data.count_rulebased
     axios
       .post(LinkService.getpythonlink() + "/checkfda", con)
       .then(async (res) => {
-        console.log(res.data);
+        // console.log(res.data);
         var pro = {
           name:res.data.name,
           fda:fda,
@@ -876,7 +877,7 @@ return data.count_rulebased
           fda_status:product_status,
           name_status:res.data.mapnamestatus
         }
-        console.log(pro);
+        // console.log(pro);
         MapRuleBasedService.updatemap(id,pro).then(()=>{
           // console.log(res.data); 
           this.product.push({name:data.productha+' '+data.produceng,
@@ -909,9 +910,9 @@ return data.count_rulebased
         }
         this.colorcat =res.data.colorcat
         this.colorname=res.data.colorname
-        console.log(this.product);
-        console.log(this.procheck);
-        console.log(this.fda);
+        // console.log(this.product);
+        // console.log(this.procheck);
+        // console.log(this.fda);
         })
     })
 

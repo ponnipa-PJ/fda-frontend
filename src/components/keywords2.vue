@@ -275,7 +275,6 @@ var prodata = {
         }
     },
     createrulebased(){
-
       for (let l = 0; l < this.list.length; l++) {
           
           var maprule = {
@@ -283,12 +282,14 @@ var prodata = {
                       advertise_id: null,
                       status:1,
                       answer:1,
-                      user:1
+                      user:1,
+                      map_dict:JSON.parse(this.list[l].dict_id)
                     }
+                    console.log(maprule);
                     MapRuleBasedService.createmap_rule_based(maprule).then(async (res) => {
                       // console.log(res.data);
                       var map_id = res.data.id
-                      var dictlist = JSON.parse(this.list[l].token)
+                      var dictlist = JSON.parse(this.list[l].dict_name)
                       for (let d = 0; d < dictlist.length; d++) {
                       console.log(dictlist[d]);
                         await DictService.getdicts('',dictlist[d]).then((res)=>{
