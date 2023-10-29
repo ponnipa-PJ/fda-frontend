@@ -398,6 +398,7 @@ return data.count_rulebased
         status: 1,
         answer: answer,
         user: this.currentUser.id,
+        map_dict:JSON.parse(data.dict_id)
       };
       if (!data.mapId) {
         MapRuleBasedService.checkintb(data.dict_id).then((check)=>{
@@ -556,6 +557,7 @@ return data.count_rulebased
           // var best = this.getMax(res.data.keyword,'count_rulebased')
           //console.log(best);
           this.list = res.data
+          this.status = true
           var data = {
             advertise_id:res.data.keyword[0].product_token_id
           }
@@ -692,10 +694,12 @@ this.product_token = producttoken.data.id
                 );
               
                 }else{
+                  await AdvertiseService.deleteadvertise(this.product_token).then(async ()=>{
+
                   await MapRuleBasedService.updatproduct_token(this.product_token,des).then(
                    async () => {
 
-                    await AdvertiseService.deleteadvertise(this.product_token).then(async ()=>{
+                    // await AdvertiseService.deleteadvertise(this.product_token).then(async ()=>{
                       // console.log(del);
                 await this.checkfda(content,this.product_token)
                      con = {
@@ -745,8 +749,6 @@ this.product_token = producttoken.data.id
                           );
                         }
                           
-                        }else{
-                        this.getdetail()
                         }
                       });
                   }
@@ -774,6 +776,15 @@ getMaxlength(arr, prop) {
     }
     return max;
 },
+getAllMaxArray(arr,value){
+  var array = []
+  arr.map(function (num, idx) {
+    if (num.allcount == value) {
+      array.push(arr[idx])
+    }
+                                        });
+                                        return array
+},
     async tokendata(list) {
       //console.log(list);
       if (list.keyword.length > 0) {
@@ -788,8 +799,14 @@ getMaxlength(arr, prop) {
           // console.log(map);
            await MapRuleBasedService.getmapproduct(map).then(async (res) => {
             // console.log(res.data);
-            var bestdata = this.getMax(res.data,'allcount')
-            console.log(bestdata);
+            var maxvalue = this.getMax(res.data,'allcount')
+            // console.log(maxvalue.allcount);
+            var i = this.getAllMaxArray(res.data,maxvalue.allcount);
+            // console.log(i);
+            var bestdata = this.getMax(i,'length')
+            // console.log(bestdata);
+            // getAllIndexes
+            // console.log(bestdata);
             var best = {
             id: list.keyword[l].id,
             sentence: bestdata,
@@ -940,7 +957,7 @@ getMaxlength(arr, prop) {
           type:'-',
         }
 
-        this.status = true
+        // this.status = true
                 }else{
                   // console.log(data);
                   // console.log(data.cncnm.includes("คงอยู่"))
@@ -1010,7 +1027,7 @@ getMaxlength(arr, prop) {
         })
     })
 
-    this.status = true
+    // this.status = true
                 }
   })
     }else{
@@ -1043,7 +1060,7 @@ getMaxlength(arr, prop) {
           type:'-',
         }
 
-        this.status = true
+        // this.status = true
     }
     
    
