@@ -568,6 +568,9 @@ return data.count_rulebased
         })
     },
     async search() {
+
+      // var url = this.data.url.split("-i.");
+      // this.data.url = url[0]
       this.procheck = {}
       this.product = []
       this.product_token = 0
@@ -605,8 +608,6 @@ return data.count_rulebased
 
         this.fda = await this.findfda(content)
                 console.log(this.fda);
-        // var url = this.data.url.split("-i.");
-        //  console.log(url);
         var selectpro = {
           url: this.data.url,
           id:this.currentUser.id
