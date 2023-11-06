@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-   
     <div class="row">
       <div>
         <div class="form-group mt-5">
@@ -22,53 +21,137 @@
           ></textarea>
         </div>
         <button @click="search()" type="submit" class="mb-3 btn btn-success">
-          ค้นหา
-        </button>&nbsp;
+          ค้นหา</button
+        >&nbsp;
         <button @click="clear()" type="submit" class="mb-3 btn btn-danger">
           ล้างข้อมูล
         </button>
       </div>
       <table class="table table-bordered" v-if="status">
-      <thead>
-        <tr>
-          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">เงื่อนไขการตรวจสอบข้อที่ 1</th>
-          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">ข้อมูลจากฐานข้อมูลอย.</th>
-          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">ข้อมูลจากเว็บไซต์</th>
-          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">ผลการตรวจสอบ</th>
-          <th scope="col" style="text-align:center;vertical-align: middle;background-color:#ffb454">ข้อสรุป</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td :style="colorfda">เลขที่อนุญาต</td>
-          <td :style="colorfda">{{procheck.mapfda}}</td>
-          <td :style="colorfda">{{procheck.fda}}</td>
-          <td :style="colorfda">{{procheck.cncnm}}</td>
-          <td v-if="procheck.cat_status && procheck.name_status && procheck.fda_status == 1" rowspan="3" style="text-align: center;vertical-align: middle;background-color:#a3e9a4">
-          <span>ผ่าน</span></td>
-          <td v-else rowspan="3" style="text-align: center;vertical-align: middle;background-color:#f9bdbb">
-          <span>ไม่ผ่าน</span></td>
-        </tr>
-        <tr>
-          <td :style="colorcat">ประเภทผลิตภัณฑ์</td>
-          <td :style="colorcat">{{ procheck.typepro}}</td>
-          <td :style="colorcat"><span v-if="procheck.typepro">{{procheck.type}}</span><span v-else>-</span> </td>
-          <td :style="colorcat"><span v-if="procheck.cat_status">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
-        </tr>
-        <tr>
-          <td :style="colorname">ชื่อผลิตภัณฑ์</td>
-          <td :style="colorname">{{ procheck.productha }}<br/>{{ procheck.produceng }}</td>
-          <td :style="colorname"><span v-html="procheck.name"></span></td>
-          <td :style="colorname"><span v-if="procheck.name_status">ผ่าน</span><span v-else>ไม่ผ่าน</span></td>
-        </tr>
-      </tbody>
+        <thead>
+          <tr>
+            <th
+              scope="col"
+              style="
+                text-align: center;
+                vertical-align: middle;
+                background-color: #ffb454;
+              "
+            >
+              เงื่อนไขการตรวจสอบข้อที่ 1
+            </th>
+            <th
+              scope="col"
+              style="
+                text-align: center;
+                vertical-align: middle;
+                background-color: #ffb454;
+              "
+            >
+              ข้อมูลจากฐานข้อมูลอย.
+            </th>
+            <th
+              scope="col"
+              style="
+                text-align: center;
+                vertical-align: middle;
+                background-color: #ffb454;
+              "
+            >
+              ข้อมูลจากเว็บไซต์
+            </th>
+            <th
+              scope="col"
+              style="
+                text-align: center;
+                vertical-align: middle;
+                background-color: #ffb454;
+              "
+            >
+              ผลการตรวจสอบ
+            </th>
+            <th
+              scope="col"
+              style="
+                text-align: center;
+                vertical-align: middle;
+                background-color: #ffb454;
+              "
+            >
+              ข้อสรุป
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td :style="colorfda">เลขที่อนุญาต</td>
+            <td :style="colorfda">{{ procheck.mapfda }}</td>
+            <td :style="colorfda">{{ procheck.fda }}</td>
+            <td :style="colorfda">{{ procheck.cncnm }}</td>
+            <td
+              v-if="
+                procheck.cat_status &&
+                procheck.name_status &&
+                procheck.fda_status == 1
+              "
+              rowspan="3"
+              style="
+                text-align: center;
+                vertical-align: middle;
+                background-color: #a3e9a4;
+              "
+            >
+              <span>ผ่าน</span>
+            </td>
+            <td
+              v-else
+              rowspan="3"
+              style="
+                text-align: center;
+                vertical-align: middle;
+                background-color: #f9bdbb;
+              "
+            >
+              <span>ไม่ผ่าน</span>
+            </td>
+          </tr>
+          <tr>
+            <td :style="colorcat">ประเภทผลิตภัณฑ์</td>
+            <td :style="colorcat">{{ procheck.typepro }}</td>
+            <td :style="colorcat">
+              <span v-if="procheck.typepro">{{ procheck.type }}</span
+              ><span v-else>-</span>
+            </td>
+            <td :style="colorcat">
+              <span v-if="procheck.cat_status">ผ่าน</span
+              ><span v-else>ไม่ผ่าน</span>
+            </td>
+          </tr>
+          <tr>
+            <td :style="colorname">ชื่อผลิตภัณฑ์</td>
+            <td :style="colorname">
+              {{ procheck.productha }}<br />{{ procheck.produceng }}
+            </td>
+            <td :style="colorname"><span v-html="procheck.name"></span></td>
+            <td :style="colorname">
+              <span v-if="procheck.name_status">ผ่าน</span
+              ><span v-else>ไม่ผ่าน</span>
+            </td>
+          </tr>
+        </tbody>
       </table>
       <table class="table table-bordered mt-3 mb-5" v-if="status">
         <tbody>
           <tr>
-            <th style="background-color: #ffb454;vertical-align: middle;">เงื่อนไขการตรวจสอบข้อที่ 2</th>
-            <th style="background-color: #ffb454;vertical-align: middle;">ข้อความโฆษณา</th>
-            <th style="background-color: #ffb454;vertical-align: middle;">ข้อความโฆษณาเกินจริง</th>
+            <th style="background-color: #ffb454; vertical-align: middle">
+              เงื่อนไขการตรวจสอบข้อที่ 2
+            </th>
+            <th style="background-color: #ffb454; vertical-align: middle">
+              ข้อความโฆษณา
+            </th>
+            <th style="background-color: #ffb454; vertical-align: middle">
+              ข้อความโฆษณาเกินจริง
+            </th>
           </tr>
           <tr>
             <td :style="colorkey">รายละเอียดสินค้า</td>
@@ -79,16 +162,26 @@
             <td :style="colorkey" v-if="list.keyword != 0">
               <tr v-for="(k, i) in list.keyword" :key="i">
                 <td>
-                  <span v-html="k.sentence_rulebase"></span><br><br>
-                  <span v-for="(s,idx) in k.rule_based_name" :key="idx">{{s}}</span>
-                  <br><br>
-<span v-if="k.count_rulebased">เกินจริง {{(getpercentage(k))}}%</span><br><br>
-<div style="text-align:left"> <button
-          data-bs-toggle="modal"
-          data-bs-target="#AddScopusToken"
-           type="submit" class="mb-3 btn btn-success">
-      <i class="fa fa-plus" aria-hidden="true"> เพิ่ม keyword</i>
-    </button></div>
+                  <span v-html="k.sentence_rulebase"></span><br /><br />
+                  <span v-for="(s, idx) in k.rule_based_name" :key="idx">{{
+                    s
+                  }}</span>
+                  <br /><br />
+                  <span v-if="k.count_rulebased"
+                    >เกินจริง {{ getpercentage(k) }}%</span
+                  ><br /><br />
+                  <div style="text-align: left">
+                    <button
+                      data-bs-toggle="modal"
+                      data-bs-target="#AddScopusToken"
+                      type="submit"
+                      class="mb-3 btn btn-success"
+                    >
+                      <i class="fa fa-plus" aria-hidden="true">
+                        เพิ่ม keyword</i
+                      >
+                    </button>
+                  </div>
                 </td>
                 <td>
                   <span v-if="k.answer == 1">เกินจริง</span
@@ -123,94 +216,108 @@
         </tbody>
       </table>
       <table class="table mt-3" v-if="status">
-      <thead>
-        <tr>
-          <th scope="col">สินค้า</th>
-          <th scope="col">ข้อมูล</th>
-          <th scope="col">FDA</th>
-          <th scope="col">ตัดคำ</th>
-          <th scope="col">ข้อมูลจากฐานข้อมูลอย.</th>
-          <!-- <th scope="col"></th> -->
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(l, i) in product" :key="i">
-          <td :style="l.bg">{{ l.name }}</td>
-          <td :style="l.bg">{{ l.detail }}</td>
-          <!-- <td :style="l.bg">
+        <thead>
+          <tr>
+            <th scope="col">สินค้า</th>
+            <th scope="col">ข้อมูล</th>
+            <th scope="col">FDA</th>
+            <th scope="col">ตัดคำ</th>
+            <th scope="col">ข้อมูลจากฐานข้อมูลอย.</th>
+            <!-- <th scope="col"></th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(l, i) in product" :key="i">
+            <td :style="l.bg">{{ l.name }}</td>
+            <td :style="l.bg">{{ l.detail }}</td>
+            <!-- <td :style="l.bg">
               <div class="row">
           <div class="col-md-2" v-for="(im ,i) in imagelists" :key="i">
             <img :src="im" width="100%"/>
           </div>
         </div>
             </td> -->
-          <td :style="l.bg" style="width:300px"><div >เลขที่อนุญาต : {{ l.fda }}<br/>
-            <!-- ชื่อผลิตภัณฑ์: <span v-html="matchname"></span> -->
-            <!-- ชื่อผลิตภัณฑ์: {{l.productha}} -->
-           </div></td>
-          <td :style="l.bg">{{cut(l.token)}}</td>
-          <td style="background-color:#BDEDFF" v-if="l.status == 1 || l.status == 3">
-            <p class="card-text">สถานะ : {{ l.cncnm || '' }}</p>
-            <p class="card-text">ประเภทผลิตภัณฑ์ :<span> {{ l.typepro }}</span></p>
-            <p class="card-text">ใบสำคัญ/เลขที่อนุญาต : <span> {{ l.lcnno }}</span></p>
-            <p class="card-text">ชื่อผลิตภัณฑ์ (TH) : <span> {{ l.productha }}</span></p>
-            <p class="card-text">ชื่อผลิตภัณฑ์ (EN) : <span> {{ l.produceng }}</span></p>
-            <p class="card-text">ชื่อผู้รับอนุญาต : {{ l.licen }}</p>
-            <p class="card-text">สถานที่ผลิต : {{ l.Addr }}</p>
-            <p class="card-text">Newcode : {{ l.Newcode }}</p>
-          </td>
-          <td :style="l.bg" v-else> ไม่พบข้อมูล</td>
-          <!-- <td :style="l.bg">
+            <td :style="l.bg" style="width: 300px">
+              <div>
+                เลขที่อนุญาต : {{ l.fda }}<br />
+                <!-- ชื่อผลิตภัณฑ์: <span v-html="matchname"></span> -->
+                <!-- ชื่อผลิตภัณฑ์: {{l.productha}} -->
+              </div>
+            </td>
+            <td :style="l.bg">{{ cut(l.token) }}</td>
+            <td
+              style="background-color: #bdedff"
+              v-if="l.status == 1 || l.status == 3"
+            >
+              <p class="card-text">สถานะ : {{ l.cncnm || "" }}</p>
+              <p class="card-text">
+                ประเภทผลิตภัณฑ์ :<span> {{ l.typepro }}</span>
+              </p>
+              <p class="card-text">
+                ใบสำคัญ/เลขที่อนุญาต : <span> {{ l.lcnno }}</span>
+              </p>
+              <p class="card-text">
+                ชื่อผลิตภัณฑ์ (TH) : <span> {{ l.productha }}</span>
+              </p>
+              <p class="card-text">
+                ชื่อผลิตภัณฑ์ (EN) : <span> {{ l.produceng }}</span>
+              </p>
+              <p class="card-text">ชื่อผู้รับอนุญาต : {{ l.licen }}</p>
+              <p class="card-text">สถานที่ผลิต : {{ l.Addr }}</p>
+              <p class="card-text">Newcode : {{ l.Newcode }}</p>
+            </td>
+            <td :style="l.bg" v-else>ไม่พบข้อมูล</td>
+            <!-- <td :style="l.bg">
             <i class="fa fa-circle" :style="l.icon" aria-hidden="true"></i>
           </td> -->
-        </tr>
-      </tbody>
-    </table>
-        <!-- Modal -->
-  <div
-      class="modal fade"
-      id="AddScopusToken"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{ title }}</h5>
-            
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="card-body mt-3">
-                <div class="form-group mt-3">
-                  <label>ข้อความ</label>
-                  <input
-                    v-model="key.name"
-                    type="text"
-                    min="1"
-                    class="form-control form-control-sm"
-                  />
+          </tr>
+        </tbody>
+      </table>
+      <clip-loader :loading="loading" :color="color" :size="size"></clip-loader>
+      <!-- Modal -->
+      <div
+        class="modal fade"
+        id="AddScopusToken"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">{{ title }}</h5>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="card-body mt-3">
+                  <div class="form-group mt-3">
+                    <label>ข้อความ</label>
+                    <input
+                      v-model="key.name"
+                      type="text"
+                      min="1"
+                      class="form-control form-control-sm"
+                    />
+                  </div>
                 </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer mt-3">
-            <button type="button" class="btn btn-success" @click="save()">
-              บันทึก
-            </button>
-            <button
-            id="closedcategory"
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              ปิด
-            </button>
+              </form>
+            </div>
+            <div class="modal-footer mt-3">
+              <button type="button" class="btn btn-success" @click="save()">
+                บันทึก
+              </button>
+              <button
+                id="closedcategory"
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                ปิด
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   </div>
 </template>
@@ -224,12 +331,20 @@ import MapRuleBasedService from "../services/MapRuleBasedService";
 import LinkService from "../services/LinkService";
 import AdvertiseService from "../services/AdvertiseService";
 import KeywordService from "../services/KeywordService";
+import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 
 export default {
   name: "App",
-  components: {},
+  components: {
+    ClipLoader,
+  },
   data() {
     return {
+      color: '#5bc0de',
+      size: '50px',
+      margin: '2px',
+      radius: '2px',
+      loading:false,
       list: [],
       url: "",
       file: "",
@@ -256,12 +371,12 @@ export default {
       back: 0,
       next: 0,
       data: {},
-      product_token:0,
-      title:'เพิ่ม keyword',
-      key:{},
-      fda:'',
-      product:[],
-      procheck:[]
+      product_token: 0,
+      title: "เพิ่ม keyword",
+      key: {},
+      fda: "",
+      product: [],
+      procheck: [],
     };
   },
   computed: {
@@ -270,19 +385,19 @@ export default {
     },
   },
   methods: {
-    clear(){
-      this.data = {}
-        this.product = []
-this.procheck = {}
-this.status = false
+    clear() {
+      this.data = {};
+      this.product = [];
+      this.procheck = {};
+      this.status = false;
     },
-    cut(data){
-  data = data.filter((letter) => letter !== " ");
-  var mapname = data.toString()
+    cut(data) {
+      data = data.filter((letter) => letter !== " ");
+      var mapname = data.toString();
 
-  mapname = mapname.replaceAll(',', ' | ')
-  return mapname
-},
+      mapname = mapname.replaceAll(",", " | ");
+      return mapname;
+    },
     save() {
       //console.log(this.key);
       if (this.key.name == null || this.key.name == "") {
@@ -290,31 +405,31 @@ this.status = false
       } else {
         var prodata = {
           name: this.key.name,
-          status:1,
+          status: 1,
         };
-        //console.log(prodata); 
-          KeywordService.createkeyword(prodata).then((res) => {
-            //console.log(res.data);
-            if (res.data.err == 1062) {
-              alert('มีคำนี้ในระบบแล้ว')
-            }else{
-          DictService.createdict(prodata).then(() => {
-            //console.log(res.data );
-            // RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
-              
-            document.getElementById("closedcategory").click();
-            alert('บันทึกสำเร็จ')
-          // })
-        })
-      }
-      })
+        //console.log(prodata);
+        KeywordService.createkeyword(prodata).then((res) => {
+          //console.log(res.data);
+          if (res.data.err == 1062) {
+            alert("มีคำนี้ในระบบแล้ว");
+          } else {
+            DictService.createdict(prodata).then(() => {
+              //console.log(res.data );
+              // RuleBasedService.createdcolumnrule_based(res.data.id).then(() => {
+
+              document.getElementById("closedcategory").click();
+              alert("บันทึกสำเร็จ");
+              // })
+            });
+          }
+        });
       }
     },
-    getpercentage(data){
-// var dict = JSON.parse(data.dict_id)
-// var rule_based_id = JSON.parse(data.rule_based_id)
-// var re = (100 * data.count_rulebased)/ (rule_based_id.length)
-return data.count_rulebased
+    getpercentage(data) {
+      // var dict = JSON.parse(data.dict_id)
+      // var rule_based_id = JSON.parse(data.rule_based_id)
+      // var re = (100 * data.count_rulebased)/ (rule_based_id.length)
+      return data.count_rulebased;
     },
     savetorule(sen, answer) {
       // console.log(answer);
@@ -398,50 +513,53 @@ return data.count_rulebased
         status: 1,
         answer: answer,
         user: this.currentUser.id,
-        map_dict:JSON.parse(data.dict_id)
+        map_dict: JSON.parse(data.dict_id),
       };
       if (!data.mapId) {
-        MapRuleBasedService.checkintb(data.dict_id).then((check)=>{
+        MapRuleBasedService.checkintb(data.dict_id).then((check) => {
           if (check.count == 1) {
-            alert('มีรูปประโยคนี้อยู่ใน rule based แล้ว')
-          }else{
-      MapRuleBasedService.createmap_rule_based(maprule).then(async (res) => {
-        // console.log(res.data);
-        var map_id = res.data.id;
-        var sendata = JSON.parse(data.dict_id);
-        // console.log(sendata);
-        // console.log(dict_name);
-        for (let d = 0; d < sendata.length; d++) {
-          // console.log(sendata[d]);
-          await DictService.getdict(sendata[d]).then(async (sen) => {
-            // console.log(sen.data);
-          var rule = {
-            map_rule_based_id: map_id,
-            dict_id: sendata[d],
-            dict_name: sen.data.name,
-            no: d + 1,
-          };
-          // console.log(rule);
-          await RuleBasedService.createrule_based(rule).then(() => {
-            if (d + 1 == sendata.length) {      
-               this.getdetail()
+            alert("มีรูปประโยคนี้อยู่ใน rule based แล้ว");
+          } else {
+            MapRuleBasedService.createmap_rule_based(maprule).then(
+              async (res) => {
+                // console.log(res.data);
+                var map_id = res.data.id;
+                var sendata = JSON.parse(data.dict_id);
+                // console.log(sendata);
+                // console.log(dict_name);
+                for (let d = 0; d < sendata.length; d++) {
+                  // console.log(sendata[d]);
+                  await DictService.getdict(sendata[d]).then(async (sen) => {
+                    // console.log(sen.data);
+                    var rule = {
+                      map_rule_based_id: map_id,
+                      dict_id: sendata[d],
+                      dict_name: sen.data.name,
+                      no: d + 1,
+                    };
+                    // console.log(rule);
+                    await RuleBasedService.createrule_based(rule).then(() => {
+                      if (d + 1 == sendata.length) {
+                        this.getdetail();
 
-              alert("บันทึกสำเร็จ");
-            }
-          });
+                        alert("บันทึกสำเร็จ");
+                      }
+                    });
+                  });
+                }
+              }
+            );
+          }
         });
-        }
-      });
-    }
-
-    })
-      }else{
-      MapRuleBasedService.deletemap_rule_based(data.mapId,maprule).then(async () => {
-        // console.log(res.data);
-       this.getdetail()
-        alert("บันทึกสำเร็จ");
-      });
-    }
+      } else {
+        MapRuleBasedService.deletemap_rule_based(data.mapId, maprule).then(
+          async () => {
+            // console.log(res.data);
+            this.getdetail();
+            alert("บันทึกสำเร็จ");
+          }
+        );
+      }
     },
     checkkeyword(name) {
       // console.log(name);
@@ -546,35 +664,42 @@ return data.count_rulebased
     loaddict() {
       axios.get(LinkService.getpythonlink() + "/loaddict").then(async () => {});
     },
-    getdetail(){
+    getdetail() {
       // var url = this.data.url.split("-i.");
+      var url = this.data.url.split("-i.");
+      this.data.url = url[0];
       var selectpro = {
-          url: this.data.url,
-          id:this.currentUser.id
+        url: this.data.url,
+        id: this.currentUser.id,
+      };
+      MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
+        console.log(res.data);
+        // var best = this.getMax(res.data.keyword,'count_rulebased')
+        //console.log(best);
+        this.list = res.data;
+        this.status = true;
+        this.loading = false
+        var data = {
+          advertise_id: res.data.keyword[0].product_token_id,
         };
-        MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-          console.log(res.data);
-          // var best = this.getMax(res.data.keyword,'count_rulebased')
-          //console.log(best);
-          this.list = res.data
-          this.status = true
-          var data = {
-            advertise_id:res.data.keyword[0].product_token_id
-          }
-          MapRuleBasedService.updateweight(res.data.keyword[0].map_rule_based_id,data).then( () => {
-          })
-          // this.list.keyword = [best]
-          // this.status = true
-        })
+        MapRuleBasedService.updateweight(
+          res.data.keyword[0].map_rule_based_id,
+          data
+        ).then(() => {});
+        // this.list.keyword = [best]
+        // this.status = true
+      });
     },
     async search() {
-
-      // var url = this.data.url.split("-i.");
-      // this.data.url = url[0]
-      this.procheck = {}
-      this.product = []
-      this.product_token = 0
-      var con ={}
+      this.loading = true
+      var url = this.data.url.replaceAll(".",'');
+      url = url.split("-i");
+      this.data.url = url[0];
+      console.log(this.data.url);
+      this.procheck = {};
+      this.product = [];
+      this.product_token = 0;
+      var con = {};
       await this.loaddict();
       this.status = false;
       if (this.data.url == null || this.data.url == "") {
@@ -591,11 +716,9 @@ return data.count_rulebased
           /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g,
           " "
         );
-        
-        content = content.replaceAll(
-          /\ud83d[\ude00-\ude4f]/g," "
-        );
-        content = content.replaceAll(/(\r\n|\n|\r)/gm, ' ');
+
+        content = content.replaceAll(/\ud83d[\ude00-\ude4f]/g, " ");
+        content = content.replaceAll(/(\r\n|\n|\r)/gm, " ");
         content = content.replaceAll("_", "");
         content = content.replaceAll("!", "");
         content = content.replaceAll("*", "");
@@ -604,250 +727,264 @@ return data.count_rulebased
         content = content.replaceAll("•", "");
         content = content.replaceAll("+", "");
         content = content.replaceAll(`_/l\_`, ""); // eslint-disable-line
-        content = content.replaceAll(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, ' ');
+        content = content.replaceAll(
+          /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+          " "
+        );
 
-        this.fda = await this.findfda(content)
-                console.log(this.fda);
+        this.fda = await this.findfda(content);
+        console.log(this.fda);
         var selectpro = {
           url: this.data.url,
-          id:this.currentUser.id
+          id: this.currentUser.id,
         };
-        MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
+        await MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
           // console.log(res.data);
           // console.log(content);
           if (res.data.id) {
-            this.product_token =res.data.id
+            this.product_token = res.data.id;
           }
           // console.log(this.product_token);
-            // console.log(LinkService.getpythonlink()+'/worktokendesc?text=' + content);
-             con = {
-              content: content,
-            };
-            await axios
-              .post(LinkService.getpythonlink() + "/wordtokendesc", con)
-              .then(async (res) => {
-                // var sentence = res.data.sentent.replaceAll("<spanstyle", "<span style");
-                var des = {
-                  url: this.data.url,
-                  sentence: content,
-                  sentence_keyword: res.data.sentent,
-                  keyword_id:res.data.keywordId,
-                  status: 1,
-                };
-                if (this.product_token == 0) {
-                  await MapRuleBasedService.createproduct_token(des).then(
-                   async (producttoken) => {
-this.product_token = producttoken.data.id
-                await this.checkfda(content,this.product_token)
+          // console.log(LinkService.getpythonlink()+'/worktokendesc?text=' + content);
+          con = {
+            content: content,
+          };
+          await axios
+            .post(LinkService.getpythonlink() + "/wordtokendesc", con)
+            .then(async (res) => {
+              // var sentence = res.data.sentent.replaceAll("<spanstyle", "<span style");
+              var des = {
+                url: this.data.url,
+                sentence: content,
+                sentence_keyword: res.data.sentent,
+                keyword_id: res.data.keywordId,
+                status: 1,
+              };
+              console.log(des);
+              if (this.product_token == 0) {
+                await MapRuleBasedService.createproduct_token(des).then(
+                  async (producttoken) => {
+                    console.log(producttoken);
+                    this.product_token = producttoken.data.id;
+                    await this.checkfda(content, this.product_token);
                     // console.log(producttoken);
                     this.product_token = producttoken.data.id;
-                     con = {
-              content: content,
-            };
-            //console.log(con);
-                     axios
+                    con = {
+                      content: content,
+                    };
+                    //console.log(con);
+                    await axios
                       .post(LinkService.getpythonlink() + "/checkkeyword", con)
                       .then(async (res) => {
                         //console.log(res.data);
                         if (res.data.length > 0) {
-                        for (let r = 0; r < res.data.length; r++) {
-                          var sentencetoken = res.data[r].sentent.replaceAll(
-                            '"',
-                            ""
-                          ); // eslint-disable-line
-                          sentencetoken = sentencetoken.replaceAll(
-                            "<spanstyle",
-                            "<span style"
-                          );
+                          for (let r = 0; r < res.data.length; r++) {
+                            var sentencetoken = res.data[r].sentent.replaceAll(
+                              '"',
+                              ""
+                            ); // eslint-disable-line
+                            sentencetoken = sentencetoken.replaceAll(
+                              "<spanstyle",
+                              "<span style"
+                            );
 
-                          // sentencetoken = sentencetoken.replaceAll('"color:red\"','"color:red"')
-                          var advertise = {
-                            product_token_id: this.product_token,
-                            keyword_dict_id: res.data[r].keyword_dict_id,
-                            dict_id: res.data[r].dict_id,
-                            dict_name: res.data[r].dict_name,
-                            sentent: sentencetoken,
-                            sen: res.data[r].sen,
-                          };
-                          // console.log(this.product_token);
-                          AdvertiseService.createadvertise(advertise).then(
-                            () => {
-                              if (r + 1 == res.data.length) {
-                                var getprotoken = {
-                                  url:this.product_token
+                            // sentencetoken = sentencetoken.replaceAll('"color:red\"','"color:red"')
+                            var advertise = {
+                              product_token_id: this.product_token,
+                              keyword_dict_id: res.data[r].keyword_dict_id,
+                              dict_id: res.data[r].dict_id,
+                              dict_name: res.data[r].dict_name,
+                              sentent: sentencetoken,
+                              sen: res.data[r].sen,
+                            };
+                            // console.log(this.product_token);
+                            await AdvertiseService.createadvertise(advertise).then(
+                              async () => {
+                                if (r + 1 == res.data.length) {
+                                  var getprotoken = {
+                                    url: this.product_token,
+                                  };
+                                  await MapRuleBasedService.getproductkeyword(
+                                    getprotoken
+                                  ).then((pro) => {
+                                    // console.log(pro.data);
+                                    this.tokendata(pro.data);
+                                  });
                                 }
-                                MapRuleBasedService.getproductkeyword(
-                                  getprotoken
-                                ).then((pro) => {
-                                  // console.log(pro.data);
-                                  this.tokendata(pro.data);
-                                });
                               }
-                            }
-                          );
-                        }
-                          
-                        }else{
-                        this.getdetail()
+                            );
+                          }
+                        } else {
+                          this.getdetail();
                         }
                       });
                   }
                 );
-              
-                }else{
-                  await AdvertiseService.deleteadvertise(this.product_token).then(async ()=>{
-
-                  await MapRuleBasedService.updatproduct_token(this.product_token,des).then(
-                   async () => {
-
-                    // await AdvertiseService.deleteadvertise(this.product_token).then(async ()=>{
+              } else {
+                await AdvertiseService.deleteadvertise(this.product_token).then(
+                  async () => {
+                    await MapRuleBasedService.updatproduct_token(
+                      this.product_token,
+                      des
+                    ).then(async () => {
+                      // await AdvertiseService.deleteadvertise(this.product_token).then(async ()=>{
                       // console.log(del);
-                await this.checkfda(content,this.product_token)
-                     con = {
-              content: content,
-            };
-            //console.log(con);
-                     axios
-                      .post(LinkService.getpythonlink() + "/checkkeyword", con)
-                      .then(async (res) => {
-                        //console.log(res.data);
-                        if (res.data.length > 0) {
-                        for (let r = 0; r < res.data.length; r++) {
-                          var sentencetoken = res.data[r].sentent.replaceAll(
-                            '"',
-                            ""
-                          ); // eslint-disable-line
-                          sentencetoken = sentencetoken.replaceAll(
-                            "<spanstyle",
-                            "<span style"
-                          );
+                      await this.checkfda(content, this.product_token);
+                      con = {
+                        content: content,
+                      };
+                      //console.log(con);
+                      axios
+                        .post(
+                          LinkService.getpythonlink() + "/checkkeyword",
+                          con
+                        )
+                        .then(async (res) => {
+                          //console.log(res.data);
+                          if (res.data.length > 0) {
+                            for (let r = 0; r < res.data.length; r++) {
+                              var sentencetoken = res.data[
+                                r
+                              ].sentent.replaceAll('"', ""); // eslint-disable-line
+                              sentencetoken = sentencetoken.replaceAll(
+                                "<spanstyle",
+                                "<span style"
+                              );
 
-                          // sentencetoken = sentencetoken.replaceAll('"color:red\"','"color:red"')
-                          var advertise = {
-                            product_token_id: this.product_token,
-                            keyword_dict_id: res.data[r].keyword_dict_id,
-                            dict_id: res.data[r].dict_id,
-                            dict_name: res.data[r].dict_name,
-                            sentent: sentencetoken,
-                            sen: res.data[r].sen,
-                            status:1
-                          };
-                          // console.log(this.product_token);
-                          AdvertiseService.createadvertise(advertise).then(
-                            () => {
-                              if (r + 1 == res.data.length) {
-                                var getprotoken = {
-                                  url:this.product_token
+                              // sentencetoken = sentencetoken.replaceAll('"color:red\"','"color:red"')
+                              var advertise = {
+                                product_token_id: this.product_token,
+                                keyword_dict_id: res.data[r].keyword_dict_id,
+                                dict_id: res.data[r].dict_id,
+                                dict_name: res.data[r].dict_name,
+                                sentent: sentencetoken,
+                                sen: res.data[r].sen,
+                                status: 1,
+                              };
+                              // console.log(this.product_token);
+                              AdvertiseService.createadvertise(advertise).then(
+                                () => {
+                                  if (r + 1 == res.data.length) {
+                                    var getprotoken = {
+                                      url: this.product_token,
+                                    };
+                                    MapRuleBasedService.getproductkeyword(
+                                      getprotoken
+                                    ).then((pro) => {
+                                      // console.log(pro.data);
+                                      this.tokendata(pro.data);
+                                    });
+                                  }
                                 }
-                                MapRuleBasedService.getproductkeyword(
-                                  getprotoken
-                                ).then((pro) => {
-                                  // console.log(pro.data);
-                                  this.tokendata(pro.data);
-                                });
-                              }
+                              );
                             }
-                          );
-                        }
-                          
-                        }
-                      });
+                          }
+                        });
+                    });
                   }
                 );
-              })
-                }
-                
-              });
+              }
+            });
         });
       }
     },
     getMax(arr, prop) {
-    var max;
-    for (var i=0 ; i< arr.length ; i++) {
+      var max;
+      for (var i = 0; i < arr.length; i++) {
         if (max == null || parseInt(arr[i][prop]) > parseInt(max[prop]))
-            max = arr[i];
-    }
-    return max;
-},
-getMaxlength(arr, prop) {
-    var max;
-    for (var i=0 ; i< arr.length ; i++) {
+          max = arr[i];
+      }
+      return max;
+    },
+    getMaxlength(arr, prop) {
+      var max;
+      for (var i = 0; i < arr.length; i++) {
         if (max == null || parseInt(arr[i][prop]) > parseInt(max[prop]))
-            max = arr[i];
-    }
-    return max;
-},
-getAllMaxArray(arr,value){
-  var array = []
-  arr.map(function (num, idx) {
-    if (num.allcount == value) {
-      array.push(arr[idx])
-    }
-                                        });
-                                        return array
-},
+          max = arr[i];
+      }
+      return max;
+    },
+    getAllMaxArray(arr, value) {
+      var array = [];
+      arr.map(function (num, idx) {
+        if (num.allcount == value) {
+          array.push(arr[idx]);
+        }
+      });
+      return array;
+    },
     async tokendata(list) {
       //console.log(list);
       if (list.keyword.length > 0) {
-      for (let l = 0; l < list.keyword.length; l++) {
-        //console.log(list.keyword[l].keyword_dict_id);
-        if (list.keyword[l].keyword_dict_id) {
-          var map = {
-            id: list.keyword[l].id,
-            url: list.keyword[l].keyword_dict_id,
-            keyword_id:list.keyword[l].dict_id,
-          };
-          // console.log(map);
-           await MapRuleBasedService.getmapproduct(map).then(async (res) => {
-            // console.log(res.data);
-            var maxvalue = this.getMax(res.data,'allcount')
-            // console.log(maxvalue.allcount);
-            var i = this.getAllMaxArray(res.data,maxvalue.allcount);
-            // console.log(i);
-            var bestdata = this.getMax(i,'length')
-            // console.log(bestdata);
-            // getAllIndexes
-            // console.log(bestdata);
-            var best = {
-            id: list.keyword[l].id,
-            sentence: bestdata,
-          };
-          var rule_based_name =bestdata.name.toString()
-                rule_based_name = rule_based_name.replaceAll(',', '')
-
-          await axios.get(LinkService.getpythonlink() + '/loaddict?word='+rule_based_name).then(async () => {
-
-            await MapRuleBasedService.getbestrulebased(best).then(async (res) => {
+        for (let l = 0; l < list.keyword.length; l++) {
+          //console.log(list.keyword[l].keyword_dict_id);
+          if (list.keyword[l].keyword_dict_id) {
+            var map = {
+              id: list.keyword[l].id,
+              url: list.keyword[l].keyword_dict_id,
+              keyword_id: list.keyword[l].dict_id,
+            };
+            // console.log(map);
+            await MapRuleBasedService.getmapproduct(map).then(async (res) => {
               // console.log(res.data);
+              var maxvalue = this.getMax(res.data, "allcount");
+              // console.log(maxvalue.allcount);
+              var i = this.getAllMaxArray(res.data, maxvalue.allcount);
+              // console.log(i);
+              var bestdata = this.getMax(i, "length");
+              // console.log(bestdata);
+              // getAllIndexes
+              // console.log(bestdata);
+              var best = {
+                id: list.keyword[l].id,
+                sentence: bestdata,
+              };
+              console.log(best);
+              var rule_based_name = bestdata.name.toString();
+              rule_based_name = rule_based_name.replaceAll(",", "");
+              console.log(rule_based_name);
+              await axios
+                .get(
+                  LinkService.getpythonlink() +
+                    "/loaddict?word=" +
+                    rule_based_name
+                )
+                .then(async () => {
+                  await MapRuleBasedService.getbestrulebased(best).then(
+                    async (res) => {
+                      console.log(res.data);
 
-              var rulebased = {
-            count_rulebased: res.data.count,
-            sentence_rulebase: res.data.sentence,
-            rule_based_id:res.data.rule_based_id,
-            rule_based_name:res.data.rule_based_name,
-            map_rule_based_id:res.data.map_id
-          };
-          // console.log(rulebased);
-          // console.log(list.keyword[l].id);
-             await MapRuleBasedService.updaterulebased(list.keyword[l].id,rulebased).then(() => {
-              if (l+1 == list.keyword.length) {
-                this.getdetail()
-              }
-              })
-            })
-          });
-            // list.keyword[l].rulebase = res.data;
-            // if (l + 1 == list.keyword.length) {
-            //   this.compare(list);
-            // }
-          });
+                      var rulebased = {
+                        count_rulebased: res.data.count,
+                        sentence_rulebase: res.data.sentence,
+                        rule_based_id: res.data.rule_based_id,
+                        rule_based_name: res.data.rule_based_name,
+                        map_rule_based_id: res.data.map_id,
+                      };
+                      console.log(rulebased);
+                      // console.log(list.keyword[l].id);
+                      await MapRuleBasedService.updaterulebased(
+                        list.keyword[l].id,
+                        rulebased
+                      ).then(() => {
+                        if (l + 1 == list.keyword.length) {
+                          this.getdetail();
+                        }
+                      });
+                    }
+                  );
+                });
+              // list.keyword[l].rulebase = res.data;
+              // if (l + 1 == list.keyword.length) {
+              //   this.compare(list);
+              // }
+            });
+          }
+
+          // }
         }
-
-        // }
-      }
-        
-      }else{
-        this.getdetail()
+      } else {
+        this.getdetail();
       }
     },
     compare(list) {
@@ -881,20 +1018,21 @@ getAllMaxArray(arr,value){
       }
     },
     getAllIndexes(arr, val) {
-  var indexes = [], i = -1;
-  while ((i = arr.indexOf(val, i + 1)) != -1) {
-      indexes.push(i);
-  }
-  return indexes;
-},
+      var indexes = [],
+        i = -1;
+      while ((i = arr.indexOf(val, i + 1)) != -1) {
+        indexes.push(i);
+      }
+      return indexes;
+    },
     findfda(data) {
-      var text = ['หมายเลขใบอนุญาต/อย.']
+      var text = ["หมายเลขใบอนุญาต/อย."];
       // var end = ['']
-      var findfda = data
+      var findfda = data;
       for (let t = 0; t < text.length; t++) {
-        findfda = findfda.substring(findfda.indexOf(text[t]),data.length); 
-        var endindex = this.getAllIndexes(findfda,' ')        
-        findfda = findfda.substring(findfda.indexOf(text[t]),endindex[1]);       
+        findfda = findfda.substring(findfda.indexOf(text[t]), data.length);
+        var endindex = this.getAllIndexes(findfda, " ");
+        findfda = findfda.substring(findfda.indexOf(text[t]), endindex[1]);
       }
       // console.log(findfda);
 
@@ -906,172 +1044,191 @@ getAllMaxArray(arr,value){
       // var regex = /\d+/g;
       // var matches = findfda.match(regex);  // creates array from matches
       // console.log(matches[0]);
-      return findfda
+      return findfda;
     },
-    checkfda(content,id){
-    console.log(this.fda);
-    if (this.fda) {
-      var fda = this.fda
-    var product_status = 0
-    const url = "https://tawaiforhealth.org/api/oryor/check-product";
-            const data = { "number_src": fda };
-// console.log(data);
-            const options = {
-              method: "POST",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json;charset=UTF-8",
-              },
-              body: JSON.stringify(data),
-            };
+    checkfda(content, id) {
+      console.log(this.fda);
+      if (this.fda) {
+        var fda = this.fda;
+        var product_status = 0;
+        const url = "https://tawaiforhealth.org/api/oryor/check-product";
+        const data = { number_src: fda };
+        // console.log(data);
+        const options = {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json;charset=UTF-8",
+          },
+          body: JSON.stringify(data),
+        };
 
-            fetch(url, options)
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.message) {
-                  this.product.push({name:'-',
-          detail:content,
-          fda:this.fda,
-          cncnm:'-',
-          typepro:'-',
-          lcnno:'-',
-          productha:'-',
-          produceng:'-',
-          licen:'-',
-          Addr:'-',
-          Newcode:'-',
-          status:'-',
-          token:'',
-        })
-        this.procheck ={
-          fda:this.fda,
-          mapfda:'-',
-          cncnm:'-',
-          productha:'-',
-          produceng:'-',
-          name:'-',
-          product_status:0,
-          cat_status:0,
-          fda_status:0,
-          name_status:0,
-          typepro:'-',
-          type:'-',
-        }
+        fetch(url, options)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.message) {
+              this.product.push({
+                name: "-",
+                detail: content,
+                fda: this.fda,
+                cncnm: "-",
+                typepro: "-",
+                lcnno: "-",
+                productha: "-",
+                produceng: "-",
+                licen: "-",
+                Addr: "-",
+                Newcode: "-",
+                status: "-",
+                token: "",
+              });
+              this.procheck = {
+                fda: this.fda,
+                mapfda: "-",
+                cncnm: "-",
+                productha: "-",
+                produceng: "-",
+                name: "-",
+                product_status: 0,
+                cat_status: 0,
+                fda_status: 0,
+                name_status: 0,
+                typepro: "-",
+                type: "-",
+              };
+
+              // this.status = true
+            } else {
+              // console.log(data);
+              // console.log(data.cncnm.includes("คงอยู่"))
+              if (data.cncnm.includes("คงอยู่")) {
+                product_status = 1;
+                this.colorfda = "background-color:#a3e9a4";
+              } else {
+                product_status = 3;
+              }
+              console.log(this.colorfda);
+              var con = {
+                fda: fda,
+                productha: data.productha,
+                produceng: data.produceng,
+                typepro: data.typepro,
+                content: content,
+              };
+              axios
+                .post(LinkService.getpythonlink() + "/checkfda", con)
+                .then(async (res) => {
+                  // console.log(res.data);
+                  var pro = {
+                    name: res.data.name,
+                    fda: fda,
+                    product_status: product_status,
+                    cat_status: res.data.mapcatstatus,
+                    fda_status: product_status,
+                    name_status: res.data.mapnamestatus,
+                  };
+                  // console.log(pro);
+                  MapRuleBasedService.updatemap(id, pro).then(() => {
+                    // console.log(res.data);
+                    this.product.push({
+                      name: data.productha + " " + data.produceng,
+                      detail: content,
+                      fda: fda,
+                      cncnm: data.cncnm,
+                      typepro: data.typepro,
+                      lcnno: data.lcnno,
+                      productha: data.productha,
+                      produceng: data.produceng,
+                      licen: data.licen,
+                      Addr: data.Addr,
+                      Newcode: data.Newcode,
+                      status: product_status,
+                      token: res.data.token,
+                    });
+                    this.procheck = {
+                      fda: fda,
+                      mapfda: data.lcnno,
+                      cncnm: data.cncnm,
+                      productha: data.productha,
+                      produceng: data.produceng,
+                      name: res.data.name,
+                      product_status: product_status,
+                      cat_status: res.data.mapcatstatus,
+                      fda_status: product_status,
+                      name_status: res.data.mapnamestatus,
+                      typepro: data.typepro,
+                      type: res.data.category,
+                    };
+                    this.colorcat = res.data.colorcat;
+                    this.colorname = res.data.colorname;
+                    // console.log(this.product);
+                    // console.log(this.procheck);
+                    // console.log(this.fda);
+                  });
+                });
+
+              // this.status = true
+            }
+          });
+      } else {
+        this.product.push({
+          name: "-",
+          detail: content,
+          fda: this.fda,
+          cncnm: "-",
+          typepro: "-",
+          lcnno: "-",
+          productha: "-",
+          produceng: "-",
+          licen: "-",
+          Addr: "-",
+          Newcode: "-",
+          status: "-",
+          token: "",
+        });
+        this.procheck = {
+          fda: this.fda,
+          mapfda: "-",
+          cncnm: "-",
+          productha: "-",
+          produceng: "-",
+          name: "-",
+          product_status: 0,
+          cat_status: 0,
+          fda_status: 0,
+          name_status: 0,
+          typepro: "-",
+          type: "-",
+        };
 
         // this.status = true
-                }else{
-                  // console.log(data);
-                  // console.log(data.cncnm.includes("คงอยู่"))
-                  if (data.cncnm.includes("คงอยู่")) {
-                    product_status = 1
-                    this.colorfda="background-color:#a3e9a4"
-                  }else{
-                  product_status = 3
-                  }
-                  // console.log(product_status);
-                  var con = {
-      fda: fda,
-      productha:data.productha,
-      produceng:data.produceng,
-      typepro:data.typepro,
-      content: content
-      
-    };
-    axios
-      .post(LinkService.getpythonlink() + "/checkfda", con)
-      .then(async (res) => {
-        // console.log(res.data);
-        var pro = {
-          name:res.data.name,
-          fda:fda,
-          product_status:product_status,
-          cat_status:res.data.mapcatstatus,
-          fda_status:product_status,
-          name_status:res.data.mapnamestatus
-        }
-        // console.log(pro);
-        MapRuleBasedService.updatemap(id,pro).then(()=>{
-          // console.log(res.data); 
-          this.product.push({name:data.productha+' '+data.produceng,
-          detail:content,
-          fda:fda,
-          cncnm:data.cncnm,
-          typepro:data.typepro,
-          lcnno:data.lcnno,
-          productha:data.productha,
-          produceng:data.produceng,
-          licen:data.licen,
-          Addr:data.Addr,
-          Newcode:data.Newcode,
-          status:product_status,
-          token:res.data.token,
-        })
-        this.procheck ={
-          fda:fda,
-          mapfda:data.lcnno,
-          cncnm:data.cncnm,
-          productha:data.productha,
-          produceng:data.produceng,
-          name:res.data.name,
-          product_status:product_status,
-          cat_status:res.data.mapcatstatus,
-          fda_status:product_status,
-          name_status:res.data.mapnamestatus,
-          typepro:data.typepro,
-          type:res.data.category,
-        }
-        this.colorcat =res.data.colorcat
-        this.colorname=res.data.colorname
-        // console.log(this.product);
-        // console.log(this.procheck);
-        // console.log(this.fda);
-        })
-    })
-
-    // this.status = true
-                }
-  })
-    }else{
-      this.product.push({name:'-',
-          detail:content,
-          fda:this.fda,
-          cncnm:'-',
-          typepro:'-',
-          lcnno:'-',
-          productha:'-',
-          produceng:'-',
-          licen:'-',
-          Addr:'-',
-          Newcode:'-',
-          status:'-',
-          token:'',
-        })
-        this.procheck ={
-          fda:this.fda,
-          mapfda:'-',
-          cncnm:'-',
-          productha:'-',
-          produceng:'-',
-          name:'-',
-          product_status:0,
-          cat_status:0,
-          fda_status:0,
-          name_status:0,
-          typepro:'-',
-          type:'-',
-        }
-
-        // this.status = true
-    }
-    
-   
-    }
+      }
+    },
   },
   mounted() {
+//     var best = {
+//     "id": 67,
+//     "sentence": {
+//         "length": 2,
+//         "allcount": 100,
+//         "rule": [
+//             8899,
+//             57
+//         ],
+//         "name": [
+//             "ควบคุม",
+//             "น้ำหนัก"
+//         ],
+//         "map_id": 75
+//     }
+// }
+//                   MapRuleBasedService.getbestrulebased(best).then(
+//                      (res) => {
+//                       console.log(res.data);
+//                     });
     // var text = 'หมายเลขใบอนุญาต/อย. 13-1-13465-5-0052 จำนวนสินค้า 415 ส่งจาก'
     // console.log(this.findfda(text));
-
-  // this.data.url =
+    // this.data.url =
     //   "https://shopee.co.th/%E2%99%A6%EF%B8%8F%E0%B9%82%E0%B8%89%E0%B8%A1%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88-%E0%B8%82%E0%B8%AD%E0%B8%87%E0%B9%81%E0%B8%97%E0%B9%89%E2%99%A6%EF%B8%8F-%E0%B8%82%E0%B8%B2%E0%B8%A2%E0%B8%94%E0%B8%B5%E0%B8%A1%E0%B8%B2%E0%B8%81-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F-%E0%B8%A5%E0%B8%B4%E0%B9%82%E0%B8%8B%E0%B9%88-%E0%B8%9E%E0%B8%A5%E0%B8%B1%E0%B8%AA-%E2%80%8B-coffee-lishou-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%84%E0%B8%A7%E0%B8%9A%E0%B8%84%E0%B8%B8%E0%B8%A1%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%84%E0%B8%B8%E0%B8%A1%E0%B8%AB%E0%B8%B4%E0%B8%A7-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%A5%E0%B8%94%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%81-%E0%B8%81%E0%B8%B2%E0%B9%81%E0%B8%9F%E0%B8%A5%E0%B8%94%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%AD%E0%B9%89%E0%B8%A7%E0%B8%99";
     // this.data.content =
     //   "️ถ้าเป็นลูกค้าพิมแล้ว ดูแลจนน้ำหนักลดเลยค่ะ สั่งซื้อสินค้าแล้ว ทักแชทมาคุยกันได้เลยค่ะ";
