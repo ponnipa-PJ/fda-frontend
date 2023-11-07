@@ -167,8 +167,9 @@
                     s
                   }}</span>
                   <br /><br />
+                  <span>{{getstatuscheck(k.statustrue,k.statusfalse)}}</span>
                   <span v-if="k.count_rulebased"
-                    >เกินจริง {{ getpercentage(k) }}%</span
+                    > {{ getpercentage(k) }}%</span
                   ><br /><br />
                   <div style="text-align: left">
                     <button
@@ -336,7 +337,7 @@ import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 export default {
   name: "App",
   components: {
-    ClipLoader,
+    ClipLoader
   },
   data() {
     return {
@@ -385,6 +386,17 @@ export default {
     },
   },
   methods: {
+    getstatuscheck(t,f){
+      var text = ''
+if (t == f) {
+  text = 'เกินจริง'
+}else if (t > f) {
+  text = 'เกินจริง'
+}else if (f > t) {
+  text = 'ไม่เกินจริง'
+}
+return text
+    },
     clear() {
       this.data = {};
       this.product = [];
@@ -505,20 +517,43 @@ export default {
     savetorule_based(data, answer) {
       // console.log(sen.length);
       // console.log('answer',answer);
-      console.log(data);
+      // console.log(data);
 
-      var maprule = {
+      
+      // if (!data.mapId) {
+        MapRuleBasedService.checkintb(data.dict_id).then((check) => {
+          // console.log(check.data);
+          var statusfalse = 0
+          var statustrue = 0
+          if (check.data) {
+            
+          statusfalse = check.data.statusfalse
+          statustrue = check.data.statustrue
+          }
+          if (answer == 1) {
+            statustrue = statustrue+ parseInt(1)
+          }
+          if (answer == 9) {
+            statusfalse = statusfalse + parseInt(1)
+          }
+          var maprule = {
         keyword_id: 1,
         advertise_id: this.product_token,
         status: 1,
         answer: answer,
         user: this.currentUser.id,
         map_dict: JSON.parse(data.dict_id),
+        statusfalse:statusfalse,
+        statustrue:statustrue,
       };
-      if (!data.mapId) {
-        MapRuleBasedService.checkintb(data.dict_id).then((check) => {
-          if (check.count == 1) {
-            alert("มีรูปประโยคนี้อยู่ใน rule based แล้ว");
+          if (check.data) {
+            MapRuleBasedService.updateanswer(check.data.id, maprule).then(
+          async () => {
+            // console.log(res.data);
+            this.getdetail();
+            alert("บันทึกสำเร็จ");
+          }
+        );
           } else {
             MapRuleBasedService.createmap_rule_based(maprule).then(
               async (res) => {
@@ -551,15 +586,15 @@ export default {
             );
           }
         });
-      } else {
-        MapRuleBasedService.deletemap_rule_based(data.mapId, maprule).then(
-          async () => {
-            // console.log(res.data);
-            this.getdetail();
-            alert("บันทึกสำเร็จ");
-          }
-        );
-      }
+      // } else {
+      //   MapRuleBasedService.deletemap_rule_based(data.mapId, maprule).then(
+      //     async () => {
+      //       // console.log(res.data);
+      //       this.getdetail();
+      //       alert("บันทึกสำเร็จ");
+      //     }
+      //   );
+      // }
     },
     checkkeyword(name) {
       // console.log(name);
@@ -670,7 +705,7 @@ export default {
       this.data.url = url[0];
       var selectpro = {
         url: this.data.url,
-        id: this.currentUser.id,
+        // id: this.currentUser.id,
       };
       MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
         console.log(res.data);
@@ -736,7 +771,7 @@ export default {
         console.log(this.fda);
         var selectpro = {
           url: this.data.url,
-          id: this.currentUser.id,
+          // id: this.currentUser.id,
         };
         await MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
           // console.log(res.data);
