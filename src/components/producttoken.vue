@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div>
-        <div class="form-group mt-5">
+        <!-- <div class="form-group mt-5">
           <label for="exampleFormControlTextarea1">URL</label>
           <textarea
             v-model="data.url"
@@ -10,8 +10,8 @@
             id="exampleFormControlTextarea1"
             rows="3"
           ></textarea>
-        </div>
-        <div class="form-group">
+        </div> -->
+        <div class="form-group mt-5">
           <label for="exampleFormControlTextarea1">Content</label>
           <textarea
             v-model="data.content"
@@ -159,7 +159,8 @@
               <span v-html="list.sentence_keyword"></span>
             </td>
             <!-- <th :style="colorkey">ข้อความโฆษณา</th> -->
-            <td :style="colorkey" v-if="list.keyword != 0">
+            <!-- {{list}} -->
+            <td :style="colorkey" v-if="list.keyword != 1">
               <tr v-for="(k, i) in list.keyword" :key="i">
                 <td>
                   <span v-html="k.sentence_rulebase"></span><br /><br />
@@ -387,6 +388,7 @@ export default {
   },
   methods: {
     getstatuscheck(t,f){
+      console.log(t,f);
       var text = ''
 if (t == f) {
   text = 'เกินจริง'
@@ -514,14 +516,14 @@ return text
         });
       }
     },
-    savetorule_based(data, answer) {
+    async savetorule_based(data, answer) {
       // console.log(sen.length);
       // console.log('answer',answer);
       // console.log(data);
 
       
       // if (!data.mapId) {
-        MapRuleBasedService.checkintb(data.dict_id).then((check) => {
+        await MapRuleBasedService.checkintb(data.dict_id).then(async (check) => {
           // console.log(check.data);
           var statusfalse = 0
           var statustrue = 0
@@ -547,10 +549,10 @@ return text
         statustrue:statustrue,
       };
           if (check.data) {
-            MapRuleBasedService.updateanswer(check.data.id, maprule).then(
+            await MapRuleBasedService.updateanswer(check.data.id, maprule).then(
           async () => {
             // console.log(res.data);
-            this.getdetail();
+            await this.getdetail();
             alert("บันทึกสำเร็จ");
           }
         );
@@ -573,9 +575,9 @@ return text
                       no: d + 1,
                     };
                     // console.log(rule);
-                    await RuleBasedService.createrule_based(rule).then(() => {
+                    await RuleBasedService.createrule_based(rule).then(async () => {
                       if (d + 1 == sendata.length) {
-                        this.getdetail();
+                        await this.getdetail();
 
                         alert("บันทึกสำเร็จ");
                       }
@@ -701,11 +703,11 @@ return text
     },
     getdetail() {
       // var url = this.data.url.split("-i.");
-      var url = this.data.url.split("-i.");
-      this.data.url = url[0];
+      // var url = this.data.url.split("-i.");
+      // this.data.url = url[0];
       var selectpro = {
-        url: this.data.url,
-        // id: this.currentUser.id,
+        // url: this.data.url,
+        id: this.product_token,
       };
       MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
         console.log(res.data);
@@ -714,32 +716,33 @@ return text
         this.list = res.data;
         this.status = true;
         this.loading = false
-        var data = {
-          advertise_id: res.data.keyword[0].product_token_id,
-        };
-        MapRuleBasedService.updateweight(
-          res.data.keyword[0].map_rule_based_id,
-          data
-        ).then(() => {});
+        // var data = {
+        //   advertise_id: res.data.keyword[0].product_token_id,
+        // };
+        // MapRuleBasedService.updateweight(
+        //   res.data.keyword[0].map_rule_based_id,
+        //   data
+        // ).then(() => {});
         // this.list.keyword = [best]
         // this.status = true
       });
     },
     async search() {
       this.loading = true
-      var url = this.data.url.replaceAll(".",'');
-      url = url.split("-i");
-      this.data.url = url[0];
-      console.log(this.data.url);
+      // var url = this.data.url.replaceAll(".",'');
+      // url = url.split("-i");
+      // this.data.url = url[0];
+      // console.log(this.data.url);
       this.procheck = {};
       this.product = [];
       this.product_token = 0;
       var con = {};
       await this.loaddict();
       this.status = false;
-      if (this.data.url == null || this.data.url == "") {
-        alert("กรุณากรอก URL");
-      } else if (this.data.content == null || this.data.content == "") {
+      // if (this.data.url == null || this.data.url == "") {
+      //   alert("กรุณากรอก URL");
+      // } else 
+      if (this.data.content == null || this.data.content == "") {
         alert("กรุณากรอกข้อความโฆษณา");
       } else {
         var content = "";
@@ -769,16 +772,16 @@ return text
 
         this.fda = await this.findfda(content);
         console.log(this.fda);
-        var selectpro = {
-          url: this.data.url,
-          // id: this.currentUser.id,
-        };
-        await MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
+        // var selectpro = {
+        //   url: this.data.url,
+        //   // id: this.currentUser.id,
+        // };
+        // await MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
           // console.log(res.data);
           // console.log(content);
-          if (res.data.id) {
-            this.product_token = res.data.id;
-          }
+          // if (res.data.id) {
+          //   this.product_token = res.data.id;
+          // }
           // console.log(this.product_token);
           // console.log(LinkService.getpythonlink()+'/worktokendesc?text=' + content);
           con = {
@@ -811,7 +814,7 @@ return text
                     await axios
                       .post(LinkService.getpythonlink() + "/checkkeyword", con)
                       .then(async (res) => {
-                        //console.log(res.data);
+                        console.log(res.data);
                         if (res.data.length > 0) {
                           for (let r = 0; r < res.data.length; r++) {
                             var sentencetoken = res.data[r].sentent.replaceAll(
@@ -841,16 +844,16 @@ return text
                                   };
                                   await MapRuleBasedService.getproductkeyword(
                                     getprotoken
-                                  ).then((pro) => {
+                                  ).then(async (pro) => {
                                     // console.log(pro.data);
-                                    this.tokendata(pro.data);
+                                   await this.tokendata(pro.data);
                                   });
                                 }
                               }
                             );
                           }
                         } else {
-                          this.getdetail();
+                          await this.getdetail();
                         }
                       });
                   }
@@ -920,7 +923,7 @@ return text
                 );
               }
             });
-        });
+        // });
       }
     },
     getMax(arr, prop) {
@@ -1001,9 +1004,9 @@ return text
                       await MapRuleBasedService.updaterulebased(
                         list.keyword[l].id,
                         rulebased
-                      ).then(() => {
+                      ).then(async () => {
                         if (l + 1 == list.keyword.length) {
-                          this.getdetail();
+                          await this.getdetail();
                         }
                       });
                     }
@@ -1019,7 +1022,7 @@ return text
           // }
         }
       } else {
-        this.getdetail();
+        await this.getdetail();
       }
     },
     compare(list) {
@@ -1081,7 +1084,7 @@ return text
       // console.log(matches[0]);
       return findfda;
     },
-    checkfda(content, id) {
+    async checkfda(content, id) {
       console.log(this.fda);
       if (this.fda) {
         var fda = this.fda;
@@ -1098,9 +1101,9 @@ return text
           body: JSON.stringify(data),
         };
 
-        fetch(url, options)
+        await fetch(url, options)
           .then((response) => response.json())
-          .then((data) => {
+          .then(async (data) => {
             if (data.message) {
               this.product.push({
                 name: "-",
@@ -1150,7 +1153,7 @@ return text
                 typepro: data.typepro,
                 content: content,
               };
-              axios
+              await axios
                 .post(LinkService.getpythonlink() + "/checkfda", con)
                 .then(async (res) => {
                   // console.log(res.data);
@@ -1163,7 +1166,7 @@ return text
                     name_status: res.data.mapnamestatus,
                   };
                   // console.log(pro);
-                  MapRuleBasedService.updatemap(id, pro).then(() => {
+                  await MapRuleBasedService.updatemap(id, pro).then(() => {
                     // console.log(res.data);
                     this.product.push({
                       name: data.productha + " " + data.produceng,
