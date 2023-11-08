@@ -186,9 +186,9 @@
                   </div>
                 </td>
                 <td>
-                  <span v-if="k.answer == 1">เกินจริง</span
-                  ><span v-if="k.answer == 9">ไม่เกินจริง</span
-                  ><span v-if="k.answer == 0"></span>
+                  <span v-if="answer == 1">เกินจริง</span
+                  ><span v-if="answer == 9">ไม่เกินจริง</span
+                  ><span v-if="answer == 0"></span>
                 </td>
 
                 <td>
@@ -379,6 +379,7 @@ export default {
       fda: "",
       product: [],
       procheck: [],
+      answer:''
     };
   },
   computed: {
@@ -406,10 +407,17 @@ return text
       this.status = false;
     },
     cut(data) {
-      data = data.filter((letter) => letter !== " ");
-      var mapname = data.toString();
+      // console.log(data);
+      var mapname = ''
+      if (data != '-' && data != '') {
+        data = data.filter((letter) => letter !== " ");
+      mapname = data.toString();
 
       mapname = mapname.replaceAll(",", " | ");
+      }else{
+        mapname = data
+      }
+      
       return mapname;
     },
     save() {
@@ -517,6 +525,7 @@ return text
       }
     },
     async savetorule_based(data, answer) {
+      this.answer = answer
       // console.log(sen.length);
       // console.log('answer',answer);
       // console.log(data);
@@ -705,12 +714,13 @@ return text
       // var url = this.data.url.split("-i.");
       // var url = this.data.url.split("-i.");
       // this.data.url = url[0];
+      // console.log(this.product_token);
       var selectpro = {
         // url: this.data.url,
         id: this.product_token,
       };
       MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-        console.log(res.data);
+        // console.log(res.data);
         // var best = this.getMax(res.data.keyword,'count_rulebased')
         //console.log(best);
         this.list = res.data;
@@ -798,11 +808,11 @@ return text
                 keyword_id: res.data.keywordId,
                 status: 1,
               };
-              console.log(des);
+              // console.log(des);
               if (this.product_token == 0) {
                 await MapRuleBasedService.createproduct_token(des).then(
                   async (producttoken) => {
-                    console.log(producttoken);
+                    // console.log(producttoken);
                     this.product_token = producttoken.data.id;
                     await this.checkfda(content, this.product_token);
                     // console.log(producttoken);
@@ -814,7 +824,7 @@ return text
                     await axios
                       .post(LinkService.getpythonlink() + "/checkkeyword", con)
                       .then(async (res) => {
-                        console.log(res.data);
+                        // console.log(res.data);
                         if (res.data.length > 0) {
                           for (let r = 0; r < res.data.length; r++) {
                             var sentencetoken = res.data[r].sentent.replaceAll(
@@ -977,10 +987,10 @@ return text
                 id: list.keyword[l].id,
                 sentence: bestdata,
               };
-              console.log(best);
+              // console.log(best);
               var rule_based_name = bestdata.name.toString();
               rule_based_name = rule_based_name.replaceAll(",", "");
-              console.log(rule_based_name);
+              // console.log(rule_based_name);
               await axios
                 .get(
                   LinkService.getpythonlink() +
@@ -990,7 +1000,7 @@ return text
                 .then(async () => {
                   await MapRuleBasedService.getbestrulebased(best).then(
                     async (res) => {
-                      console.log(res.data);
+                      // console.log(res.data);
 
                       var rulebased = {
                         count_rulebased: res.data.count,
@@ -999,7 +1009,7 @@ return text
                         rule_based_name: res.data.rule_based_name,
                         map_rule_based_id: res.data.map_id,
                       };
-                      console.log(rulebased);
+                      // console.log(rulebased);
                       // console.log(list.keyword[l].id);
                       await MapRuleBasedService.updaterulebased(
                         list.keyword[l].id,
@@ -1118,7 +1128,7 @@ return text
                 Addr: "-",
                 Newcode: "-",
                 status: "-",
-                token: "",
+                token: "-",
               });
               this.procheck = {
                 fda: this.fda,
@@ -1145,7 +1155,7 @@ return text
               } else {
                 product_status = 3;
               }
-              console.log(this.colorfda);
+              // console.log(this.colorfda);
               var con = {
                 fda: fda,
                 productha: data.productha,
