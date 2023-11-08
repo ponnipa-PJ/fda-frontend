@@ -212,6 +212,19 @@
             <td :style="colorkey" v-else>
               <tr>
                 ไม่พบข้อความโฆษณาเกินจริง
+                <br /><br />
+                  <div style="text-align: left">
+                    <button
+                      data-bs-toggle="modal"
+                      data-bs-target="#AddScopusToken"
+                      type="submit"
+                      class="mb-3 btn btn-success"
+                    >
+                      <i class="fa fa-plus" aria-hidden="true">
+                        เพิ่ม keyword</i
+                      >
+                    </button>
+                  </div>
               </tr>
             </td>
           </tr>
@@ -1114,7 +1127,8 @@ return text
         await fetch(url, options)
           .then((response) => response.json())
           .then(async (data) => {
-            if (data.message) {
+            // console.log(data);
+            if (data.message || data.length > 1) {
               this.product.push({
                 name: "-",
                 detail: content,
