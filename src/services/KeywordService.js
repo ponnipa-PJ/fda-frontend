@@ -10,6 +10,9 @@ class KeywordService {
   updatedictid(id,data) {
     return http.put(`/keywords/updatedictid/${id}`, data);
   }
+  updateweight(id,data) {
+    return http.put(`/keywords/updateweight/${id}`, data);
+  }
   getkeywords(status) {
     return http.get('/keyword_dicts?name='+status);
   }

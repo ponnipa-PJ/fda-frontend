@@ -82,17 +82,18 @@
             </th>
           </tr>
         </thead>
+        <!-- {{procheck}} -->
         <tbody>
-          <tr>
+          <tr v-for="(p,o) in procheck" :key="o">
             <td :style="colorfda">เลขที่อนุญาต</td>
-            <td :style="colorfda">{{ procheck.mapfda }}</td>
-            <td :style="colorfda">{{ procheck.fda }}</td>
-            <td :style="colorfda">{{ procheck.cncnm }}</td>
+            <td :style="colorfda">{{ p.mapfda }}</td>
+            <td :style="colorfda">{{ p.fda }}</td>
+            <td :style="colorfda">{{ p.cncnm }}</td>
             <td
               v-if="
-                procheck.cat_status &&
-                procheck.name_status &&
-                procheck.fda_status == 1
+                p.cat_status &&
+                p.name_status &&
+                p.fda_status == 1
               "
               rowspan="3"
               style="
@@ -115,26 +116,26 @@
               <span>ไม่ผ่าน</span>
             </td>
           </tr>
-          <tr>
+          <tr v-for="(pp,oo) in procheck" :key="oo+10">
             <td :style="colorcat">ประเภทผลิตภัณฑ์</td>
-            <td :style="colorcat">{{ procheck.typepro }}</td>
+            <td :style="colorcat">{{ pp.typepro }}</td>
             <td :style="colorcat">
-              <span v-if="procheck.typepro">{{ procheck.type }}</span
+              <span v-if="pp.typepro">{{ pp.type }}</span
               ><span v-else>-</span>
             </td>
             <td :style="colorcat">
-              <span v-if="procheck.cat_status">ผ่าน</span
+              <span v-if="pp.cat_status">ผ่าน</span
               ><span v-else>ไม่ผ่าน</span>
             </td>
           </tr>
-          <tr>
+          <tr v-for="(ppp,ooo) in procheck" :key="ooo+20">
             <td :style="colorname">ชื่อผลิตภัณฑ์</td>
             <td :style="colorname">
-              {{ procheck.productha }}<br />{{ procheck.produceng }}
+              {{ ppp.productha }}<br />{{ ppp.produceng }}
             </td>
-            <td :style="colorname"><span v-html="procheck.name"></span></td>
+            <td :style="colorname"><span v-html="ppp.name"></span></td>
             <td :style="colorname">
-              <span v-if="procheck.name_status">ผ่าน</span
+              <span v-if="ppp.name_status">ผ่าน</span
               ><span v-else>ไม่ผ่าน</span>
             </td>
           </tr>
@@ -164,11 +165,13 @@
               <tr v-for="(k, i) in list.keyword" :key="i">
                 <td>
                   <span v-html="k.sentence_rulebase"></span><br /><br />
-                  <span v-for="(s, idx) in k.rule_based_name" :key="idx">{{
+                  <span v-html="getsentent(k.rule_based_name)"></span>
+                  <!-- <span v-for="(s, idx) in k.rule_based_name" :key="idx">{{
                     s
-                  }}</span>
+                  }}</span> -->
                   <br /><br />
-                  <span>{{getstatuscheck(k.statustrue,k.statusfalse)}}</span>
+                  <!-- <span>{{getstatuscheck(k.statustrue,k.statusfalse)}}</span> -->
+                  <span>ตรงกฎ</span>
                   <span v-if="k.count_rulebased"
                     > {{ getpercentage(k) }}%</span
                   ><br /><br />
@@ -186,9 +189,12 @@
                   </div>
                 </td>
                 <td>
-                  <span v-if="answer == 1">เกินจริง</span
+                  <span>{{getstatuscheck(k.statustrue,k.statusfalse)}}</span
+                  >
+                  
+                  <!-- <span v-if="answer == 1">เกินจริง</span
                   ><span v-if="answer == 9">ไม่เกินจริง</span
-                  ><span v-if="answer == 0"></span>
+                  ><span v-if="answer == 0"></span> -->
                 </td>
 
                 <td>
@@ -401,8 +407,23 @@ export default {
     },
   },
   methods: {
+    getsentent(data){
+      data = JSON.parse(data)
+      // var text = ''
+      var arr =[]
+      for (let d = 0; d < data.length; d++) {
+        // text += data[d]
+        arr.push(data[d])
+      }
+      // console.log(arr);
+      // var arrtxt = String(arr)
+      // console.log(arrtxt);
+      // arrtxt = arrtxt.replaceAll(",","<span style='color:red;'> | </span>")
+      // console.log(arrtxt);
+return arr
+    },
     getstatuscheck(t,f){
-      console.log(t,f);
+      // console.log(t,f);
       var text = ''
 if (t == f) {
   text = 'เกินจริง'
@@ -416,7 +437,7 @@ return text
     clear() {
       this.data = {};
       this.product = [];
-      this.procheck = {};
+      this.procheck = [];
       this.status = false;
     },
     cut(data) {
@@ -542,7 +563,9 @@ return text
       // console.log(sen.length);
       // console.log('answer',answer);
       // console.log(data);
-
+      var datas = {
+        name :data.rule_based_id
+      }
       
       // if (!data.mapId) {
         await MapRuleBasedService.checkintb(data.dict_id).then(async (check) => {
@@ -574,8 +597,12 @@ return text
             await MapRuleBasedService.updateanswer(check.data.id, maprule).then(
           async () => {
             // console.log(res.data);
+           
+     await KeywordService.updateweight(1,datas).then(async (res)=>{
+            console.log(res);
             await this.getdetail();
             alert("บันทึกสำเร็จ");
+          })
           }
         );
           } else {
@@ -588,7 +615,8 @@ return text
                 // console.log(dict_name);
                 for (let d = 0; d < sendata.length; d++) {
                   // console.log(sendata[d]);
-                  await DictService.getdict(sendata[d]).then(async (sen) => {
+                  if (sendata[d]) {
+                    await DictService.getdict(sendata[d]).then(async (sen) => {
                     // console.log(sen.data);
                     var rule = {
                       map_rule_based_id: map_id,
@@ -599,18 +627,24 @@ return text
                     // console.log(rule);
                     await RuleBasedService.createrule_based(rule).then(async () => {
                       if (d + 1 == sendata.length) {
-                        await this.getdetail();
-
-                        alert("บันทึกสำเร็จ");
+                        await KeywordService.updateweight(1,datas).then(async (res)=>{
+            console.log(res);
+            await this.getdetail();
+            alert("บันทึกสำเร็จ");
+          })
                       }
                     });
                   });
+                  }
                 }
               }
             );
           }
+          
+          
         });
-      // } else {
+     
+        // } else {
       //   MapRuleBasedService.deletemap_rule_based(data.mapId, maprule).then(
       //     async () => {
       //       // console.log(res.data);
@@ -756,7 +790,7 @@ return text
       // url = url.split("-i");
       // this.data.url = url[0];
       // console.log(this.data.url);
-      this.procheck = {};
+      this.procheck = [];
       this.product = [];
       this.product_token = 0;
       var con = {};
@@ -793,7 +827,8 @@ return text
           " "
         );
 
-        this.fda = await this.findfda(content);
+        // this.fda = await this.findfda(content);
+        this.fda = await this.getfda(content)[0]
         console.log(this.fda);
         // var selectpro = {
         //   url: this.data.url,
@@ -813,6 +848,7 @@ return text
           await axios
             .post(LinkService.getpythonlink() + "/wordtokendesc", con)
             .then(async (res) => {
+              // console.log(res.data);
               // var sentence = res.data.sentent.replaceAll("<spanstyle", "<span style");
               var des = {
                 url: this.data.url,
@@ -1087,7 +1123,7 @@ return text
       return indexes;
     },
     findfda(data) {
-      var text = ["หมายเลขใบอนุญาต/อย."];
+      var text = ["หมายเลขใบอนุญาต/อย.","อย."];
       // var end = ['']
       var findfda = data;
       for (let t = 0; t < text.length; t++) {
@@ -1097,7 +1133,10 @@ return text
       }
       // console.log(findfda);
 
-      findfda = findfda.replaceAll("หมายเลขใบอนุญาต/อย.", "");
+      for (let v = 0; v < text.length; v++) {
+      findfda = findfda.replaceAll(text[v], "");
+      }
+      findfda = findfda.replaceAll(/[^\d.-]/g, '');
       findfda = findfda.replaceAll("-", "");
       findfda = findfda.replaceAll("–", "");
       findfda = findfda.replaceAll(" ", "");
@@ -1108,7 +1147,7 @@ return text
       return findfda;
     },
     async checkfda(content, id) {
-      console.log(this.fda);
+      // console.log(this.fda);
       if (this.fda) {
         var fda = this.fda;
         var product_status = 0;
@@ -1144,7 +1183,7 @@ return text
                 status: "-",
                 token: "-",
               });
-              this.procheck = {
+              this.procheck.push({
                 fda: this.fda,
                 mapfda: "-",
                 cncnm: "-",
@@ -1157,7 +1196,7 @@ return text
                 name_status: 0,
                 typepro: "-",
                 type: "-",
-              };
+              });
 
               // this.status = true
             } else {
@@ -1207,7 +1246,7 @@ return text
                       status: product_status,
                       token: res.data.token,
                     });
-                    this.procheck = {
+                    this.procheck.push({
                       fda: fda,
                       mapfda: data.lcnno,
                       cncnm: data.cncnm,
@@ -1220,7 +1259,7 @@ return text
                       name_status: res.data.mapnamestatus,
                       typepro: data.typepro,
                       type: res.data.category,
-                    };
+                    });
                     this.colorcat = res.data.colorcat;
                     this.colorname = res.data.colorname;
                     // console.log(this.product);
@@ -1248,7 +1287,7 @@ return text
           status: "-",
           token: "",
         });
-        this.procheck = {
+        this.procheck.push({
           fda: this.fda,
           mapfda: "-",
           cncnm: "-",
@@ -1261,13 +1300,49 @@ return text
           name_status: 0,
           typepro: "-",
           type: "-",
-        };
+        });
 
         // this.status = true
       }
     },
+    getfda(content){
+        var tt = content.split(' ')
+
+    // console.log(tt);
+    var arr = []
+    for (let l = 0; l < tt.length; l++) {
+      var findfda = tt[l].replaceAll('-', '');
+      findfda = findfda.replaceAll("–", "");
+      findfda = findfda.replaceAll(".", "");
+    findfda = findfda.replaceAll(/[^\d.-]/g, '');
+    // console.log(findfda);
+    if (findfda) {
+      if (findfda.length == 13) {
+      arr.push(findfda)
+      }
+    }
+      
+    }
+    console.log(arr);
+    return arr;
+    }
   },
   mounted() {
+    // var f = this.findfda('หมายเลขใบอนุญาต/อย.เลขจดแจ้ง 13-1-1-7562-2-0006')
+    // var text = ["หมายเลขใบอนุญาต/อย.","อย."];
+    // var sen = 'อย.14-1-02662-2-0021 อย. 13-1-1-7562-2-0006'
+    // var l = sen.split(' ')
+    // console.log(l);
+    // var f = this.findfda(sen)
+    // var text = ["หมายเลขใบอนุญาต/อย.","อย."];
+    //   // var end = ['']
+    //   var findfda = sen;
+    //   for (let t = 0; t < text.length; t++) {
+    //     console.log(findfda.indexOf(text[t]));
+        
+    //     console.log(this.getAllIndexes(l,text[t]));
+    //   }
+    // console.log(f);
 //     var best = {
 //     "id": 67,
 //     "sentence": {
