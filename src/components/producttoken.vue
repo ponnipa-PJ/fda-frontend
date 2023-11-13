@@ -152,6 +152,7 @@
             </th>
             <th style="background-color: #ffb454; vertical-align: middle">
               ข้อความโฆษณาเกินจริง
+              
             </th>
           </tr>
           <tr>
@@ -161,7 +162,20 @@
             </td>
             <!-- <th :style="colorkey">ข้อความโฆษณา</th> -->
             <!-- {{list}} -->
+            
             <td :style="colorkey" v-if="list.keyword != 1">
+              <div style="text-align: right;">
+                    <button
+                      data-bs-toggle="modal"
+                      data-bs-target="#AddScopusToken"
+                      type="submit"
+                      class="mb-3 btn btn-success"
+                    >
+                      <i class="fa fa-plus" aria-hidden="true">
+                        เพิ่ม keyword</i
+                      >
+                    </button>
+                  </div>
               <tr v-for="(k, i) in list.keyword" :key="i">
                 <td>
                   <span v-html="k.sentence_rulebase"></span><br /><br />
@@ -175,7 +189,7 @@
                   <span v-if="k.count_rulebased"
                     > {{ getpercentage(k) }}%</span
                   ><br /><br />
-                  <div style="text-align: left">
+                  <!-- <div style="text-align: left">
                     <button
                       data-bs-toggle="modal"
                       data-bs-target="#AddScopusToken"
@@ -186,7 +200,7 @@
                         เพิ่ม keyword</i
                       >
                     </button>
-                  </div>
+                  </div> -->
                 </td>
                 <td>
                   <span>{{getstatuscheck(k.statustrue,k.statusfalse)}}</span
@@ -216,10 +230,7 @@
               </tr>
             </td>
             <td :style="colorkey" v-else>
-              <tr>
-                ไม่พบข้อความโฆษณาเกินจริง
-                <br /><br />
-                  <div style="text-align: left">
+              <div style="text-align: right;">
                     <button
                       data-bs-toggle="modal"
                       data-bs-target="#AddScopusToken"
@@ -231,6 +242,21 @@
                       >
                     </button>
                   </div>
+              <tr>
+                ไม่พบข้อความโฆษณาเกินจริง
+                <br /><br />
+                  <!-- <div style="text-align: left">
+                    <button
+                      data-bs-toggle="modal"
+                      data-bs-target="#AddScopusToken"
+                      type="submit"
+                      class="mb-3 btn btn-success"
+                    >
+                      <i class="fa fa-plus" aria-hidden="true">
+                        เพิ่ม keyword</i
+                      >
+                    </button>
+                  </div> -->
               </tr>
             </td>
           </tr>
