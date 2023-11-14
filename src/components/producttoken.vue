@@ -147,23 +147,11 @@
             <th style="background-color: #ffb454; vertical-align: middle">
               เงื่อนไขการตรวจสอบข้อที่ 2
             </th>
-            <th style="background-color: #ffb454; vertical-align: middle">
+            <th style="background-color: #ffb454; vertical-align: top">
               ข้อความโฆษณา
             </th>
             <th style="background-color: #ffb454; vertical-align: middle">
-              ข้อความโฆษณาเกินจริง
-              
-            </th>
-          </tr>
-          <tr>
-            <td :style="colorkey">รายละเอียดสินค้า</td>
-            <td :style="colorkey" style="width: 40%">
-              <span v-html="list.sentence_keyword"></span>
-            </td>
-            <!-- <th :style="colorkey">ข้อความโฆษณา</th> -->
-            <!-- {{list}} -->
-            
-            <td :style="colorkey" v-if="list.keyword != 1">
+              ข้อความโฆษณาเกินจริง<br>
               <div style="text-align: right;">
                     <button
                       data-bs-toggle="modal"
@@ -176,6 +164,18 @@
                       >
                     </button>
                   </div>
+            </th>
+          </tr>
+          <tr>
+            <td :style="colorkey">รายละเอียดสินค้า</td>
+            <td :style="colorkey" style="width: 40%">
+              <span v-html="list.sentence_keyword"></span>
+            </td>
+            <!-- <th :style="colorkey">ข้อความโฆษณา</th> -->
+            <!-- {{list}} -->
+            
+            <td :style="colorkey" v-if="list.keyword != 1">
+             
               <tr v-for="(k, i) in list.keyword" :key="i">
                 <td>
                   <span v-html="k.sentence_rulebase"></span><br /><br />
@@ -230,7 +230,7 @@
               </tr>
             </td>
             <td :style="colorkey" v-else>
-              <div style="text-align: right;">
+              <!-- <div style="text-align: right;">
                     <button
                       data-bs-toggle="modal"
                       data-bs-target="#AddScopusToken"
@@ -241,7 +241,7 @@
                         เพิ่ม keyword</i
                       >
                     </button>
-                  </div>
+                  </div> -->
               <tr>
                 ไม่พบข้อความโฆษณาเกินจริง
                 <br /><br />
@@ -379,6 +379,7 @@ import LinkService from "../services/LinkService";
 import AdvertiseService from "../services/AdvertiseService";
 import KeywordService from "../services/KeywordService";
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
+import FDATypesService from "../services/FDATypesService";
 
 export default {
   name: "App",
@@ -424,7 +425,8 @@ export default {
       fda: "",
       product: [],
       procheck: [],
-      answer:''
+      answer:'',
+      typeId:0
     };
   },
   computed: {
@@ -442,11 +444,11 @@ export default {
         arr.push(data[d])
       }
       // console.log(arr);
-      // var arrtxt = String(arr)
+      var arrtxt = String(arr)
       // console.log(arrtxt);
-      // arrtxt = arrtxt.replaceAll(",","<span style='color:red;'> | </span>")
+      arrtxt = arrtxt.replaceAll(",","<span style='color:red;'> | </span>")
       // console.log(arrtxt);
-return arr
+return arrtxt
     },
     getstatuscheck(t,f){
       // console.log(t,f);
@@ -590,7 +592,9 @@ return text
       // console.log('answer',answer);
       // console.log(data);
       var datas = {
-        name :data.rule_based_id
+        name :data.rule_based_id,
+        typeId:this.typeId,
+        advertiseId:data.id
       }
       
       // if (!data.mapId) {
@@ -598,10 +602,13 @@ return text
           // console.log(check.data);
           var statusfalse = 0
           var statustrue = 0
+          var weight = 0
+          var advertise_id = []
           if (check.data) {
-            
+            advertise_id = JSON.parse(check.data.map_advertise)
           statusfalse = check.data.statusfalse
           statustrue = check.data.statustrue
+          datas.rulebasedId = check.data.id
           }
           if (answer == 1) {
             statustrue = statustrue+ parseInt(1)
@@ -609,23 +616,29 @@ return text
           if (answer == 9) {
             statusfalse = statusfalse + parseInt(1)
           }
+          // console.log(advertise_id);
+          advertise_id.push(data.id)
+          // console.log(advertise_id);
+          weight = statusfalse+statustrue
           var maprule = {
         keyword_id: 1,
-        advertise_id: this.product_token,
-        status: 1,
+        advertise_id: data.id,
+        status: 9,
         answer: answer,
         user: this.currentUser.id,
         map_dict: JSON.parse(data.dict_id),
         statusfalse:statusfalse,
         statustrue:statustrue,
+        weight:weight,
+        map_advertise: advertise_id,
       };
           if (check.data) {
             await MapRuleBasedService.updateanswer(check.data.id, maprule).then(
           async () => {
             // console.log(res.data);
            
-     await KeywordService.updateweight(1,datas).then(async (res)=>{
-            console.log(res);
+     await KeywordService.updateweight(1,datas).then(async ()=>{
+            // console.log(res);
             await this.getdetail();
             alert("บันทึกสำเร็จ");
           })
@@ -636,6 +649,7 @@ return text
               async (res) => {
                 // console.log(res.data);
                 var map_id = res.data.id;
+                datas.rulebasedId = map_id
                 var sendata = JSON.parse(data.dict_id);
                 // console.log(sendata);
                 // console.log(dict_name);
@@ -765,9 +779,55 @@ return text
       //         }
       //       });
     },
+    find(){
+var type = this.findtypeproduct(this.data.content)
+console.log(type);
+var split = type.split("\n")
+console.log(split[3]);
+      var content = "";
+        content = this.data.content.replaceAll(
+          /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g,
+          ""
+        );
+        content = content.replaceAll(
+          /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g,
+          " "
+        );
+
+        content = content.replaceAll(/\ud83d[\ude00-\ude4f]/g, " ");
+        content = content.replaceAll(/(\r\n|\n|\r)/gm, " ");
+        content = content.replaceAll("_", "");
+        content = content.replaceAll("!", "");
+        content = content.replaceAll("*", "");
+        content = content.replaceAll("&", "");
+        content = content.replaceAll("#", "");
+        content = content.replaceAll("•", "");
+        content = content.replaceAll("+", "");
+        content = content.replaceAll(`_/l\_`, ""); // eslint-disable-line
+        content = content.replaceAll(
+          /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+          " "
+        );
+console.log(this.finddescription(content));
+    },
+    findtypeproduct(data) {
+      // console.log(data);
+      var text = ["หมวดหมู่"];
+      var findfda = data;
+      for (let t = 0; t < text.length; t++) {
+        if (findfda.indexOf(text[t]) != -1) {
+          findfda = findfda.substring(findfda.indexOf(text[t]));
+        }
+      }
+      // if (findfda == 'อาหาร') {
+      //   findfda = findfda+ findfda+'เสริม'
+      // }
+      // console.log(findfda);
+      return findfda;
+    },
     finddescription(data) {
       // console.log(data);
-      var text = ["รายละเอียด"];
+      var text = ["รายละเอียดสินค้า"];
       var findfda = data;
       for (let t = 0; t < text.length; t++) {
         if (findfda.indexOf(text[t]) != -1) {
@@ -828,6 +888,26 @@ return text
       if (this.data.content == null || this.data.content == "") {
         alert("กรุณากรอกข้อความโฆษณา");
       } else {
+
+        var findtype = this.findtypeproduct(this.data.content)
+// console.log(type);
+var split = findtype.split("\n")
+var type = split[3]
+// console.log(type);
+await FDATypesService.getfdatypes(type).then(async (res)=>{
+  // console.log(res.data);
+  if (res.data.length > 0) {
+    this.typeId = res.data[0].id
+  }else{
+    var name = {
+      name : type
+    }
+    await FDATypesService.createfdatype(name).then((res)=>{
+      this.typeId = res.data.id
+    });
+  }
+})
+// console.log(this.typeId);
         var content = "";
         content = this.data.content.replaceAll(
           /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g,
@@ -854,6 +934,8 @@ return text
         );
 
         // this.fda = await this.findfda(content);
+
+var desc = this.finddescription(content)
         this.fda = await this.getfda(content)[0]
         console.log(this.fda);
         // var selectpro = {
@@ -869,7 +951,7 @@ return text
           // console.log(this.product_token);
           // console.log(LinkService.getpythonlink()+'/worktokendesc?text=' + content);
           con = {
-            content: content,
+            content: desc,
           };
           await axios
             .post(LinkService.getpythonlink() + "/wordtokendesc", con)
@@ -878,7 +960,7 @@ return text
               // var sentence = res.data.sentent.replaceAll("<spanstyle", "<span style");
               var des = {
                 url: this.data.url,
-                sentence: content,
+                sentence: desc,
                 sentence_keyword: res.data.sentent,
                 keyword_id: res.data.keywordId,
                 status: 1,
@@ -893,7 +975,7 @@ return text
                     // console.log(producttoken);
                     this.product_token = producttoken.data.id;
                     con = {
-                      content: content,
+                      content: desc,
                     };
                     //console.log(con);
                     await axios
@@ -954,7 +1036,7 @@ return text
                       // console.log(del);
                       await this.checkfda(content, this.product_token);
                       con = {
-                        content: content,
+                        content: desc,
                       };
                       //console.log(con);
                       axios
