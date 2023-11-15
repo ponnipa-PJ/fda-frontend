@@ -463,10 +463,11 @@ if (t == f) {
 return text
     },
     clear() {
-      this.data = {};
+      this.data = [];
       this.product = [];
       this.procheck = [];
-      this.status = false;
+      this.loading = false;
+      this.status = false
     },
     cut(data) {
       // console.log(data);
@@ -871,17 +872,17 @@ console.log(this.finddescription(content));
       });
     },
     async search() {
-      this.loading = true
       // var url = this.data.url.replaceAll(".",'');
       // url = url.split("-i");
       // this.data.url = url[0];
       // console.log(this.data.url);
-      this.procheck = [];
       this.product = [];
+      this.procheck = [];
+      this.loading = false;
+      this.status = false
       this.product_token = 0;
       var con = {};
       await this.loaddict();
-      this.status = false;
       // if (this.data.url == null || this.data.url == "") {
       //   alert("กรุณากรอก URL");
       // } else 
@@ -889,6 +890,7 @@ console.log(this.finddescription(content));
         alert("กรุณากรอกข้อความโฆษณา");
       } else {
 
+        this.loading = true
         var findtype = this.findtypeproduct(this.data.content)
 // console.log(type);
 var split = findtype.split("\n")

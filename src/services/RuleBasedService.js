@@ -10,6 +10,12 @@ class RuleBasedService {
   getrule_based(id) {
     return http.get('/rule_based/'+id);
   }
+  getweightrulebasemax() {
+    return http.get('/rule_based/getweightrulebasemax');
+  }
+  getweightkeywordmax() {
+    return http.get('/rule_based/getweightkeywordmax');
+  }
   getbydict(id) {
     return http.get('/rule_based/getbydict?name='+id);
   }

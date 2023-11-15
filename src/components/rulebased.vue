@@ -278,7 +278,13 @@ export default {
     getcategory(){
       MapRuleBasedService.getallrulebased().then((res)=>{
         this.list = res.data
-        console.log(res.data);
+        RuleBasedService.getweightrulebasemax().then((res)=>{
+          console.log('rulebased',res.data.max);
+        })
+        RuleBasedService.getweightkeywordmax().then((res)=>{
+          console.log('keyword',res.data.max);
+        })
+        // console.log(res.data);
         // for (let l = 0; l < this.list.length; l++) {
           // this.updatetoken(this.list[l])
           // for (let t = 0; t < this.list[l].token.length; t++) {
