@@ -31,6 +31,9 @@ class KeywordService {
   deletekeyword(id) {
     return http.delete(`/keyword_dicts/${id}`);
   }
+  gettraining() {
+    return http.get('/keyword_dicts/gettraining');
+  }
 }
 
 export default new KeywordService();

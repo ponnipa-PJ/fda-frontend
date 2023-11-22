@@ -22,6 +22,7 @@ import check from './components/check.vue';
 import token from './components/token.vue';
 import producttoken from './components/producttoken.vue';
 import producttokenlink from './components/producttokenlink.vue';
+import trainingscores from './components/trainingscores.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -159,6 +160,12 @@ const router = new Router({
       alias: "/producttokenlink",
       name: "producttokenlink",
       component: producttokenlink
+    },
+    {
+      path: "/trainingscores",
+      alias: "/trainingscores",
+      name: "trainingscores",
+      component: trainingscores
     },
   ]
 });
