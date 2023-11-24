@@ -27,7 +27,7 @@
           ล้างข้อมูล
         </button>
       </div>
-      <table class="table table-bordered" v-if="status">
+      <table class="table table-bordered" v-if="statusprocheck">
         <thead>
           <tr>
             <th
@@ -141,7 +141,8 @@
           </tr>
         </tbody>
       </table>
-      <table class="table table-bordered mt-3 mb-5" v-if="status">
+      <div style="text-align:center" v-if="statusprocheckone && statuslist"><span> เงื่อนไขการตรวจสอบข้อที่ 1 ไม่สามารถตรวจสอบได้ เนื่องจาก {{prochecktext}}</span></div>
+      <table class="table table-bordered mt-3 mb-5" v-if="statuslist">
         <tbody>
           <tr>
             <th style="background-color: #ffb454; vertical-align: middle">
@@ -262,7 +263,7 @@
           </tr>
         </tbody>
       </table>
-      <table class="table mt-3" v-if="status">
+      <table class="table mt-3" v-if="statusproduct">
         <thead>
           <tr>
             <th scope="col">สินค้า</th>
@@ -388,6 +389,10 @@ export default {
   },
   data() {
     return {
+      statusprocheck:false,
+      statuslist:false,
+      statusproduct:false,
+      statusprocheckone:false,
       color: '#5bc0de',
       size: '50px',
       margin: '2px',
@@ -426,7 +431,8 @@ export default {
       product: [],
       procheck: [],
       answer:'',
-      typeId:0
+      typeId:0,
+      prochecktext:''
     };
   },
   computed: {
@@ -895,6 +901,7 @@ var con = {
         // var best = this.getMax(res.data.keyword,'count_rulebased')
         //console.log(best);
         this.list = res.data;
+        this.statuslist = true
         this.status = true;
         this.loading = false
         // var data = {
@@ -917,6 +924,9 @@ var con = {
       this.procheck = [];
       this.loading = false;
       this.status = false
+      this.statusprocheck = false
+      this.statusproduct = false
+      this.statuslist = false
       this.product_token = 0;
       var con = {};
       await this.loaddict();
@@ -998,7 +1008,7 @@ var desc = this.finddescription(content)
                   async (producttoken) => {
                     // console.log(producttoken);
                     this.product_token = producttoken.data.id;
-                    await this.checkfda(content, this.product_token);
+                    this.checkfda(content, this.product_token);
                     // console.log(producttoken);
                     this.product_token = producttoken.data.id;
                     con = {
@@ -1061,7 +1071,7 @@ var desc = this.finddescription(content)
                     ).then(async () => {
                       // await AdvertiseService.deleteadvertise(this.product_token).then(async ()=>{
                       // console.log(del);
-                      await this.checkfda(content, this.product_token);
+                      this.checkfda(content, this.product_token);
                       con = {
                         content: desc,
                       };
@@ -1332,7 +1342,7 @@ var desc = this.finddescription(content)
                 typepro: "-",
                 type: "-",
               });
-
+              this.statusprocheck = true
               // this.status = true
             } else {
               // console.log(data);
@@ -1395,6 +1405,7 @@ var desc = this.finddescription(content)
                       typepro: data.typepro,
                       type: res.data.category,
                     });
+                    this.statusprocheck = true
                     this.colorcat = res.data.colorcat;
                     this.colorname = res.data.colorname;
                     // console.log(this.product);
@@ -1405,6 +1416,10 @@ var desc = this.finddescription(content)
 
               // this.status = true
             }
+          }).catch(err=>{
+            console.log(err);
+            this.statusprocheckone = true
+            this.prochecktext = 'Api tawaiforhealth ไม่สามารถทำงานได้'
           });
       } else {
         this.product.push({
@@ -1422,6 +1437,7 @@ var desc = this.finddescription(content)
           status: "-",
           token: "",
         });
+        this.statusproduct = true
         this.procheck.push({
           fda: this.fda,
           mapfda: "-",
