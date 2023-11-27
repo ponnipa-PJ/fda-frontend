@@ -23,6 +23,10 @@ import token from './components/token.vue';
 import producttoken from './components/producttoken.vue';
 import producttokenlink from './components/producttokenlink.vue';
 import trainingscores from './components/trainingscores.vue';
+import addproducttoken from './components/addproducttoken.vue';
+import products from './components/products.vue';
+import product from './components/product.vue';
+import productcheck from './components/productcheck.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -166,6 +170,30 @@ const router = new Router({
       alias: "/trainingscores",
       name: "trainingscores",
       component: trainingscores
+    },
+    {
+      path: "/addproducttoken",
+      alias: "/addproducttoken",
+      name: "addproducttoken",
+      component: addproducttoken
+    },
+    {
+      path: "/products",
+      alias: "/products",
+      name: "products",
+      component: products
+    },
+    {
+      path: "/product/:id",
+      alias: "/product",
+      name: "product",
+      component: product
+    },
+    {
+      path: "/productcheck/:id",
+      alias: "/productcheck",
+      name: "productcheck",
+      component: productcheck
     },
   ]
 });
