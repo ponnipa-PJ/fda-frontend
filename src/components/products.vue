@@ -11,15 +11,27 @@
         <thead>
           <tr>
             <th scope="col" style="text-align:center">ลำดับของเว็บไซต์</th>
-            <!-- <th scope="col" style="width:10%">หมวดหมู่</th> -->
+            <th scope="col">ประเภทผลิตภัณฑ์</th>
+            <th scope="col">รายละเอียดสินค้า</th>
+            <th scope="col"></th>
+            
             <th scope="col" style="text-align:center">เข้าสู่ระบบการเทรน</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(l, i) in list" :key="i+1">
-            <td style="width:40%">{{ l.url }}</td>
-           
-          <td style="text-align:center"><a :href="'/product/'+l.id"> <button
+            <td style="width:20%">{{ l.url }}</td>
+            <td style="width:20%">{{ l.typename }}</td>
+            <td style="width:40%">{{ l.sentence }}</td>
+            <td style="width:5%">{{ l.rulename }}</td>
+          <td style="text-align:center"><a :href="'/addproducttoken?id='+l.id"> <button
+                type="button"
+                style="color:white;"
+                class="btn btn-warning"
+              >  <i class="fa fa-edit"></i>
+               </button
+            > </a>
+            &nbsp;<a :href="'/product/'+l.id"> <button
                 type="button"
                 style="background-color: #4472C4;color:white;"
                 class="btn"
@@ -250,6 +262,7 @@ export default {
     },
     getcategory(){
       ProductsService.getproductstoken().then((res)=>{
+        console.log(res.data);
         this.list = res.data
         
       })

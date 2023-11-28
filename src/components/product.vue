@@ -2,29 +2,34 @@
   <div class="container">
     <div class="row">
       <div v-if="status">
-        <div class="card mt-5">
+        <h5 class="mt-3">
+        {{detail.url}}</h5>
+        <div class="card">
   <div class="card-body">
     <h5 class="card-title">ข้อมูลจำเพาะของสินค้า</h5>
-    <p class="card-text">
-      {{detail.spec}}
-      <!-- <span v-for="(s,i) in detail.spec" :key="i">{{s}}<br/></span> -->
+    <p class="card-text" v-html="detail.spec">
     </p>
+
+      <!-- <span v-for="(s,i) in detail.spec" :key="i">{{s}}<br/></span> -->
   </div>
 </div>
-<div class="card mt-5">
+<div class="card mt-3">
   <div class="card-body">
     <h5 class="card-title">รายละเอียดสินค้า</h5>
-    <p class="card-text">{{detail.desc }}</p>
+    <p class="card-text" v-html="detail.desc"></p>
   </div>
 </div>
-<div style="text-align:center" class="mt-3">
+<!-- <div style="text-align:center" class="mt-3">
 <a :href="'/productcheck/'+id"> <button type="submit" class="mb-3 btn btn-success">
           Train และเพิ่ม keyword ที่ผิดกฎหมาย</button
         ></a>&nbsp;
         <a href="/products"><button type="submit" class="mb-3 btn btn-danger">
           ล้างข้อมูล
         </button></a>
-      </div>
+      </div> -->
+      <div>
+      <clip-loader :loading="loading" :color="color" :size="size"></clip-loader>
+    </div>
       <div class="row">
       <table class="table table-bordered mt-5" v-if="statusprocheck">
         <thead>
@@ -185,6 +190,7 @@
                   }}</span> -->
                   <br /><br />
                   <!-- <span>{{getstatuscheck(k.statustrue,k.statusfalse)}}</span> -->
+                  <span>{{getstatuscheck(k.statustrue,k.statusfalse)}}</span>
                   <span>ตรงกฎ</span>
                   <span v-if="k.count_rulebased"
                     > {{ getpercentage(k) }}%</span
@@ -203,12 +209,12 @@
                   </div> -->
                 </td>
                 <td>
-                  <span>{{getstatuscheck(k.statustrue,k.statusfalse)}}</span
-                  >
                   
-                  <!-- <span v-if="answer == 1">เกินจริง</span
-                  ><span v-if="answer == 9">ไม่เกินจริง</span
-                  ><span v-if="answer == 0"></span> -->
+                  <!-- <span>{{getstatuscheck(k.statustrue,k.statusfalse)}}</span> -->
+                  
+                  <span v-if="k.answer == 1">เกินจริง</span
+                  ><span v-if="k.answer == 9">ไม่เกินจริง</span
+                  ><span v-if="k.answer == 0"></span>
                 </td>
 
                 <td>
@@ -320,7 +326,17 @@
           </tr>
         </tbody>
       </table>
-      <clip-loader :loading="loading" :color="color" :size="size"></clip-loader>
+      <div class="row" v-if="id">
+      <div class="col-md-6">
+        <a :href="'/product/'+back"> <button type="submit" class="mb-3 btn btn-info" v-if="id !=1">
+          <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            </button></a>
+      </div>
+      <div class="col-md-6" style="text-align: right;" v-if="id < alldata.length">
+        <a :href="'/product/'+next"><button type="submit" class="mb-3 btn btn-info" >
+              <i class="fa fa-arrow-right" aria-hidden="true"></i>
+            </button></a></div>
+    </div>
       <!-- Modal -->
       <div
         class="modal fade"
@@ -383,6 +399,7 @@ import KeywordService from "../services/KeywordService";
 import FDATypesService from "../services/FDATypesService";
 import ProductsService from "../services/ProductsService";
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
+import MapRuleBasedUserService from "../services/MapRuleBasedUserService";
 
 export default {
   name: "App",
@@ -399,7 +416,7 @@ export default {
       size: '50px',
       margin: '2px',
       radius: '2px',
-      loading:false,
+      loading:true,
       list: [],
       url: "",
       file: "",
@@ -642,23 +659,46 @@ return text
         weight:weight,
         map_advertise: advertise_id,
       };
+      var mapruleuser = {
+        advertiseId: data.id,
+        map_rule_basedId: check.data.id,
+        answer: answer,
+        userId: this.currentUser.id,
+      };
           if (check.data) {
-            await MapRuleBasedService.updateanswer(check.data.id, maprule).then(
+            if (data.map_rule_based_userId) {
+  MapRuleBasedUserService.updatemap_rule_based_user(data.map_rule_based_userId,mapruleuser).then(
           async () => {
-            // console.log(res.data);
+            // await this.getdetail();
+            // alert("บันทึกสำเร็จ");
+          });
+}else{
+  MapRuleBasedUserService.createmap_rule_based_user(mapruleuser).then(
+          async () => {
            
+          });
+}
+await MapRuleBasedService.updateanswer(check.data.id, maprule).then(
+          async () => {
      await KeywordService.updateweight(1,datas).then(async ()=>{
             // console.log(res);
             await this.getdetail();
             alert("บันทึกสำเร็จ");
           })
-          }
-        );
+        });
           } else {
             MapRuleBasedService.createmap_rule_based(maprule).then(
               async (res) => {
                 // console.log(res.data);
                 var map_id = res.data.id;
+                var mapruleusercreate = {
+        advertiseId: data.id,
+        map_rule_basedId: map_id,
+        answer: answer,
+        userId: this.currentUser.id,
+      };
+                MapRuleBasedUserService.createmap_rule_based_user(mapruleusercreate).then(
+          async () => {
                 datas.rulebasedId = map_id
                 var sendata = JSON.parse(data.dict_id);
                 // console.log(sendata);
@@ -683,11 +723,15 @@ return text
             alert("บันทึกสำเร็จ");
           })
                       }
+                      
                     });
                   });
+                  
                   }
                 }
+              });
               }
+            
             );
           }
           
@@ -949,15 +993,16 @@ var con = {
       var selectpro = {
         // url: this.data.url,
         id: this.id,
+        fda_status: this.currentUser.id
       };
       MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-        // console.log(res.data);
+        console.log(res.data);
         // var best = this.getMax(res.data.keyword,'count_rulebased')
         //console.log(best);
         this.list = res.data;
         this.statuslist = true
         this.status = true;
-        this.loading = false
+        // this.loading = false
         // var data = {
         //   advertise_id: res.data.keyword[0].product_token_id,
         // };
@@ -1509,6 +1554,7 @@ var desc = this.finddescription(content)
 
         // this.status = true
       }
+      this.loading = false
     },
     getfda(content){
         var tt = content.split(' ')
@@ -1535,16 +1581,24 @@ var desc = this.finddescription(content)
   mounted() {
     // console.log(this.$route.params.id);
     this.id = this.$route.params.id
+
+    ProductsService.getproductstoken().then(async (res)=>{
+      this.alldata = res.data
+      this.back = parseInt(this.id)-1
+    this.next = parseInt(this.id)+1
+    })
     ProductsService.getproducttoken(this.id).then(async (res)=>{
-      // console.log(res.data);
+      console.log(res.data);
+
+      this.detail = res.data
       // var spec = this.findspecific(res.data.sentencefull)
       // this.detail.spec = this.findspecificlist(spec)
-      this.detail.spec = this.findspecific(res.data.sentencefull)
-      this.detail.desc = this.finddescription(res.data.sentence)
-// console.log(res.data);
+      this.detail.spec = await this.findspecific(res.data.sentencefull)
+      this.detail.desc = await this.finddescription(res.data.sentencefull)
       this.fda = res.data.fda
-    await this.checkfda(res.data.sentence, this.id);
     await this.getdetail()
+    await this.checkfda(res.data.sentence, this.id);
+
     })
     // var f = this.findfda('หมายเลขใบอนุญาต/อย.เลขจดแจ้ง 13-1-1-7562-2-0006')
     // var text = ["หมายเลขใบอนุญาต/อย.","อย."];

@@ -27,6 +27,7 @@ import addproducttoken from './components/addproducttoken.vue';
 import products from './components/products.vue';
 import product from './components/product.vue';
 import productcheck from './components/productcheck.vue';
+import typesproduct from './components/typesproduct.vue';
 
 Vue.use(Router);
 const router = new Router({
@@ -194,6 +195,12 @@ const router = new Router({
       alias: "/productcheck",
       name: "productcheck",
       component: productcheck
+    },
+    {
+      path: "/typesproduct",
+      alias: "/typesproduct",
+      name: "typesproduct",
+      component: typesproduct
     },
   ]
 });

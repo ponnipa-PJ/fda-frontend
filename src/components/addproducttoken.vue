@@ -3,21 +3,28 @@
     <div class="row">
       <div>
         <div class="form-group mt-5">
-          <label for="exampleFormControlTextarea1">URL</label>
+          <label for="exampleFormControlTextarea1">ลำดับของเว็บไซต์</label>
           <input
           v-model="data.url"
                       type="text"
                       class="form-control form-control-sm"
                     />
-          <!-- <textarea
-            v-model="data.url"
-            class="form-control"
-            id="exampleFormControlTextarea1"
-            rows="3"
-          ></textarea> -->
+                    <label for="exampleFormControlTextarea1" class="mt-3">ประเภทผลิตภัณฑ์</label>
+                    <div class="form-check" v-for="(p,i) in producttypes" :key="i">
+  <input class="form-check-input" type="radio" name="types" :id="'types'+p.name" :value="p.id" v-model="data.type_productId">
+  <label class="form-check-label" :for="'types'+p.name">
+    {{p.name}}
+  </label>
+</div>
+<!-- <div class="form-check">
+  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+  <label class="form-check-label" for="exampleRadios2">
+    Second default radio
+  </label>
+</div> -->
         </div>
         <div class="form-group">
-          <label for="exampleFormControlTextarea1">Content</label>
+          <label for="exampleFormControlTextarea1">รายละเอียดสินค้า</label>
           <textarea
             v-model="data.content"
             class="form-control"
@@ -25,13 +32,25 @@
             rows="7"
           ></textarea>
         </div>
-        <button @click="search()" type="submit" class="mb-3 btn btn-success">
-          ค้นหา</button
+        <!-- <label for="exampleFormControlTextarea1" class="mt-3">ประเภทผลิตภัณฑ์</label> -->
+                    <div class="form-check" v-for="(r,i) in rulebasetypes" :key="i">
+  <input class="form-check-input" type="radio" name="rulebased" :id="'rule'+r.name" :value="r.id" v-model="data.type_rulebasedId">
+  <label class="form-check-label" :for="'rule'+r.name">
+    {{r.name}}
+  </label>
+</div>
+<div style="text-align:center">
+        <button @click="search()" type="submit" class="mb-3 mt-3 btn btn-success" v-if="!$route.query.id">
+          เพิ่มข้อมูลสินค้า</button
+        >
+        <button @click="edit()" type="submit" class="mb-3 mt-3 btn btn-success" v-else>
+          แก้ไขข้อมูลสินค้า</button
         >&nbsp;
-        <button @click="clear()" type="submit" class="mb-3 btn btn-danger">
+        <button @click="clear()" type="submit" class="mb-3 mt-3 btn btn-danger">
           ล้างข้อมูล
         </button>
       </div>
+    </div>
       <table class="table table-bordered" v-if="statusprocheck">
         <thead>
           <tr>
@@ -386,6 +405,9 @@ import AdvertiseService from "../services/AdvertiseService";
 import KeywordService from "../services/KeywordService";
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 import FDATypesService from "../services/FDATypesService";
+import ProductTypesService from "../services/ProductTypesService";
+import RulebasedTypesService from "../services/RulebasedTypesService";
+import ProductsService from '../services/ProductsService';
 
 export default {
   name: "App",
@@ -437,7 +459,9 @@ export default {
       procheck: [],
       answer:'',
       typeId:0,
-      prochecktext:''
+      prochecktext:'',
+      producttypes:[],
+      rulebasetypes:[]
     };
   },
   computed: {
@@ -446,6 +470,18 @@ export default {
     },
   },
   methods: {
+    getproducttype(){
+      ProductTypesService.gettypes_product().then((res)=>{
+        // console.log(res.data);
+this.producttypes = res.data
+      })
+    },
+    getrulebasedtype(){
+      RulebasedTypesService.gettypes_rulebased().then((res)=>{
+        // console.log(res.data);
+this.rulebasetypes = res.data
+      })
+    },
     getsentent(data){
       data = JSON.parse(data)
       // var text = ''
@@ -474,6 +510,7 @@ if (t == f) {
 return text
     },
     clear() {
+      
       this.data = [];
       this.product = [];
       this.procheck = [];
@@ -866,7 +903,7 @@ var con = {
                       });
     },
     findtypeproduct(data) {
-      // console.log(data);
+      console.log(data);
       var text = ["หมวดหมู่"];
       var findfda = data;
       for (let t = 0; t < text.length; t++) {
@@ -877,7 +914,7 @@ var con = {
       // if (findfda == 'อาหาร') {
       //   findfda = findfda+ findfda+'เสริม'
       // }
-      // console.log(findfda);
+      console.log(findfda);
       return findfda;
     },
     finddescription(data) {
@@ -915,6 +952,7 @@ var con = {
         this.statuslist = true
         this.status = true;
         this.loading = false
+        alert("บันทึกสำเร็จ");
         // var data = {
         //   advertise_id: res.data.keyword[0].product_token_id,
         // };
@@ -926,7 +964,8 @@ var con = {
         // this.status = true
       });
     },
-    async search() {
+    
+    async edit() {
       // var url = this.data.url.replaceAll(".",'');
       // url = url.split("-i");
       // this.data.url = url[0];
@@ -938,7 +977,6 @@ var con = {
       this.statusprocheck = false
       this.statusproduct = false
       this.statuslist = false
-      this.product_token = 0;
       var con = {};
       await this.loaddict();
       // if (this.data.url == null || this.data.url == "") {
@@ -946,29 +984,37 @@ var con = {
       // } else 
       if (this.data.content == null || this.data.content == "") {
         alert("กรุณากรอกข้อความโฆษณา");
+      }else if (this.data.url == null || this.data.url == "") {
+        alert("กรุณากรอกลำดับของเว็บไซต์");
+      }else if (this.data.type_productId == null || this.data.type_productId == "") {
+        alert("กรุณาเลือกประเภทผลิตภัณฑ์");
+      }else if (this.data.type_rulebasedId == null || this.data.type_rulebasedId == "") {
+        alert("กรุณาเลือกกฎของสินค้า");
       } else {
-
+         
         this.loading = true
-        var findtype = this.findtypeproduct(this.data.content)
 // console.log(type);
-var split = findtype.split("\n")
-var type = split[3]
-// console.log(type);
-await FDATypesService.getfdatypes(type).then(async (res)=>{
-  // console.log(res.data);
-  if (res.data.length > 0) {
-    this.typeId = res.data[0].id
-  }else{
-    var name = {
-      name : type
-    }
-    await FDATypesService.createfdatype(name).then((res)=>{
-      this.typeId = res.data.id
-    });
-  }
-})
+// console.log(this.data.content);
+// var findtype = this.findtypeproduct(this.data.content)
+// var split = findtype.split("\n")
+// var type = split[3]
+// // console.log(type);
+// await FDATypesService.getfdatypes(type).then(async (res)=>{
+//   // console.log(res.data);
+//   if (res.data.length > 0) {
+//     this.typeId = res.data[0].id
+//   }else{
+//     var name = {
+//       name : type
+//     }
+//     await FDATypesService.createfdatype(name).then((res)=>{
+//       this.typeId = res.data.id
+//     });
+//   }
+// })
 // console.log(this.typeId);
         var content = "";
+        var contentfull = this.data.content
         content = this.data.content.replaceAll(
           /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g,
           ""
@@ -1012,7 +1058,235 @@ var desc = this.finddescription(content)
                 sentence_keyword: res.data.sentent,
                 keyword_id: res.data.keywordId,
                 status: 2,
-                sentencefull:content
+                sentencefull:contentfull,
+                type_rulebasedId:this.data.type_rulebasedId,
+                type_productId:this.data.type_productId
+              };
+              // console.log(des);
+              if (this.product_token == 0) {
+                await MapRuleBasedService.createproduct_token(des).then(
+                  async (producttoken) => {
+                    // console.log(producttoken);
+                    this.product_token = producttoken.data.id;
+                    this.checkfda(content, this.product_token);
+                    // console.log(producttoken);
+                    this.product_token = producttoken.data.id;
+                    con = {
+                      content: desc,
+                    };
+                    //console.log(con);
+                    await axios
+                      .post(LinkService.getpythonlink() + "/checkkeyword", con)
+                      .then(async (res) => {
+                        // console.log(res.data);
+                        if (res.data.length > 0) {
+                          for (let r = 0; r < res.data.length; r++) {
+                            var sentencetoken = res.data[r].sentent.replaceAll(
+                              '"',
+                              ""
+                            ); // eslint-disable-line
+                            sentencetoken = sentencetoken.replaceAll(
+                              "<spanstyle",
+                              "<span style"
+                            );
+
+                            // sentencetoken = sentencetoken.replaceAll('"color:red\"','"color:red"')
+                            var advertise = {
+                              product_token_id: this.product_token,
+                              keyword_dict_id: res.data[r].keyword_dict_id,
+                              dict_id: res.data[r].dict_id,
+                              dict_name: res.data[r].dict_name,
+                              sentent: sentencetoken,
+                              sen: res.data[r].sen,
+                            };
+                            // console.log(this.product_token);
+                            await AdvertiseService.createadvertise(advertise).then(
+                              async () => {
+                                if (r + 1 == res.data.length) {
+                                  var getprotoken = {
+                                    url: this.product_token,
+                                  };
+                                  await MapRuleBasedService.getproductkeyword(
+                                    getprotoken
+                                  ).then(async (pro) => {
+                                    // console.log(pro.data);
+                                   await this.tokendata(pro.data);
+                                  });
+                                }
+                              }
+                            );
+                          }
+                        } else {
+                          await this.getdetail();
+                        }
+                      });
+                  }
+                );
+              } else {
+                
+                await AdvertiseService.deleteadvertise(this.product_token).then(
+                  async () => {
+                    await MapRuleBasedService.updatproduct_token(
+                      this.product_token,
+                      des
+                    ).then(async () => {
+                      // await AdvertiseService.deleteadvertise(this.product_token).then(async ()=>{
+                      // console.log(del);
+                      this.checkfda(content, this.product_token);
+                      con = {
+                        content: desc,
+                      };
+                      //console.log(con);
+                      axios
+                        .post(
+                          LinkService.getpythonlink() + "/checkkeyword",
+                          con
+                        )
+                        .then(async (res) => {
+                          //console.log(res.data);
+                          if (res.data.length > 0) {
+                            for (let r = 0; r < res.data.length; r++) {
+                              var sentencetoken = res.data[
+                                r
+                              ].sentent.replaceAll('"', ""); // eslint-disable-line
+                              sentencetoken = sentencetoken.replaceAll(
+                                "<spanstyle",
+                                "<span style"
+                              );
+
+                              // sentencetoken = sentencetoken.replaceAll('"color:red\"','"color:red"')
+                              var advertise = {
+                                product_token_id: this.product_token,
+                                keyword_dict_id: res.data[r].keyword_dict_id,
+                                dict_id: res.data[r].dict_id,
+                                dict_name: res.data[r].dict_name,
+                                sentent: sentencetoken,
+                                sen: res.data[r].sen,
+                                status: 1,
+                              };
+                              // console.log(this.product_token);
+                              AdvertiseService.createadvertise(advertise).then(
+                                () => {
+                                  if (r + 1 == res.data.length) {
+                                    var getprotoken = {
+                                      url: this.product_token,
+                                    };
+                                    MapRuleBasedService.getproductkeyword(
+                                      getprotoken
+                                    ).then((pro) => {
+                                      // console.log(pro.data);
+                                      this.tokendata(pro.data);
+                                    });
+                                  }
+                                }
+                              );
+                            }
+                          }
+                        });
+                    });
+                  }
+                );
+                }
+            });
+        // });
+      }
+    },
+    async search() {
+      // var url = this.data.url.replaceAll(".",'');
+      // url = url.split("-i");
+      // this.data.url = url[0];
+      // console.log(this.data.url);
+      this.product = [];
+      this.procheck = [];
+      this.loading = false;
+      this.status = false
+      this.statusprocheck = false
+      this.statusproduct = false
+      this.statuslist = false
+      this.product_token = 0;
+      var con = {};
+      await this.loaddict();
+      // if (this.data.url == null || this.data.url == "") {
+      //   alert("กรุณากรอก URL");
+      // } else 
+      if (this.data.content == null || this.data.content == "") {
+        alert("กรุณากรอกข้อความโฆษณา");
+      }else if (this.data.url == null || this.data.url == "") {
+        alert("กรุณากรอกลำดับของเว็บไซต์");
+      }else if (this.data.type_productId == null || this.data.type_productId == "") {
+        alert("กรุณาเลือกประเภทผลิตภัณฑ์");
+      }else if (this.data.type_rulebasedId == null || this.data.type_rulebasedId == "") {
+        alert("กรุณาเลือกกฎของสินค้า");
+      }  else {
+
+        this.loading = true
+        var findtype = await this.findtypeproduct(this.data.content)
+console.log(findtype);
+var split = findtype.split("\n")
+var type = split[3]
+console.log(type);
+await FDATypesService.getfdatypes(type).then(async (res)=>{
+  // console.log(res.data);
+  if (res.data.length > 0) {
+    this.typeId = res.data[0].id
+  }else{
+    var name = {
+      name : type
+    }
+    await FDATypesService.createfdatype(name).then((res)=>{
+      this.typeId = res.data.id
+    });
+  }
+})
+// console.log(this.typeId);
+        var content = "";
+        var contentfull = this.data.content
+        content = this.data.content.replaceAll(
+          /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g,
+          ""
+        );
+        content = content.replaceAll(
+          /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g,
+          " "
+        );
+
+        content = content.replaceAll(/\ud83d[\ude00-\ude4f]/g, " ");
+        content = content.replaceAll(/(\r\n|\n|\r)/gm, " ");
+        content = content.replaceAll("_", "");
+        content = content.replaceAll("!", "");
+        content = content.replaceAll("*", "");
+        content = content.replaceAll("&", "");
+        content = content.replaceAll("#", "");
+        content = content.replaceAll("•", "");
+        content = content.replaceAll("+", "");
+        content = content.replaceAll(`_/l\_`, ""); // eslint-disable-line
+        content = content.replaceAll(
+          /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+          " "
+        );
+
+        // this.fda = await this.findfda(content);
+
+var desc = this.finddescription(content)
+        this.fda = await this.getfda(content)[0]
+        console.log(this.fda);
+          con = {
+            content: desc,
+          };
+          await axios
+            .post(LinkService.getpythonlink() + "/wordtokendesc", con)
+            .then(async (res) => {
+              // console.log(res.data);
+              // var sentence = res.data.sentent.replaceAll("<spanstyle", "<span style");
+              var des = {
+                url: this.data.url,
+                sentence: desc,
+                sentence_keyword: res.data.sentent,
+                keyword_id: res.data.keywordId,
+                status: 2,
+                sentencefull:contentfull,
+                type_rulebasedId:this.data.type_rulebasedId,
+                type_productId:this.data.type_productId
               };
               // console.log(des);
               if (this.product_token == 0) {
@@ -1491,6 +1765,17 @@ var desc = this.finddescription(content)
     }
   },
   mounted() {
+    this.product_token = this.$route.query.id
+    console.log(this.$route.query.id);
+    this.getproducttype()
+    this.getrulebasedtype()
+    if (this.$route.query.id) {
+      ProductsService.getproducttoken(this.$route.query.id).then((res)=>{
+        this.data = res.data
+        this.data.content = res.data.sentencefull
+        // console.log(res.data);
+      })
+    }
     // var f = this.findfda('หมายเลขใบอนุญาต/อย.เลขจดแจ้ง 13-1-1-7562-2-0006')
     // var text = ["หมายเลขใบอนุญาต/อย.","อย."];
     // var sen = 'อย.14-1-02662-2-0021 อย. 13-1-1-7562-2-0006'
