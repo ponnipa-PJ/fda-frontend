@@ -22,7 +22,9 @@
           <tr v-for="(l, i) in list" :key="i+1">
             <td style="width:20%">{{ l.url }}</td>
             <td style="width:20%">{{ l.typename }}</td>
-            <td style="width:40%">{{ l.sentence }}</td>
+            <td style="width:40%">
+              <img :src="l.img_path" style="width:50%"><br>
+              {{ l.sentence }}</td>
             <td style="width:5%">{{ l.rulename }}</td>
           <td style="text-align:center"><a :href="'/addproducttoken?id='+l.id"> <button
                 type="button"
@@ -261,7 +263,7 @@ export default {
       });
     },
     getcategory(){
-      ProductsService.getproductstoken().then((res)=>{
+      ProductsService.getproductstoken('').then((res)=>{
         console.log(res.data);
         this.list = res.data
         

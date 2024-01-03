@@ -4,8 +4,11 @@ class ProductsService {
   getproducts(status,statusdelete,statusfda) {
     return http.get('/products?status='+status+'&&statusdelete='+statusdelete+'&&statusfda='+statusfda);
   }
-  getproductstoken() {
-    return http.get('/product_token');
+  getproductstoken(name) {
+    return http.get('/product_token?name='+name);
+  }
+  findAlltest(name) {
+    return http.get('/product_token/findAlltest?name='+name);
   }
   getproducttoken(id) {
     return http.get('/product_token/'+id);

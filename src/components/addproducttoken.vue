@@ -24,6 +24,17 @@
 </div> -->
         </div>
         <div class="form-group">
+                  <label for="username">รูปภาพสินค้า</label><br>
+                  <img :src="img_path" style="width:30%">
+                  <input
+        id="my_file"
+        class="form-control"
+        type="file"
+        accept="image/*"
+        @change="onFileChange"
+      />
+                </div>
+        <div class="form-group">
           <label for="exampleFormControlTextarea1">รายละเอียดสินค้า</label>
           <textarea
             v-model="data.content"
@@ -461,7 +472,10 @@ export default {
       typeId:0,
       prochecktext:'',
       producttypes:[],
-      rulebasetypes:[]
+      rulebasetypes:[],
+      filename:'',
+      selectedFile:'',
+      img_path:''
     };
   },
   computed: {
@@ -470,6 +484,34 @@ export default {
     },
   },
   methods: {
+    onFileChange(evt) {
+      const files = evt.target.files || evt.dataTransfer.files;
+      this.selectedFile = evt.target.files[0];
+      
+      this.filename = this.selectedFile.name;
+      if (!files.length) return;
+      this.onUploadFile();
+      // }
+    },
+    onUploadFile() {
+      const formData = new FormData();
+      formData.append("file", this.selectedFile); // appending file
+      //  sending file to the backend
+      //console.log(this.filename);
+      // var http = "http://localhost:8080/uploadbanner?name="+this.filename;
+      var http = LinkService.getpythonlink()+ "/uploadimg?name="+this.filename;
+      console.log(LinkService.getpythonlink()+ "/uploadimg?name="+this.filename);
+      axios
+        .post(http, formData)
+        .then(() => {    
+          this.data.img_path = LinkService.getpythonlink() +"/uploads/img/" + this.filename
+          console.log(this.data.img_path);
+          this.img_path = LinkService.getpythonlink() +"/uploads/img/" + this.filename
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
     getproducttype(){
       ProductTypesService.gettypes_product().then((res)=>{
         // console.log(res.data);
@@ -1060,9 +1102,9 @@ var desc = this.finddescription(content)
                 status: 2,
                 sentencefull:contentfull,
                 type_rulebasedId:this.data.type_rulebasedId,
-                type_productId:this.data.type_productId
+                type_productId:this.data.type_productId,
+                img_path:this.data.img_path
               };
-              // console.log(des);
               if (this.product_token == 0) {
                 await MapRuleBasedService.createproduct_token(des).then(
                   async (producttoken) => {
@@ -1286,9 +1328,10 @@ var desc = this.finddescription(content)
                 status: 2,
                 sentencefull:contentfull,
                 type_rulebasedId:this.data.type_rulebasedId,
-                type_productId:this.data.type_productId
+                type_productId:this.data.type_productId,
+                img_path:this.data.img_path
               };
-              // console.log(des);
+              console.log(des);
               if (this.product_token == 0) {
                 await MapRuleBasedService.createproduct_token(des).then(
                   async (producttoken) => {
@@ -1773,6 +1816,7 @@ var desc = this.finddescription(content)
       ProductsService.getproducttoken(this.$route.query.id).then((res)=>{
         this.data = res.data
         this.data.content = res.data.sentencefull
+        this.img_path = res.data.img_path
         // console.log(res.data);
       })
     }

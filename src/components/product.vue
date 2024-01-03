@@ -4,7 +4,8 @@
       <div v-if="status">
         <h5 class="mt-3">
         {{detail.url}}</h5>
-        <div class="card">
+        <img :src="detail.img_path" style="width:30%" v-if="detail.img_path">
+        <div class="card mt-3">
   <div class="card-body">
     <h5 class="card-title">ข้อมูลจำเพาะของสินค้า</h5>
     <p class="card-text" v-html="detail.spec">
@@ -996,7 +997,7 @@ var con = {
         fda_status: this.currentUser.id
       };
       MapRuleBasedService.getproduct_token(selectpro).then(async (res) => {
-        console.log(res.data);
+        // console.log(res.data);
         // var best = this.getMax(res.data.keyword,'count_rulebased')
         //console.log(best);
         this.list = res.data;
@@ -1582,13 +1583,13 @@ var desc = this.finddescription(content)
     // console.log(this.$route.params.id);
     this.id = this.$route.params.id
 
-    ProductsService.getproductstoken().then(async (res)=>{
+    ProductsService.getproductstoken('').then(async (res)=>{
       this.alldata = res.data
       this.back = parseInt(this.id)-1
     this.next = parseInt(this.id)+1
     })
     ProductsService.getproducttoken(this.id).then(async (res)=>{
-      console.log(res.data);
+      // console.log(res.data);
 
       this.detail = res.data
       // var spec = this.findspecific(res.data.sentencefull)

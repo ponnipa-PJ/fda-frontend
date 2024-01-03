@@ -25,6 +25,9 @@ class MapRuleBasedService {
   getproduct_token(data) {
     return http.post('/product_token/getproduct', data);
   } 
+  getproducttest(data) {
+    return http.post('/product_token/getproducttest', data);
+  } 
   getproductkeyword(data) {
     return http.post('/product_token/getproductkeyword', data);
   }
